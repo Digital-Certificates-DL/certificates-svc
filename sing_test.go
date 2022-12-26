@@ -32,17 +32,27 @@ func TestSign(t *testing.T) {
 	}
 
 	resultSign := []byte("HAQnJ3w8TAAUbuNJ7rcf8pjR1ef1LZJXme8DC6ORv5jTCW/tNlrDCYagQUv+t7oqZtRj/3KhIVV8rgZ2txsysPg=")
+	resultAddress := []byte("1BooKnbm48Eabw3FdPgTSudt9u4YTWKBvf")
 	key := "key"
-	for _, user := range users {
-		msg := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-		signature, _, _ := Sign([]byte(key), []byte(msg))
-		want := resultSign
 
-		if  bytes.Equal(signature, want) {
-			t.Errorf("got %q, wanted %q", signature, want)
+
+	for id, user := range users {
+		msg := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
+		signature, _, address := Sign([]byte(key), []byte(msg))
+		wantSign := resultSign
+		wantAddress := resultAddress
+
+		if  !bytes.Equal(signature, wantSign) {
+			t.Errorf("got %q, wanted %q", signature, wantSign)
 			continue
 		}
-		log.Println("PASS")
+		if  !bytes.Equal(address, wantAddress) {
+			t.Errorf("got %q, wanted %q", address, wantAddress)
+			continue
+		}
+
+
+		log.Println("PASS: ", id )
 
 	}
 
