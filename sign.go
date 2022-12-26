@@ -8,17 +8,20 @@ import (
 	"github.com/btcsuite/btcutil"
 )
 
-func Sign(priv, hashText []byte) ([]byte, []byte) {
-
+func Sign(priv, hashText []byte) ([]byte, []byte, []byte) {
 	privKey, pubKey := btcec.PrivKeyFromBytes(priv)
-
 	signature := ecdsa.Sign(privKey, hashText)
+	return signature.Serialize(), pubKey.SerializeCompressed(), GenerateAddress(pubKey)
+}
 
-	mainNetAddr, err := btcutil.NewAddressPubKey(serializedPubKey, &chaincfg.MainNetParams)
+func GenerateAddress(key *btcec.PublicKey) []byte {
+	mainNetAddr, err := btcutil.NewAddressPubKey(key.SerializeCompressed(), &chaincfg.MainNetParams)
 	if err != nil {
 		fmt.Println(err)
-		return
+		return nil
 	}
 
-	return signature.Serialize(), pubKey.SerializeCompressed()
+	mainNetAddr.SetFormat(btcutil.PKFCompressed)
+	return []byte(mainNetAddr.EncodeAddress())
+
 }

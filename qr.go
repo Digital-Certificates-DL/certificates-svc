@@ -23,9 +23,9 @@ func GenerateQR(user *user, key string) {
 
 	s := svg.New(fi)
 	msg := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-	signature, pub := Sign([]byte(key), []byte(msg))
+	signature, _, address := Sign([]byte(key), []byte(msg))
 
-	qrCode, _ := qr.Encode(PrepareMsgForQR(msg, signature, pub), qr.M, qr.Auto)
+	qrCode, _ := qr.Encode(PrepareMsgForQR(msg, address, signature), qr.M, qr.Auto)
 
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)

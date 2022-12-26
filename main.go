@@ -40,7 +40,7 @@ type user struct {
 	DataCertificatePath string
 }
 
-func PrepareMsgForQR(name string, signature, pubKey []byte) string {
-	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%x", signature), fmt.Sprintf("%x", pubKey))
+func PrepareMsgForQR(name string, address, signature []byte) string {
+	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%x", address), fmt.Sprintf("%x", signature))
 	return msg
 }
