@@ -5,6 +5,7 @@ import (
 	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
+	"log"
 	"os"
 	"strings"
 )
@@ -22,10 +23,15 @@ func GenerateQR(user *user, key string) {
 	fi, _ := os.Create(path)
 
 	s := svg.New(fi)
-	msg := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-	signature, _, address := Sign([]byte(key), []byte(msg))
+	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
+	signature, _, address, err := Sign(key, []byte(aggregatedStr))
 
-	qrCode, _ := qr.Encode(PrepareMsgForQR(msg, address, signature), qr.M, qr.Auto)
+	if err != nil {
+		log.Println(err)
+	}
+
+	user.Signature = string(signature)
+	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, []byte(signature)), qr.M, qr.Auto)
 
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)

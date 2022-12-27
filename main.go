@@ -41,6 +41,6 @@ type user struct {
 }
 
 func PrepareMsgForQR(name string, address, signature []byte) string {
-	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%x", address), fmt.Sprintf("%x", signature))
+	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
 	return msg
 }

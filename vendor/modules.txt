@@ -24,6 +24,8 @@ github.com/btcsuite/btcd/btcec/v2/ecdsa
 github.com/btcsuite/btcutil
 github.com/btcsuite/btcutil/base58
 github.com/btcsuite/btcutil/bech32
+# github.com/chainlibs/btcaddress v0.0.0-20181112162409-a66f759e8197
+## explicit
 # github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0
 ## explicit; go 1.17
 github.com/decred/dcrd/dcrec/secp256k1/v4

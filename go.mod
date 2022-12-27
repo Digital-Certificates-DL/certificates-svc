@@ -13,6 +13,7 @@ require (
 
 require (
 	github.com/btcsuite/btcd v0.20.1-beta // indirect
+	github.com/chainlibs/btcaddress v0.0.0-20181112162409-a66f759e8197 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect

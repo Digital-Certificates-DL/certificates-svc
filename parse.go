@@ -54,12 +54,12 @@ func SetRes(users []*user) {
 				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 				continue
 			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("H%d", id+1), "Signature")
+			err = f.SetCellValue(sheepList[0], fmt.Sprintf("I%d", id+1), "Signature")
 			if err != nil {
 				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 				continue
 			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("I%d", id+1), "Digital Certificate")
+			err = f.SetCellValue(sheepList[0], fmt.Sprintf("J%d", id+1), "Digital Certificate")
 			if err != nil {
 				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 				continue
@@ -105,12 +105,12 @@ func SetRes(users []*user) {
 				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 				continue
 			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("H%d", id+1), user.Signature)
+			err = f.SetCellValue(sheepList[0], fmt.Sprintf("I%d", id+1), user.Signature)
 			if err != nil {
 				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 				continue
 			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("H%d", id+1), user.DataCertificatePath)
+			err = f.SetCellValue(sheepList[0], fmt.Sprintf("J%d", id+1), user.DataCertificatePath)
 			if err != nil {
 				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 				continue
