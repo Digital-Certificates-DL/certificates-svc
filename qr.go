@@ -15,23 +15,19 @@ func GenerateQR(user *user, key string) {
 	path := ""
 	if len(parsedName) < 2 {
 		path = fmt.Sprintf("QRs/certificate_%s_QR_codecreate.svg", parsedName[0])
-
 	} else {
 		path = fmt.Sprintf("QRs/certificate_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1])
-
 	}
 	fi, _ := os.Create(path)
-
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-	signature, _, address, err := Sign(key, []byte(aggregatedStr))
-
+	signature, _, address, err := Sign(key, aggregatedStr)
 	if err != nil {
 		log.Println(err)
 	}
 
 	user.Signature = string(signature)
-	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, []byte(signature)), qr.M, qr.Auto)
+	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, signature), qr.M, qr.Auto)
 
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
