@@ -1,0 +1,11 @@
+signature:
+  key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
+
+google:
+  secretPath: "client_secret.json"
+  qrPath: ""
+  apiKey: "AIzaSyDhxRxGawayVixY9Wn4rExpKTa97HMQ2oY"
+
+tables:
+  result: ""
+  input: "certificates.xlsx"
