@@ -6,7 +6,6 @@ cloud.google.com/go/compute/internal
 cloud.google.com/go/compute/metadata
 # github.com/Masterminds/squirrel v1.4.0
 ## explicit
-github.com/Masterminds/squirrel
 # github.com/aaronarduino/goqrsvg v0.0.0-20220419053939-17e843f1dd40
 ## explicit
 github.com/aaronarduino/goqrsvg
@@ -70,7 +69,6 @@ github.com/fsnotify/fsnotify
 github.com/getsentry/sentry-go
 # github.com/go-chi/chi v4.1.2+incompatible
 ## explicit
-github.com/go-chi/chi
 # github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
 ## explicit
 github.com/golang/groupcache/lru
@@ -109,19 +107,12 @@ github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
 # github.com/jmoiron/sqlx v1.2.0
 ## explicit
-github.com/jmoiron/sqlx
-github.com/jmoiron/sqlx/reflectx
 # github.com/lann/builder v0.0.0-20180802200727-47ae307949d0
 ## explicit
-github.com/lann/builder
 # github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0
 ## explicit
-github.com/lann/ps
 # github.com/lib/pq v1.8.0
 ## explicit; go 1.13
-github.com/lib/pq
-github.com/lib/pq/oid
-github.com/lib/pq/scram
 # github.com/magiconair/properties v1.8.0
 ## explicit
 github.com/magiconair/properties
@@ -187,14 +178,7 @@ gitlab.com/distributed_lab/figure/v3
 # gitlab.com/distributed_lab/kit v1.11.1
 ## explicit; go 1.14
 gitlab.com/distributed_lab/kit/comfig
-gitlab.com/distributed_lab/kit/copus
-gitlab.com/distributed_lab/kit/copus/cop
-gitlab.com/distributed_lab/kit/copus/janus
-gitlab.com/distributed_lab/kit/copus/types
-gitlab.com/distributed_lab/kit/janus
-gitlab.com/distributed_lab/kit/janus/internal
 gitlab.com/distributed_lab/kit/kv
-gitlab.com/distributed_lab/kit/pgdb
 # gitlab.com/distributed_lab/logan v3.8.1+incompatible
 ## explicit
 gitlab.com/distributed_lab/logan/v3
@@ -203,7 +187,6 @@ gitlab.com/distributed_lab/logan/v3/fields
 gitlab.com/distributed_lab/logan/v3/hook/sentry
 # gitlab.com/distributed_lab/running v0.0.0-20200706131153-4af0e83eb96c
 ## explicit
-gitlab.com/distributed_lab/running
 # go.opencensus.io v0.24.0
 ## explicit; go 1.13
 go.opencensus.io
@@ -227,7 +210,7 @@ go.opencensus.io/trace/tracestate
 golang.org/x/crypto/md4
 golang.org/x/crypto/ripemd160
 golang.org/x/crypto/sha3
-# golang.org/x/net v0.3.0
+# golang.org/x/net v0.4.0
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp

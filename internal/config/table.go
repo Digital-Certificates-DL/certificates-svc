@@ -29,7 +29,7 @@ type tabler struct {
 
 func (c *tabler) Table() *Table {
 	return c.once.Do(func() interface{} {
-		raw := kv.MustGetStringMap(c.getter, "aws")
+		raw := kv.MustGetStringMap(c.getter, "tables")
 		config := Table{}
 		err := figure.Out(&config).From(raw).Please()
 		if err != nil {

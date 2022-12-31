@@ -12,8 +12,9 @@ type Googler interface {
 }
 
 type Google struct {
-	Password string `fig:"password" `
-	Login    string `fig:"login" `
+	Password   string `fig:"password"`
+	Login      string `fig:"login"`
+	SecretPath string `fig:"secret_path"`
 }
 
 func NewGoogler(getter kv.Getter) Googler {

@@ -2,9 +2,11 @@ signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
 
 google:
-  secretPath: "client_secret.json"
+  secret_path: "./token.json"
   qrPath: ""
-  apiKey: "AIzaSyDhxRxGawayVixY9Wn4rExpKTa97HMQ2oY"
+  password: "Markys1256"
+  login: "mark.cherepovskyi@nure.ua"
+  apiKey: "AIzaSyBWT-h4KRDnjmzEV2lFrXz8Nil1ECHxZy8"
 
 tables:
   result: ""

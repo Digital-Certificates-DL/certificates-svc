@@ -18,7 +18,7 @@ func Start(cfg config.Config) error {
 
 	for _, user := range users {
 		hashing(user)
-		GenerateQR(user, cfg.Key().Private)
+		GenerateQR(user, cfg.Key().Private, cfg.Google().Login, cfg.Google().Password, cfg.Google().SecretPath)
 	}
 
 	SetRes(users)

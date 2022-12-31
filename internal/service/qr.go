@@ -6,6 +6,7 @@ import (
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
 	"helper/internal/data"
+	"helper/internal/service/google"
 	"log"
 	"os"
 	"strings"
@@ -13,7 +14,7 @@ import (
 
 const sample = "message:\n%s\n\naddress:\n%s\n\nsignature:\n%s\n\ncertificate page:\nhttps://dlt-academy.com/certificates"
 
-func GenerateQR(user *data.User, key string) {
+func GenerateQR(user *data.User, key string, login, password string, secretPath string) {
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
@@ -31,7 +32,7 @@ func GenerateQR(user *data.User, key string) {
 
 	user.Signature = string(signature)
 	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, signature), qr.M, qr.Auto)
-
+	google.Update(aggregatedStr, secretPath, login, password)
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)

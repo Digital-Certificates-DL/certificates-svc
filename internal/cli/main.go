@@ -18,7 +18,8 @@ func Run(args []string) bool {
 	}()
 
 	cfg := config.New(kv.MustFromEnv())
-
+	input := cfg.Table().Input
+	_ = input
 	app := kingpin.New("helper", "")
 
 	runCmd := app.Command("run", "run command")

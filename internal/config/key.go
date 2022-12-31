@@ -12,7 +12,7 @@ type Keyer interface {
 }
 
 type Key struct {
-	Private string `fig:"private,required" `
+	Private string `fig:"key" `
 }
 
 func NewKeyer(getter kv.Getter) Keyer {
@@ -28,7 +28,7 @@ type keyer struct {
 
 func (c *keyer) Key() *Key {
 	return c.once.Do(func() interface{} {
-		raw := kv.MustGetStringMap(c.getter, "aws")
+		raw := kv.MustGetStringMap(c.getter, "signature")
 		config := Key{}
 		err := figure.Out(&config).From(raw).Please()
 		if err != nil {

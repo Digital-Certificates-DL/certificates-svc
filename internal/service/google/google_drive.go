@@ -1,11 +1,5 @@
 package google
 
-import (
-	"google.golang.org/api/drive/v3"
-	"log"
-	"os"
-)
-
 var (
 //	googleOauthConfig = &oauth2.Config{
 //		RedirectURL:  "http://localhost:3000/GoogleCallback",
@@ -54,38 +48,38 @@ var (
 //
 //}
 
-func Update(name, path, login, password string) error {
-	_, client, err := Connect(login, password)
-	if err != nil {
-		return err
-	}
-	myFile := drive.File{Name: name}
-	driveService, err := drive.New(client)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	createdFile, err := driveService.Files.Create(&myFile).Do()
-	if err != nil {
-		log.Println("Couldn't create file ", err)
-		return err
-	}
-
-	myQR, err := os.Open(path)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	updatedFile := drive.File{Name: name}
-
-	driveService.Files.Update(createdFile.Id, &updatedFile)
-
-	_, err = driveService.Files.Update(createdFile.Id, &updatedFile).Media(myQR).Do()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-
-	return nil
-
-}
+//func Update(name, path, login, password string) error {
+//	Connect(path, login, password)
+//	if err != nil {
+//		return err
+//	}
+//	myFile := drive.File{Name: name}
+//	driveService, err := drive.New(client)
+//	if err != nil {
+//		log.Println(err)
+//		return err
+//	}
+//	createdFile, err := driveService.Files.Create(&myFile).Do()
+//	if err != nil {
+//		log.Println("Couldn't create file ", err)
+//		return err
+//	}
+//
+//	myQR, err := os.Open(path)
+//	if err != nil {
+//		log.Println(err)
+//		return err
+//	}
+//	updatedFile := drive.File{Name: name}
+//
+//	driveService.Files.Update(createdFile.Id, &updatedFile)
+//
+//	_, err = driveService.Files.Update(createdFile.Id, &updatedFile).Media(myQR).Do()
+//	if err != nil {
+//		log.Println(err)
+//		return err
+//	}
+//
+//	return nil
+//
+//}
