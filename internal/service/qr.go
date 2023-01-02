@@ -8,6 +8,7 @@ import (
 	"helper/internal/data"
 	"helper/internal/service/google"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -21,37 +22,43 @@ var shortTitles = map[string]string{
 	"Golang": "golang", //todo rename key
 }
 
-func GenerateQR(user *data.User, key string, login, password string, secretPath string) {
+func GenerateQR(user *data.User, key, secretPath string, client *http.Client) {
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
-		path = fmt.Sprintf("QRs/certificate_%s_%s_QR_codecreate.svg", parsedName[0], shortTitles[user.CourseTitle])
+		path = fmt.Sprintf("certificate_%s_QR_codecreate.svg", parsedName[0])
 	} else {
-		path = fmt.Sprintf("QRs/certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], shortTitles[user.CourseTitle])
+		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1])
 	}
 
-	//switch user.CourseTitle{
-	//case "Beginner at theoretical aspects blockchain technology":
-	//
-	//}
-	//
-	fi, _ := os.Create(path)
+	pathWithSuffix := fmt.Sprintf("./qr/%s", path)
+	os.MkdirAll("./qr", os.ModePerm)
+
+	fi, err := os.Create(pathWithSuffix)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 	signature, _, address, err := Sign(key, aggregatedStr)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
 	user.Signature = string(signature)
 	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, signature), qr.M, qr.Auto)
-	google.Connect(aggregatedStr, secretPath, "") // todo  fix
+
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
+
 	user.DataCertificatePath = path
 
 	s.End()
+
+	google.Update(path, client) // todo  fix
 }
 
 func PrepareMsgForQR(name string, address, signature []byte) string {

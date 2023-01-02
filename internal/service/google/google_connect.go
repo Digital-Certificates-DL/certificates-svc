@@ -62,7 +62,7 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func Connect(aggrigatedString, path, name string) {
+func Connect(path string) *http.Client {
 
 	b, err := os.ReadFile(path)
 	if err != nil {
@@ -74,22 +74,8 @@ func Connect(aggrigatedString, path, name string) {
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-
-	//token, err := config.PasswordCredentialsToken(ctx, login, password)
-	//
-	//cred, err := google.CredentialsFromJSON(ctx, b)
-	//if err != nil {
-	//}
-	//token, err := cred.TokenSource.Token()
-	////token, err := config.Exchange(ctx, "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")
-	//if err != nil {
-	//	log.Println(err)
-	//	return nil, nil, err
-	//}
-
-	client := getClient(config, path)
-
-	GetFiles(client)
-	Update(name, client)
+	//GetFiles(client)
+	//Update(name, client)
+	return getClient(config, path)
 
 }

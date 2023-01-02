@@ -2,6 +2,7 @@ package service
 
 import (
 	"helper/internal/config"
+	"helper/internal/service/google"
 	"log"
 )
 
@@ -15,10 +16,12 @@ func Start(cfg config.Config) error {
 		log.Println(err)
 		return err
 	}
-
+	connect := google.Connect(cfg.Google().SecretPath)
 	for _, user := range users {
 		hashing(user)
-		GenerateQR(user, cfg.Key().Private, cfg.Google().Login, cfg.Google().Password, cfg.Google().SecretPath)
+		GenerateQR(user, cfg.Key().Private, cfg.Google().SecretPath, connect)
+
+		//GenerateQR(user, cfg.Key().Private, cfg.Google().Login, cfg.Google().Password, cfg.Google().SecretPath)
 	}
 
 	SetRes(users)

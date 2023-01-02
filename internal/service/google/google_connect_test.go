@@ -10,6 +10,6 @@ var (
 )
 
 func TestConnect(t *testing.T) {
-	Connect("", path, name)
-	//require.Equal(t, "\x18Bitcoin Signed Mssage:\n\x0Erandom message", message)
+	Connect(path)
+
 }

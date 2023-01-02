@@ -2,7 +2,7 @@ signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
 
 google:
-  secret_path: "./token.json"
+  secret_path: "./client_secret.json"
   qrPath: ""
   password: "Markys1256"
   login: "mark.cherepovskyi@nure.ua"

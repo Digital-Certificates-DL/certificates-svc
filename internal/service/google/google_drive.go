@@ -20,11 +20,12 @@ func Update(name string, client *http.Client) error {
 		log.Println(err)
 		return err
 	}
-	myQR, err := os.Open("./" + name)
+	myQR, err := os.Open("./qr/" + name)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
+
 	_, err = srv.Files.Create(&myFile).Media(myQR).Do()
 	if err != nil {
 		log.Println("Couldn't create file ", err)
@@ -59,37 +60,3 @@ func GetFiles(client *http.Client) ([]*drive.File, error) {
 	}
 	return r.Files, nil
 }
-
-//
-//func Update(name, path string, client *http.Client) error {
-//
-//	myFile := drive.File{Name: filepath.Base(path)}
-//	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
-//	if err != nil {
-//		log.Println(err)
-//		return err
-//	}
-//	createdFile, err := srv.Files.Create(&myFile).Do()
-//	if err != nil {
-//		log.Println("Couldn't create file ", err)
-//		return err
-//	}
-//
-//	myQR, err := os.Open("./" + name)
-//	if err != nil {
-//		log.Println(err)
-//		return err
-//	}
-//	updatedFile := drive.File{Name: name}
-//
-//	//srv.Files.Update(createdFile.Id, &updatedFile)
-//
-//	_, err = srv.Files.Create (createdFile.Id, &updatedFile).Media(myQR).Do()
-//	if err != nil {
-//		log.Println(err)
-//		return err
-//	}
-//
-//	return nil
-//
-//}
