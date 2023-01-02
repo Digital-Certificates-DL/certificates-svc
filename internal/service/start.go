@@ -9,8 +9,6 @@ import (
 
 func Start(cfg config.Config) error {
 	log.Println("start")
-	//argsWithProg := os.Args
-	//os.Mkdir("QRs", os.ModePerm)
 	os.MkdirAll("./qr", os.ModePerm)
 
 	users, err := Parse(cfg.Table().Input)
@@ -18,7 +16,7 @@ func Start(cfg config.Config) error {
 		log.Println(err)
 		return err
 	}
-	connect := google.Connect(cfg.Google().SecretPath)
+	connect := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
 
 	folderIDList, err := google.CreateFolder(connect)
 	if err != nil {
@@ -28,10 +26,8 @@ func Start(cfg config.Config) error {
 	for _, user := range users {
 		hashing(user)
 		GenerateQR(user, cfg.Key().Private, connect, folderIDList)
-
-		//GenerateQR(user, cfg.Key().Private, cfg.Google().Login, cfg.Google().Password, cfg.Google().SecretPath)
 	}
 
-	SetRes(users)
+	SetRes(users, cfg.Table().Result)
 	return nil
 }

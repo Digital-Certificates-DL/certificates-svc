@@ -12,8 +12,8 @@ type Googler interface {
 }
 
 type Google struct {
-	Password   string `fig:"password"`
-	Login      string `fig:"login"`
+	Code       string `fig:"code"`
+	ApiKey     string `fig:"api_key"`
 	SecretPath string `fig:"secret_path"`
 }
 

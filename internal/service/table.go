@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func SetRes(users []*data.User) {
+func SetRes(users []*data.User, resultFile string) {
 
 	f := excelize.NewFile()
 
@@ -119,12 +119,20 @@ func SetRes(users []*data.User) {
 		}
 
 	}
+	if resultFile == "" {
+		err := f.SaveAs("result.xlsx")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+	}
 
-	err := f.SaveAs("result.xlsx")
+	err := f.SaveAs(resultFile)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
 }
 
 func Parse(pathToFile string) ([]*data.User, error) {

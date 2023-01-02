@@ -3,12 +3,10 @@ signature:
 
 google:
   secret_path: "./client_secret.json"
-  qrPath: ""
-  password: "Markys1256"
-  login: "mark.cherepovskyi@nure.ua"
-  apiKey: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
-  code: "4/0AWgavdeOIwqKrlCilWD_6ZN9kpg0ao6B6IZ44RWn-Iw58kMtL1_5vQh1KguHp2YsWisDsA"
+  qr_path: ""
+  api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
+  code: "4/0AWgavdctATOMYsPFyMqsJvO7yhtIS92lMI9AUbWulvZatn2DKkso9-tbz9RU1XpqM9FyGA"
 
 tables:
-  result: ""
+  result: "test.xlsx"
   input: "certificates.xlsx"

@@ -12,28 +12,23 @@ import (
 	"os"
 )
 
-func getClient(config *oauth2.Config, path string) *http.Client {
-	// The file token.json stores the user's access and refresh tokens, and is
-	// created automatically when the authorization flow completes for the first
-	// time.
+func getClient(config *oauth2.Config, path string, code string) *http.Client {
 	tokFile := path
 	tok, err := tokenFromFile(tokFile)
 	if err != nil {
-		tok = getTokenFromWeb(config)
+		tok = getTokenFromWeb(config, code)
 		saveToken(tokFile, tok)
 	}
 	return config.Client(context.Background(), tok)
 }
 
 // Request a token from the web, then returns the retrieved token.
-func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
+func getTokenFromWeb(config *oauth2.Config, code string) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 
-	var authCode = "4/0AWgavdctATOMYsPFyMqsJvO7yhtIS92lMI9AUbWulvZatn2DKkso9-tbz9RU1XpqM9FyGA"
-
-	tok, err := config.Exchange(context.TODO(), authCode)
+	tok, err := config.Exchange(context.TODO(), code)
 	if err != nil {
 		log.Fatalf("Unable to retrieve token from web %v", err)
 	}
@@ -62,20 +57,16 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func Connect(path string) *http.Client {
-
+func Connect(path, code string) *http.Client {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
 
-	// If modifying these scopes, delete your previously saved token.json.
 	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
-	//GetFiles(client)
-	//Update(name, client)
-	return getClient(config, path)
+	return getClient(config, path, code)
 
 }
