@@ -5,12 +5,11 @@ import (
 )
 
 var (
-	path     = "./client_secret.json"
-	login    = "mark.cherepovskyi@nure.ua"
-	password = "Markys1256"
+	path = "./client_secret.json"
+	name = "test.jpg"
 )
 
 func TestConnect(t *testing.T) {
-	Connect(path, login, password)
+	Connect("", path, name)
 	//require.Equal(t, "\x18Bitcoin Signed Mssage:\n\x0Erandom message", message)
 }

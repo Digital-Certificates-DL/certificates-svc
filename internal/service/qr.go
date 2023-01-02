@@ -14,14 +14,27 @@ import (
 
 const sample = "message:\n%s\n\naddress:\n%s\n\nsignature:\n%s\n\ncertificate page:\nhttps://dlt-academy.com/certificates"
 
+var shortTitles = map[string]string{
+	"Beginner at theoretical aspects blockchain technology": "blockchain",
+	"Theory of database organization and basic SQL":         "database",
+	"Cryptography and information security theory":          "security",
+	"Golang": "golang", //todo rename key
+}
+
 func GenerateQR(user *data.User, key string, login, password string, secretPath string) {
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
-		path = fmt.Sprintf("QRs/certificate_%s_QR_codecreate.svg", parsedName[0])
+		path = fmt.Sprintf("QRs/certificate_%s_%s_QR_codecreate.svg", parsedName[0], shortTitles[user.CourseTitle])
 	} else {
-		path = fmt.Sprintf("QRs/certificate_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1])
+		path = fmt.Sprintf("QRs/certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], shortTitles[user.CourseTitle])
 	}
+
+	//switch user.CourseTitle{
+	//case "Beginner at theoretical aspects blockchain technology":
+	//
+	//}
+	//
 	fi, _ := os.Create(path)
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
@@ -32,7 +45,7 @@ func GenerateQR(user *data.User, key string, login, password string, secretPath 
 
 	user.Signature = string(signature)
 	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, signature), qr.M, qr.Auto)
-	google.Update(aggregatedStr, secretPath, login, password)
+	google.Connect(aggregatedStr, secretPath, "") // todo  fix
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)

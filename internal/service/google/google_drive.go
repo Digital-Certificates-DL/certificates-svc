@@ -1,80 +1,90 @@
 package google
 
-var (
-//	googleOauthConfig = &oauth2.Config{
-//		RedirectURL:  "http://localhost:3000/GoogleCallback",
-//		ClientID:     os.Getenv("googlekey"),    // from https://console.developers.google.com/project/<your-project-id>/apiui/credential
-//		ClientSecret: os.Getenv("googlesecret"), // from https://console.developers.google.com/project/<your-project-id>/apiui/credential
-//		Scopes:       []string{"https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file"},
-//		Endpoint:     google.Endpoint,
-//	}
-//
-// Some random string, random for each request
-// oauthStateString = "random"
+import (
+	"context"
+	"fmt"
+	"github.com/pkg/errors"
+	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/option"
+	"log"
+	"net/http"
+	"os"
 )
 
-//func Conect() {
-//
-//	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(token))
-//	driveService, err := drive.New(client)
-//	if err != nil {
-//		fmt.Fprintln(w, err)
-//		return
-//	}
-//
-//}
+func Update(name string, client *http.Client) error {
 
-//func handleGoogleLogin() {
-//	url := googleOauthConfig.AuthCodeURL(oauthStateString)
-//	http.Redirect(w, r, url, http.StatusTemporaryRedirect) //delete w and r
-//}
+	myFile := drive.File{Name: name}
+	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
-//func handleGoogleCallback() {
-//	//state := r.FormValue("state")
-//	//if state != oauthStateString {
-//	//	fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
-//	//	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-//	//	return
-//	//}
-//
-//	//code := r.FormValue("code")
-//	token, err := googleOauthConfig.Exchange(context.Background(), code)
-//	if err != nil {
-//		log.Printf("oauthConf.Exchange() failed with '%s'\n", err)
-//		return
-//	}
-//
-//	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(token))
-//
-//}
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	myQR, err := os.Open("./" + name)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	_, err = srv.Files.Create(&myFile).Media(myQR).Do()
+	if err != nil {
+		log.Println("Couldn't create file ", err)
+		return err
+	}
+	return nil
 
-//func Update(name, path, login, password string) error {
-//	Connect(path, login, password)
-//	if err != nil {
-//		return err
-//	}
-//	myFile := drive.File{Name: name}
-//	driveService, err := drive.New(client)
+}
+
+func GetFiles(client *http.Client) ([]*drive.File, error) {
+
+	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
+	if err != nil {
+
+		return nil, err
+	}
+
+	r, err := srv.Files.List().PageSize(10).
+		Fields("nextPageToken, files(id, name)").Do()
+	if err != nil {
+
+		return nil, err
+	}
+	fmt.Println("Files:")
+	if len(r.Files) == 0 {
+
+		return nil, errors.New("No files found.")
+	} else {
+		for _, i := range r.Files {
+			fmt.Printf("%s (%s)\n", i.Name, i.Id)
+		}
+	}
+	return r.Files, nil
+}
+
+//
+//func Update(name, path string, client *http.Client) error {
+//
+//	myFile := drive.File{Name: filepath.Base(path)}
+//	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 //	if err != nil {
 //		log.Println(err)
 //		return err
 //	}
-//	createdFile, err := driveService.Files.Create(&myFile).Do()
+//	createdFile, err := srv.Files.Create(&myFile).Do()
 //	if err != nil {
 //		log.Println("Couldn't create file ", err)
 //		return err
 //	}
 //
-//	myQR, err := os.Open(path)
+//	myQR, err := os.Open("./" + name)
 //	if err != nil {
 //		log.Println(err)
 //		return err
 //	}
 //	updatedFile := drive.File{Name: name}
 //
-//	driveService.Files.Update(createdFile.Id, &updatedFile)
+//	//srv.Files.Update(createdFile.Id, &updatedFile)
 //
-//	_, err = driveService.Files.Update(createdFile.Id, &updatedFile).Media(myQR).Do()
+//	_, err = srv.Files.Create (createdFile.Id, &updatedFile).Media(myQR).Do()
 //	if err != nil {
 //		log.Println(err)
 //		return err

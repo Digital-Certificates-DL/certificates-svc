@@ -7,7 +7,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
-	"google.golang.org/api/option"
 	"log"
 	"net/http"
 	"os"
@@ -32,7 +31,7 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 
-	var authCode = "4/0AWgavdczjEe3w3YizEDoO02ggv1nWeLfqyXAXukRYIKIH_sm4jKrlKzcGE-adpF9G8spDw"
+	var authCode = "4/0AWgavdctATOMYsPFyMqsJvO7yhtIS92lMI9AUbWulvZatn2DKkso9-tbz9RU1XpqM9FyGA"
 
 	tok, err := config.Exchange(context.TODO(), authCode)
 	if err != nil {
@@ -55,7 +54,7 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 
 func saveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", "token.json")
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile("token.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		log.Fatalf("Unable to cache oauth token: %v", err)
 	}
@@ -63,15 +62,15 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func Connect(path, login, password string) {
-	ctx := context.Background()
+func Connect(aggrigatedString, path, name string) {
+
 	b, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatalf("Unable to read client secret file: %v", err)
 	}
 
 	// If modifying these scopes, delete your previously saved token.json.
-	config, err := google.ConfigFromJSON(b, drive.DriveMetadataReadonlyScope)
+	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
 		log.Fatalf("Unable to parse client secret file to config: %v", err)
 	}
@@ -90,22 +89,7 @@ func Connect(path, login, password string) {
 
 	client := getClient(config, path)
 
-	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
-	if err != nil {
-		log.Fatalf("Unable to retrieve Drive client: %v", err)
-	}
+	GetFiles(client)
+	Update(name, client)
 
-	r, err := srv.Files.List().PageSize(10).
-		Fields("nextPageToken, files(id, name)").Do()
-	if err != nil {
-		log.Fatalf("Unable to retrieve files: %v", err)
-	}
-	fmt.Println("Files:")
-	if len(r.Files) == 0 {
-		fmt.Println("No files found.")
-	} else {
-		for _, i := range r.Files {
-			fmt.Printf("%s (%s)\n", i.Name, i.Id)
-		}
-	}
 }
