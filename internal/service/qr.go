@@ -22,7 +22,7 @@ var shortTitles = map[string]string{
 	"Golang": "golang", //todo rename key
 }
 
-func GenerateQR(user *data.User, key, secretPath string, client *http.Client) {
+func GenerateQR(user *data.User, key string, client *http.Client, folderIDList []string) {
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
@@ -32,7 +32,6 @@ func GenerateQR(user *data.User, key, secretPath string, client *http.Client) {
 	}
 
 	pathWithSuffix := fmt.Sprintf("./qr/%s", path)
-	os.MkdirAll("./qr", os.ModePerm)
 
 	fi, err := os.Create(pathWithSuffix)
 	if err != nil {
@@ -58,7 +57,7 @@ func GenerateQR(user *data.User, key, secretPath string, client *http.Client) {
 
 	s.End()
 
-	google.Update(path, client) // todo  fix
+	google.Update(path, client, folderIDList)
 }
 
 func PrepareMsgForQR(name string, address, signature []byte) string {

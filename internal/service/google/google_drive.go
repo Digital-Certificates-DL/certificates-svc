@@ -9,11 +9,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
-func Update(name string, client *http.Client) error {
+func Update(name string, client *http.Client, folderIDList []string) error {
 
-	myFile := drive.File{Name: name}
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
 	if err != nil {
@@ -26,6 +26,7 @@ func Update(name string, client *http.Client) error {
 		return err
 	}
 
+	myFile := drive.File{Name: name, Parents: folderIDList}
 	_, err = srv.Files.Create(&myFile).Media(myQR).Do()
 	if err != nil {
 		log.Println("Couldn't create file ", err)
@@ -33,6 +34,24 @@ func Update(name string, client *http.Client) error {
 	}
 	return nil
 
+}
+
+func CreateFolder(client *http.Client) ([]string, error) {
+	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	createFolder, err := srv.Files.Create(&drive.File{Name: "qr " + time.Now().String(), MimeType: "application/vnd.google-apps.folder"}).Do()
+	if err != nil {
+		log.Fatalf("Unable to create folder: %v", err)
+	}
+
+	var folderIDList []string
+	folderIDList = append(folderIDList, createFolder.Id)
+	return folderIDList, nil
 }
 
 func GetFiles(client *http.Client) ([]*drive.File, error) {
