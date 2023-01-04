@@ -12,27 +12,35 @@ import (
 	"time"
 )
 
-func Update(name string, client *http.Client, folderIDList []string) error {
+const template = "https://drive.google.com/file/d/%s/view"
+
+func Update(name string, client *http.Client, folderIDList []string) (string, error) {
 
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
 	if err != nil {
 		log.Println(err)
-		return err
+		return "", err
 	}
 	myQR, err := os.Open("./qr/" + name)
 	if err != nil {
 		log.Println(err)
-		return err
+		return "", err
 	}
 
-	myFile := drive.File{Name: name, Parents: folderIDList}
-	_, err = srv.Files.Create(&myFile).Media(myQR).Do()
+	myFile := drive.File{Name: name, Parents: folderIDList, MimeType: "image/svg+xml"}
+
+	file, err := srv.Files.Create(&myFile).SupportsAllDrives(true).Media(myQR).Do()
 	if err != nil {
 		log.Println("Couldn't create file ", err)
-		return err
+		return "", err
 	}
-	return nil
+
+	return createLink(file.Id), nil
+
+}
+func createLink(id string) string {
+	return fmt.Sprintf(template, id)
 
 }
 

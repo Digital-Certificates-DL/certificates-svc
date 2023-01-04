@@ -54,11 +54,17 @@ func GenerateQR(user *data.User, key string, client *http.Client, folderIDList [
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
 
-	user.DataCertificatePath = path
+	user.CertificatePath = path
 
 	s.End()
 
-	google.Update(path, client, folderIDList)
+	link, err := google.Update(path, client, folderIDList)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	user.CertificatePath = link
+
 }
 
 func PrepareMsgForQR(name string, address, signature []byte) string {
