@@ -8,5 +8,5 @@ google:
   code: "4/0AWgavddEukwpUxaJ8CJBugnCbCf2bzTk4CakxD8IJndksk6EN_K9na94pP-UxT03AR1wnA"
 
 tables:
-  result: "test.xlsx"
+  result: "test2.xlsx"
   input: "certificates.xlsx"

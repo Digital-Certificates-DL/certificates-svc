@@ -19,7 +19,10 @@ var shortTitles = map[string]string{
 	"Beginner at theoretical aspects blockchain technology": "blockchain",
 	"Theory of database organization and basic SQL":         "database",
 	"Cryptography and information security theory":          "security",
-	"Golang": "golang", //todo rename key
+	"Біткоїн та криптовалюти":                               "bitcoin",
+	"Basic Level in Decentralized Technologies":             "decentralize_technologies",
+	"Golang programming on fundamental aspects":             "golang",
+	"Blockchain and Distributed Systems":                    "distributed_system",
 }
 
 func GenerateQR(user *data.User, key string, client *http.Client, folderIDList []string) {

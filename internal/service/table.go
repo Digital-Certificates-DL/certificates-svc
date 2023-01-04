@@ -77,7 +77,7 @@ func SetRes(users []*data.User, resultFile string) {
 			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 			continue
 		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("C%d", id+1), user.CourseTitle)
+		err = f.SetCellValue(sheepList[0], fmt.Sprintf("C%d", id+2), user.CourseTitle)
 		if err != nil {
 			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
 			continue
