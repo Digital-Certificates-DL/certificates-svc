@@ -23,8 +23,10 @@ func Start(cfg config.Config) error {
 		log.Println(err)
 		return err
 	}
+
 	for _, user := range users {
 		hashing(user)
+
 		GenerateQR(user, cfg.Key().Private, connect, folderIDList)
 	}
 

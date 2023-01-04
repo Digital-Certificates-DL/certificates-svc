@@ -23,6 +23,7 @@ var shortTitles = map[string]string{
 }
 
 func GenerateQR(user *data.User, key string, client *http.Client, folderIDList []string) {
+
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
