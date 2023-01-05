@@ -30,9 +30,9 @@ func GenerateQR(user *data.User, key string, client *http.Client, folderIDList [
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
-		path = fmt.Sprintf("certificate_%s_QR_codecreate.svg", parsedName[0])
+		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], shortTitles[user.CourseTitle])
 	} else {
-		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1])
+		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], shortTitles[user.CourseTitle])
 	}
 
 	pathWithSuffix := fmt.Sprintf("./qr/%s", path)

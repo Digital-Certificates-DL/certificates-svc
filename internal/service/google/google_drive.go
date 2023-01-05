@@ -30,7 +30,7 @@ func Update(name string, client *http.Client, folderIDList []string) (string, er
 
 	myFile := drive.File{Name: name, Parents: folderIDList, MimeType: "image/svg+xml"}
 
-	file, err := srv.Files.Create(&myFile).SupportsAllDrives(true).Media(myQR).Do()
+	file, err := srv.Files.Create(&myFile).Fields().SupportsAllDrives(true).Media(myQR).Do()
 	if err != nil {
 		log.Println("Couldn't create file ", err)
 		return "", err
