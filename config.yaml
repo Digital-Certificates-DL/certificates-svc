@@ -3,10 +3,17 @@ signature:
 
 google:
   secret_path: "./client_secret.json"
-  qr_path: ""
+  qr_path: "./qr"
   api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
   code: "4/0AWgavddEukwpUxaJ8CJBugnCbCf2bzTk4CakxD8IJndksk6EN_K9na94pP-UxT03AR1wnA"
+
 
 tables:
   result: "test2.xlsx"
   input: "certificates.xlsx"
+
+qr_codes:
+  qr_path: "./qr/"
+  template: "message:\n%s\n\naddress:\n%s\n\nsignature:\n%s\n\ncertificate page:\nhttps://dlt-academy.com/certificates"
+
+

@@ -1,4 +1,4 @@
-package service
+package signature
 
 import (
 	"crypto/sha256"
@@ -6,7 +6,7 @@ import (
 	"helper/internal/data"
 )
 
-func hashing(user *data.User) string {
+func Hashing(user *data.User) string {
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 	sum := sha256.Sum256([]byte(aggregatedStr))
 	user.DataHash = fmt.Sprintf("%x", sum)

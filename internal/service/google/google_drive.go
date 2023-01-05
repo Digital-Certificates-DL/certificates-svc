@@ -44,7 +44,7 @@ func createLink(id string) string {
 
 }
 
-func CreateFolder(client *http.Client) ([]string, error) {
+func CreateFolder(client *http.Client, folderPath string) ([]string, error) {
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
 	if err != nil {
@@ -52,7 +52,7 @@ func CreateFolder(client *http.Client) ([]string, error) {
 		return nil, err
 	}
 
-	createFolder, err := srv.Files.Create(&drive.File{Name: "qr " + time.Now().String(), MimeType: "application/vnd.google-apps.folder"}).Do()
+	createFolder, err := srv.Files.Create(&drive.File{Name: folderPath + " " + time.Now().String(), MimeType: "application/vnd.google-apps.folder"}).Do()
 	if err != nil {
 		log.Fatalf("Unable to create folder: %v", err)
 	}

@@ -7,36 +7,34 @@ import (
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
-type Googler interface {
-	Google() *Google
+type QRCoder interface {
+	QRCode() *QRCode
 }
 
-type Google struct {
-	Code       string `fig:"code"`
-	ApiKey     string `fig:"api_key"`
-	SecretPath string `fig:"secret_path"`
-	QRPath     string `	fig:"qr_path"`
+type QRCode struct {
+	QRPath   string `fig:"qr_path"`
+	Template string `fig:"template"`
 }
 
-func NewGoogler(getter kv.Getter) Googler {
-	return &googler{
+func NewQRCoder(getter kv.Getter) QRCoder {
+	return &qrcoder{
 		getter: getter,
 	}
 }
 
-type googler struct {
+type qrcoder struct {
 	getter kv.Getter
 	once   comfig.Once
 }
 
-func (c *googler) Google() *Google {
+func (c *qrcoder) QRCode() *QRCode {
 	return c.once.Do(func() interface{} {
-		raw := kv.MustGetStringMap(c.getter, "google")
-		config := Google{}
+		raw := kv.MustGetStringMap(c.getter, "qr_code")
+		config := QRCode{}
 		err := figure.Out(&config).From(raw).Please()
 		if err != nil {
 			panic(errors.Wrap(err, "failed to figure out"))
 		}
 		return &config
-	}).(*Google)
+	}).(*QRCode)
 }

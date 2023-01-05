@@ -7,6 +7,7 @@ import (
 	"github.com/boombuler/barcode/qr"
 	"helper/internal/data"
 	"helper/internal/service/google"
+	"helper/internal/service/signature"
 	"log"
 	"net/http"
 	"os"
@@ -44,7 +45,7 @@ func GenerateQR(user *data.User, key string, client *http.Client, folderIDList [
 	}
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-	signature, _, address, err := Sign(key, aggregatedStr)
+	signature, _, address, err := signature.Sign(key, aggregatedStr)
 	if err != nil {
 		log.Println(err)
 		return

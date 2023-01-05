@@ -1,4 +1,4 @@
-package service
+package signature
 
 import (
 	"github.com/stretchr/testify/require"
