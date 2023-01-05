@@ -7,13 +7,13 @@ import (
 type Config interface {
 	Tabler
 	QRCoder
-	Keyer
+	Signer
 	Googler
 }
 
 type config struct {
 	Tabler
-	Keyer
+	Signer
 	Googler
 	QRCoder
 	getter kv.Getter
@@ -24,7 +24,7 @@ func New(getter kv.Getter) Config {
 		getter:  getter,
 		QRCoder: NewQRCoder(getter),
 		Googler: NewGoogler(getter),
-		Keyer:   NewKeyer(getter),
+		Signer:  NewKeyer(getter),
 		Tabler:  NewTabler(getter),
 	}
 }

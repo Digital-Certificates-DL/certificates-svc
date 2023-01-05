@@ -7,7 +7,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
-type Keyer interface {
+type Signer interface {
 	Key() *Key
 }
 
@@ -15,7 +15,7 @@ type Key struct {
 	Private string `fig:"key" `
 }
 
-func NewKeyer(getter kv.Getter) Keyer {
+func NewKeyer(getter kv.Getter) Signer {
 	return &keyer{
 		getter: getter,
 	}

@@ -17,17 +17,19 @@ func Start(cfg config.Config) error {
 		log.Println(err)
 		return err
 	}
-	connect := google.Connect(cfg.QRCode().SecretPath, cfg.QRCode().Code)
+	connect := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
 
-	folderIDList, err := google.CreateFolder(connect, cfg.QRCode().QRPath)
+	folderIDList, err := google.CreateFolder(connect, cfg.Google().QRPath)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
 	for _, user := range users {
+		if user.Signature != "" && user.SerialNumber != "" {
+			continue
+		}
 		signature.Hashing(user)
-
 		GenerateQR(user, cfg.Key().Private, connect, folderIDList)
 	}
 
