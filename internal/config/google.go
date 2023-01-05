@@ -15,7 +15,7 @@ type Google struct {
 	Code       string `fig:"code"`
 	ApiKey     string `fig:"api_key"`
 	SecretPath string `fig:"secret_path"`
-	QRPath     string `	fig:"qr_path"`
+	QRPath     string `fig:"qr_path"`
 }
 
 func NewGoogler(getter kv.Getter) Googler {

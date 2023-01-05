@@ -5,6 +5,7 @@ import (
 	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
+	"helper/internal/config"
 	"helper/internal/data"
 	"helper/internal/service/signature"
 	"log"
@@ -24,14 +25,14 @@ var shortTitles = map[string]string{
 	"Blockchain and Distributed Systems":                    "distributed_system",
 }
 
-func GenerateQR(user *data.User, key string) (string, error) {
+func GenerateQR(user *data.User, cfg config.Config) (string, error) {
 
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
 	if len(parsedName) < 2 {
-		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], shortTitles[user.CourseTitle])
+		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], cfg.TemplatesConfig()[user.CourseTitle])
 	} else {
-		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], shortTitles[user.CourseTitle])
+		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], cfg.TemplatesConfig()[user.CourseTitle])
 	}
 
 	pathWithSuffix := fmt.Sprintf("./qr/%s", path)
@@ -43,7 +44,7 @@ func GenerateQR(user *data.User, key string) (string, error) {
 	}
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-	signature, _, address, err := signature.Sign(key, aggregatedStr)
+	signature, _, address, err := signature.Sign(cfg.Key().Private, aggregatedStr)
 	if err != nil {
 		log.Println(err)
 		return "", err

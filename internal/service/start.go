@@ -29,13 +29,10 @@ func Start(cfg config.Config) error {
 		return err
 	}
 
-	short2 := cfg.TemplatesConfig().Filters
-
-	_ = short2
 	wg := new(sync.WaitGroup)
 	for _, user := range users {
 		wg.Add(1)
-		go deciding(user, cfg.Key().Private, wg, connect, folderIDList)
+		go deciding(user, cfg, wg, connect, folderIDList)
 	}
 	wg.Wait()
 	SetRes(users, cfg.Table().Result)
@@ -45,22 +42,22 @@ func Start(cfg config.Config) error {
 	return nil
 }
 
-func deciding(user *data.User, key string, wg *sync.WaitGroup, client *http.Client, folderIDList []string) {
+func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *http.Client, folderIDList []string) {
 	defer wg.Done()
 	if user.Signature != "" && user.SerialNumber != "" {
 		return
 	}
 	signature.Hashing(user)
-	path, err := GenerateQR(user, key)
+	path, err := GenerateQR(user, cfg)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	link, err := google.Update(path, client, folderIDList)
+	link, err := google.Update(path, client, folderIDList, cfg)
 	if err != nil {
 		for {
 			time.Sleep(5 * time.Microsecond)
-			_, err := google.Update(path, client, folderIDList)
+			_, err := google.Update(path, client, folderIDList, cfg)
 			if err == nil {
 				break
 			}

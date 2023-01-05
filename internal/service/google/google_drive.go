@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
+	"helper/internal/config"
 	"log"
 	"net/http"
 	"os"
@@ -14,7 +15,7 @@ import (
 
 const template = "https://drive.google.com/file/d/%s/view"
 
-func Update(name string, client *http.Client, folderIDList []string) (string, error) {
+func Update(name string, client *http.Client, folderIDList []string, cfg config.Config) (string, error) {
 
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
@@ -22,7 +23,7 @@ func Update(name string, client *http.Client, folderIDList []string) (string, er
 
 		return "", err
 	}
-	myQR, err := os.Open("./qr/" + name)
+	myQR, err := os.Open(cfg.QRCode().QRPath + name)
 	if err != nil {
 
 		return "", err

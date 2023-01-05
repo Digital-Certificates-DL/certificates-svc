@@ -8,15 +8,7 @@ import (
 )
 
 type TemplatesConfiger interface {
-	TemplatesConfig() *RawFiltersConfig
-}
-
-type RawFiltersConfig struct {
-	Filters []rawFilterConfig `fig:"list"`
-}
-
-type rawFilterConfig struct {
-	Params map[string][]string `fig:"params"`
+	TemplatesConfig() map[string]string
 }
 
 func NewTemplatesConfiger(getter kv.Getter) TemplatesConfiger {
@@ -30,14 +22,25 @@ type templatesConfig struct {
 	once   comfig.Once
 }
 
-func (c *templatesConfig) TemplatesConfig() *RawFiltersConfig {
+func (c *templatesConfig) TemplatesConfig() map[string]string {
 	return c.once.Do(func() interface{} {
 		raw := kv.MustGetStringMap(c.getter, "templates")
-		config := RawFiltersConfig{}
+		config := struct {
+			List map[string]string `fig:"list"`
+		}{}
 		err := figure.Out(&config).From(raw).Please()
 		if err != nil {
 			panic(errors.Wrap(err, "failed to figure out"))
 		}
-		return &config
-	}).(*RawFiltersConfig)
+		return prepareMap(config.List)
+	}).(map[string]string)
+}
+
+func prepareMap(in map[string]string) map[string]string {
+
+	var templates = make(map[string]string)
+	for key, temp := range in {
+		templates[temp] = key
+	}
+	return templates
 }

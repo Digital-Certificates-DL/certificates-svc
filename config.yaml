@@ -18,19 +18,12 @@ qr_code:
 
 templates:
   list:
-    - params:
-        golang: "Golang programming on fundamental aspects"
-    - params:
-        distributed_system: "Blockchain and Distributed Systems"
-    - params:
-        decentralize_technologies: "Basic Level in Decentralized Technologies"
-    - params:
-        bitcoin: "Біткоїн та криптовалюти"
-    - params:
-        security: "Cryptography and information security theory"
-    - params:
-        database: "Theory of database organization and basic SQL"
-    - params:
-        blockchain: "Beginner at theoretical aspects blockchain technology"
+    golang: "Golang programming on fundamental aspects"
+    distributed_system: "Blockchain and Distributed Systems"
+    decentralize_technologies: "Basic Level in Decentralized Technologies"
+    bitcoin: "Біткоїн та криптовалюти"
+    security: "Cryptography and information security theory"
+    database: "Theory of database organization and basic SQL"
+    blockchain: "Beginner at theoretical aspects blockchain technology"
 
 
