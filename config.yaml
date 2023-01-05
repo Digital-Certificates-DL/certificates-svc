@@ -16,4 +16,21 @@ qr_code:
   qr_path: "./qr/"
   template: "message:\n%s\n\naddress:\n%s\n\nsignature:\n%s\n\ncertificate page:\nhttps://dlt-academy.com/certificates"
 
+templates:
+  list:
+    - params:
+        golang: "Golang programming on fundamental aspects"
+    - params:
+        distributed_system: "Blockchain and Distributed Systems"
+    - params:
+        decentralize_technologies: "Basic Level in Decentralized Technologies"
+    - params:
+        bitcoin: "Біткоїн та криптовалюти"
+    - params:
+        security: "Cryptography and information security theory"
+    - params:
+        database: "Theory of database organization and basic SQL"
+    - params:
+        blockchain: "Beginner at theoretical aspects blockchain technology"
+
 

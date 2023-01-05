@@ -19,12 +19,12 @@ func Update(name string, client *http.Client, folderIDList []string) (string, er
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
 	if err != nil {
-		log.Println(err)
+
 		return "", err
 	}
 	myQR, err := os.Open("./qr/" + name)
 	if err != nil {
-		log.Println(err)
+
 		return "", err
 	}
 
@@ -32,7 +32,7 @@ func Update(name string, client *http.Client, folderIDList []string) (string, er
 
 	file, err := srv.Files.Create(&myFile).Fields().SupportsAllDrives(true).Media(myQR).Do()
 	if err != nil {
-		log.Println("Couldn't create file ", err)
+
 		return "", err
 	}
 
@@ -48,7 +48,7 @@ func CreateFolder(client *http.Client, folderPath string) ([]string, error) {
 	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
 
 	if err != nil {
-		log.Println(err)
+
 		return nil, err
 	}
 

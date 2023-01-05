@@ -28,6 +28,10 @@ func Start(cfg config.Config) error {
 		log.Println(err)
 		return err
 	}
+
+	short2 := cfg.TemplatesConfig().Filters
+
+	_ = short2
 	wg := new(sync.WaitGroup)
 	for _, user := range users {
 		wg.Add(1)
