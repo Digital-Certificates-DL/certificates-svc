@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/pkg/errors"
 	"helper/internal/config"
 	"helper/internal/data"
 	"helper/internal/service/google"
@@ -54,12 +53,12 @@ func deciding(user *data.User, key string, wg *sync.WaitGroup, client *http.Clie
 		return
 	}
 	link, err := google.Update(path, client, folderIDList)
-	if err == errors.New(" Error 403: User rate limit exceeded., userRateLimitExceeded") {
+	if err != nil {
 		for {
 			time.Sleep(5 * time.Microsecond)
 			_, err := google.Update(path, client, folderIDList)
 			if err == nil {
-				return
+				break
 			}
 		}
 
