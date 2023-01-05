@@ -26,7 +26,7 @@ func TestHash(t *testing.T) {
 	results := "d109143293b242e776ae2050f4e437347ee566b6d1f4539ade9f17c7b60be4ab"
 
 	for _, user := range users {
-		got := fmt.Sprintf("%x", hashing(&user))
+		got := fmt.Sprintf("%x", Hashing(&user))
 		want := results
 
 		if got != want {

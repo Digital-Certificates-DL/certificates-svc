@@ -9,7 +9,7 @@ google:
 
 
 tables:
-  result: "test2.xlsx"
+  result: "test3s.xlsx"
   input: "certificates.xlsx"
 
 qr_code:

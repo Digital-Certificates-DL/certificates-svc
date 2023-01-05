@@ -6,10 +6,8 @@ import (
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
 	"helper/internal/data"
-	"helper/internal/service/google"
 	"helper/internal/service/signature"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 )
@@ -26,7 +24,7 @@ var shortTitles = map[string]string{
 	"Blockchain and Distributed Systems":                    "distributed_system",
 }
 
-func GenerateQR(user *data.User, key string, client *http.Client, folderIDList []string) {
+func GenerateQR(user *data.User, key string) (string, error) {
 
 	parsedName := strings.Split(user.Participant, " ")
 	path := ""
@@ -41,14 +39,14 @@ func GenerateQR(user *data.User, key string, client *http.Client, folderIDList [
 	fi, err := os.Create(pathWithSuffix)
 	if err != nil {
 		log.Println(err)
-		return
+		return "", err
 	}
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 	signature, _, address, err := signature.Sign(key, aggregatedStr)
 	if err != nil {
 		log.Println(err)
-		return
+		return "", err
 	}
 
 	user.Signature = string(signature)
@@ -62,13 +60,7 @@ func GenerateQR(user *data.User, key string, client *http.Client, folderIDList [
 
 	s.End()
 
-	link, err := google.Update(path, client, folderIDList)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	user.CertificatePath = link
-
+	return path, nil
 }
 
 func PrepareMsgForQR(name string, address, signature []byte) string {
