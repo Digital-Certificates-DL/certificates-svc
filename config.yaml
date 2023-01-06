@@ -1,3 +1,6 @@
+log:
+  disable_sentry: true
+
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
 
@@ -9,7 +12,7 @@ google:
 
 
 tables:
-  result: "test3s.xlsx"
+  result: "test11111.xlsx"
   input: "certificates.xlsx"
 
 qr_code:

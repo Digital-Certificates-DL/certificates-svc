@@ -1,6 +1,7 @@
 package config
 
 import (
+	"gitlab.com/distributed_lab/kit/comfig"
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
@@ -9,6 +10,7 @@ type Config interface {
 	QRCoder
 	Signer
 	Googler
+	comfig.Logger
 	TemplatesConfiger
 }
 
@@ -17,6 +19,7 @@ type config struct {
 	Signer
 	Googler
 	TemplatesConfiger
+	comfig.Logger
 	QRCoder
 	getter kv.Getter
 }
@@ -29,5 +32,6 @@ func New(getter kv.Getter) Config {
 		Googler:           NewGoogler(getter),
 		Signer:            NewKeyer(getter),
 		Tabler:            NewTabler(getter),
+		Logger:            comfig.NewLogger(getter, comfig.LoggerOpts{}),
 	}
 }

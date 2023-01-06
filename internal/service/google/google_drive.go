@@ -15,17 +15,19 @@ import (
 
 const template = "https://drive.google.com/file/d/%s/view"
 
-func Update(name string, client *http.Client, folderIDList []string, cfg config.Config) (string, error) {
+var srv *drive.Service
 
-	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
+func Update(name string, client *http.Client, folderIDList []string, cfg config.Config) (string, error) {
+	var err error
+	if srv == nil {
+		srv, err = drive.NewService(context.Background(), option.WithHTTPClient(client))
+	}
 
 	if err != nil {
-
 		return "", err
 	}
 	myQR, err := os.Open(cfg.QRCode().QRPath + name)
 	if err != nil {
-
 		return "", err
 	}
 
@@ -33,7 +35,6 @@ func Update(name string, client *http.Client, folderIDList []string, cfg config.
 
 	file, err := srv.Files.Create(&myFile).Fields().SupportsAllDrives(true).Media(myQR).Do()
 	if err != nil {
-
 		return "", err
 	}
 
@@ -46,7 +47,10 @@ func createLink(id string) string {
 }
 
 func CreateFolder(client *http.Client, folderPath string) ([]string, error) {
-	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
+	var err error
+	if srv == nil {
+		srv, err = drive.NewService(context.Background(), option.WithHTTPClient(client))
+	}
 
 	if err != nil {
 

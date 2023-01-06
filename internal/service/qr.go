@@ -35,7 +35,7 @@ func GenerateQR(user *data.User, cfg config.Config) (string, error) {
 		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], cfg.TemplatesConfig()[user.CourseTitle])
 	}
 
-	pathWithSuffix := fmt.Sprintf(cfg.QRCode().QRPath, path)
+	pathWithSuffix := fmt.Sprintf(cfg.QRCode().QRPath + path)
 
 	fi, err := os.Create(pathWithSuffix)
 	if err != nil {

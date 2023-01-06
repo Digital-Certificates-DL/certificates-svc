@@ -6,7 +6,6 @@ import (
 	"helper/internal/data"
 	"helper/internal/service/google"
 	"helper/internal/service/signature"
-	"log"
 	"net/http"
 	"os"
 	"sync"
@@ -14,20 +13,23 @@ import (
 )
 
 func Start(cfg config.Config) error {
-	log.Println("start")
+	log := cfg.Log()
+	log.Level(4).Info("Start")
+
 	os.MkdirAll(cfg.QRCode().QRPath, os.ModePerm)
 
 	users, err := Parse(cfg.Table().Input)
 	if err != nil {
-		log.Println(err)
+		cfg.Log().Debug(err)
 		return err
 	}
+
 	connect, sendToDrive := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
 	var folderIDList []string
 	if sendToDrive {
 		folderIDList, err = google.CreateFolder(connect, cfg.Google().QRPath)
 		if err != nil {
-			log.Println(err)
+			cfg.Log().Debug(err)
 			return err
 		}
 	}
@@ -40,8 +42,6 @@ func Start(cfg config.Config) error {
 	wg.Wait()
 	SetRes(users, cfg.Table().Result)
 
-	//,
-	//todo same func for upload qr in google drive
 	return nil
 }
 
@@ -53,7 +53,7 @@ func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *ht
 	signature.Hashing(user)
 	path, err := GenerateQR(user, cfg)
 	if err != nil {
-		log.Println(err)
+		cfg.Log().Debug(err)
 		return
 	}
 	if sendToDrive {
@@ -69,11 +69,8 @@ func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *ht
 
 		}
 		user.CertificatePath = link
+		return
 	}
-	user.CertificatePath = fmt.Sprint(cfg.QRCode().QRPath, path)
+	user.CertificatePath = fmt.Sprintf("%s%s", cfg.QRCode().QRPath, path)
 	return
-}
-
-type stack struct {
-	users []*data.User
 }

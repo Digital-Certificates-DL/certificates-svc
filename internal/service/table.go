@@ -5,118 +5,67 @@ import (
 	"github.com/xuri/excelize/v2"
 	"helper/internal/data"
 	"log"
+	"reflect"
+	"strings"
 )
 
-func SetRes(users []*data.User, resultFile string) {
+var titles = map[string]string{
+	"A": "Date",
+	"B": "Participant",
+	"C": "Course Title",
+	"D": "Serial Number",
+	"E": "Note",
+	"F": "Certificate",
+	"G": "Data Hash",
+	"H": "Transaction Hash",
+	"I": "Signature",
+	"J": "Digital Certificate",
+}
 
+var usersTag = map[string]string{
+	"A": "Date",
+	"B": "Participant",
+	"C": "CourseTitle",
+	"D": "SerialNumber",
+	"E": "Note",
+	"F": "Certificate",
+	"G": "DataHash",
+	"H": "TxHash",
+	"I": "Signature",
+	"J": "CertificatePath",
+}
+
+func SetRes(users []*data.User, resultFile string) {
+	errs := make([]error, 0)
 	f := excelize.NewFile()
 
 	defer f.Close()
 	sheepList := f.GetSheetList()
 	for id, user := range users {
 		if id == 0 {
-			err := f.SetCellValue(sheepList[0], fmt.Sprintf("A%d", id+1), "Date")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
+			for key, val := range titles {
+				err := f.SetCellValue(sheepList[0], fmt.Sprintf("%s%d", strings.ToUpper(key), id+1), strings.ToTitle(val))
+				if err != nil {
+					errs = append(errs, err)
+					continue
+				}
 			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("B%d", id+1), "Participant")
+		}
+
+		///////////
+
+		//log.Println(item.Key())
+		//log.Println(item.Value())
+		t := reflect.ValueOf(*user)
+		for key, val := range usersTag {
+			err := f.SetCellValue(sheepList[0], fmt.Sprintf("%s%d", strings.ToUpper(key), id+2), t.FieldByName(val).String())
 			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("C%d", id+1), "Course Title")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("D%d", id+1), "Serial Number")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("E%d", id+1), "Note")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("F%d", id+1), "Certificate")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("G%d", id+1), "Data Hash")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("H%d", id+1), "Transaction Hash")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("I%d", id+1), "Signature")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-				continue
-			}
-			err = f.SetCellValue(sheepList[0], fmt.Sprintf("J%d", id+1), "Digital Certificate")
-			if err != nil {
-				log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
+				errs = append(errs, err)
 				continue
 			}
 		}
 
-		err := f.SetCellValue(sheepList[0], fmt.Sprintf("A%d", id+2), user.Date)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("B%d", id+2), user.Participant)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("C%d", id+2), user.CourseTitle)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("D%d", id+2), user.SerialNumber)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("E%d", id+2), user.Note)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("F%d", id+2), user.Certificate)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("G%d", id+2), user.DataHash)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("H%d", id+2), user.TxHash)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("I%d", id+2), user.Signature)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
-		err = f.SetCellValue(sheepList[0], fmt.Sprintf("J%d", id+2), user.CertificatePath)
-		if err != nil {
-			log.Println(fmt.Sprintf("error with %s: %s", user.Participant, err))
-			continue
-		}
+		/////////////
 
 	}
 	if resultFile == "" {
