@@ -1,6 +1,7 @@
 package google
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func getClient(config *oauth2.Config, path string, code string) *http.Client {
@@ -57,16 +59,30 @@ func saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func Connect(path, code string) *http.Client {
+func Connect(path, code string) (*http.Client, bool) {
 	b, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
+		log.Printf("Unable to read client secret file: %v", err)
+		log.Printf("Could you continue to work without google drive ?")
+		reader := bufio.NewReader(os.Stdin)
+		text, _ := reader.ReadString('\n')
+		if strings.ToLower(text) == "y\n" {
+			return nil, false
+		}
+		return nil, true
 	}
 
 	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		log.Printf("Unable to parse client secret file to config: %v", err)
+		log.Printf("Could you continue to work without google drive ?")
+		reader := bufio.NewReader(os.Stdin)
+		text, _ := reader.ReadString('\n')
+		if strings.ToLower(text) == "y" {
+			return nil, false
+		}
+		return nil, true
 	}
-	return getClient(config, path, code)
+	return getClient(config, path, code), true
 
 }

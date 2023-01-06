@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"helper/internal/config"
 	"helper/internal/data"
 	"helper/internal/service/google"
@@ -21,18 +22,20 @@ func Start(cfg config.Config) error {
 		log.Println(err)
 		return err
 	}
-	connect := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
-
-	folderIDList, err := google.CreateFolder(connect, cfg.Google().QRPath)
-	if err != nil {
-		log.Println(err)
-		return err
+	connect, sendToDrive := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
+	var folderIDList []string
+	if sendToDrive {
+		folderIDList, err = google.CreateFolder(connect, cfg.Google().QRPath)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
 	}
 
 	wg := new(sync.WaitGroup)
 	for _, user := range users {
 		wg.Add(1)
-		go deciding(user, cfg, wg, connect, folderIDList)
+		go deciding(user, cfg, wg, connect, folderIDList, sendToDrive)
 	}
 	wg.Wait()
 	SetRes(users, cfg.Table().Result)
@@ -42,7 +45,7 @@ func Start(cfg config.Config) error {
 	return nil
 }
 
-func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *http.Client, folderIDList []string) {
+func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *http.Client, folderIDList []string, sendToDrive bool) {
 	defer wg.Done()
 	if user.Signature != "" && user.SerialNumber != "" {
 		return
@@ -53,19 +56,21 @@ func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *ht
 		log.Println(err)
 		return
 	}
-	link, err := google.Update(path, client, folderIDList, cfg)
-	if err != nil {
-		for {
-			time.Sleep(5 * time.Microsecond)
-			_, err := google.Update(path, client, folderIDList, cfg)
-			if err == nil {
-				break
+	if sendToDrive {
+		link, err := google.Update(path, client, folderIDList, cfg)
+		if err != nil {
+			for {
+				time.Sleep(5 * time.Microsecond)
+				_, err := google.Update(path, client, folderIDList, cfg)
+				if err == nil {
+					break
+				}
 			}
+
 		}
-
+		user.CertificatePath = link
 	}
-	user.CertificatePath = link
-
+	user.CertificatePath = fmt.Sprint(cfg.QRCode().QRPath, path)
 	return
 }
 
