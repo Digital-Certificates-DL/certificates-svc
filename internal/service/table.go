@@ -22,7 +22,7 @@ var titles = map[string]string{
 	"J": "Digital Certificate",
 }
 
-var usersTag = map[string]string{
+var usersTag = map[string]string{ //todo will make better
 	"A": "Date",
 	"B": "Participant",
 	"C": "CourseTitle",
@@ -32,13 +32,12 @@ var usersTag = map[string]string{
 	"G": "DataHash",
 	"H": "TxHash",
 	"I": "Signature",
-	"J": "CertificatePath",
+	"J": "DigitalCertificate",
 }
 
-func SetRes(users []*data.User, resultFile string) {
+func SetRes(users []*data.User, resultFile string) []error {
 	errs := make([]error, 0)
 	f := excelize.NewFile()
-
 	defer f.Close()
 	sheepList := f.GetSheetList()
 	for id, user := range users {
@@ -51,11 +50,6 @@ func SetRes(users []*data.User, resultFile string) {
 				}
 			}
 		}
-
-		///////////
-
-		//log.Println(item.Key())
-		//log.Println(item.Value())
 		t := reflect.ValueOf(*user)
 		for key, val := range usersTag {
 			err := f.SetCellValue(sheepList[0], fmt.Sprintf("%s%d", strings.ToUpper(key), id+2), t.FieldByName(val).String())
@@ -64,24 +58,20 @@ func SetRes(users []*data.User, resultFile string) {
 				continue
 			}
 		}
-
-		/////////////
-
 	}
 	if resultFile == "" {
 		err := f.SaveAs("result.xlsx")
 		if err != nil {
 			log.Println(err)
-			return
+			return errs
 		}
 	}
-
 	err := f.SaveAs(resultFile)
 	if err != nil {
 		log.Println(err)
-		return
+		return errs
 	}
-
+	return nil
 }
 
 func Parse(pathToFile string) ([]*data.User, error) {

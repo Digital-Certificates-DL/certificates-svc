@@ -57,7 +57,7 @@ func GenerateQR(user *data.User, cfg config.Config) (string, error) {
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
 
-	user.CertificatePath = path
+	user.DigitalCertificate = pathWithSuffix
 
 	s.End()
 

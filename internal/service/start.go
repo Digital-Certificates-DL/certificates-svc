@@ -1,14 +1,12 @@
 package service
 
 import (
-	"fmt"
+	"context"
+	"gitlab.com/distributed_lab/running"
 	"helper/internal/config"
-	"helper/internal/data"
 	"helper/internal/service/google"
 	"helper/internal/service/signature"
-	"net/http"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -23,7 +21,8 @@ func Start(cfg config.Config) error {
 		cfg.Log().Debug(err)
 		return err
 	}
-
+	var sendToDrive bool
+	sendToDrive = cfg.Google().Enable
 	connect, sendToDrive := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
 	var folderIDList []string
 	if sendToDrive {
@@ -33,44 +32,36 @@ func Start(cfg config.Config) error {
 			return err
 		}
 	}
-
-	wg := new(sync.WaitGroup)
+	ctx := context.Background()
 	for _, user := range users {
-		wg.Add(1)
-		go deciding(user, cfg, wg, connect, folderIDList, sendToDrive)
+		signature.Hashing(user)
+		path, err := GenerateQR(user, cfg)
+		if err != nil {
+			cfg.Log().Debug(err)
+			return err
+		}
+
+		chLink := make(chan string)
+
+		if sendToDrive {
+			go running.UntilSuccess(ctx, log, "test", func(ctx context.Context) (bool, error) {
+
+				link, err := google.Update(path, connect, folderIDList, cfg)
+				chLink <- link
+				var success bool
+				if err == nil {
+					success = true
+				}
+
+				return success, err
+			}, time.Millisecond*100, time.Millisecond*150)
+
+			user.DigitalCertificate = <-chLink
+
+		}
 	}
-	wg.Wait()
+
 	SetRes(users, cfg.Table().Result)
 
 	return nil
-}
-
-func deciding(user *data.User, cfg config.Config, wg *sync.WaitGroup, client *http.Client, folderIDList []string, sendToDrive bool) {
-	defer wg.Done()
-	if user.Signature != "" && user.SerialNumber != "" {
-		return
-	}
-	signature.Hashing(user)
-	path, err := GenerateQR(user, cfg)
-	if err != nil {
-		cfg.Log().Debug(err)
-		return
-	}
-	if sendToDrive {
-		link, err := google.Update(path, client, folderIDList, cfg)
-		if err != nil {
-			for {
-				time.Sleep(5 * time.Microsecond)
-				_, err := google.Update(path, client, folderIDList, cfg)
-				if err == nil {
-					break
-				}
-			}
-
-		}
-		user.CertificatePath = link
-		return
-	}
-	user.CertificatePath = fmt.Sprintf("%s%s", cfg.QRCode().QRPath, path)
-	return
 }

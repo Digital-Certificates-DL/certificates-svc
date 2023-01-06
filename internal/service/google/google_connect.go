@@ -75,7 +75,7 @@ func Connect(path, code string) (*http.Client, bool) {
 	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
 		log.Printf("Unable to parse client secret file to config: %v", err)
-		log.Printf("Could you continue to work without google drive ?")
+		log.Printf("Could you continue to work without google drive ? Press y")
 		reader := bufio.NewReader(os.Stdin)
 		text, _ := reader.ReadString('\n')
 		if strings.ToLower(text) == "y" {
