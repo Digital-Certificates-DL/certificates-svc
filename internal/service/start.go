@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"gitlab.com/distributed_lab/running"
 	"helper/internal/config"
 	"helper/internal/service/google"
@@ -12,7 +13,7 @@ import (
 
 func Start(cfg config.Config) error {
 	log := cfg.Log()
-	log.Level(4).Info("Start")
+	log.Info("Start")
 
 	os.MkdirAll(cfg.QRCode().QRPath, os.ModePerm)
 
@@ -21,8 +22,8 @@ func Start(cfg config.Config) error {
 		cfg.Log().Debug(err)
 		return err
 	}
-	var sendToDrive bool
-	sendToDrive = cfg.Google().Enable
+
+	sendToDrive := cfg.Google().Enable
 	connect, sendToDrive := google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
 	var folderIDList []string
 	if sendToDrive {
@@ -34,8 +35,12 @@ func Start(cfg config.Config) error {
 	}
 	ctx := context.Background()
 	for _, user := range users {
-		signature.Hashing(user)
-		path, err := GenerateQR(user, cfg)
+		signature := signature.NewSignature(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle), cfg.Key().Private)
+		qr := NewQR(user, cfg, signature)
+		hash := signature.Hashing()
+		user.SetDataHash(hash)
+		path := ""
+		path, user.DigitalCertificate, user.Signature, err = qr.GenerateQR()
 		if err != nil {
 			cfg.Log().Debug(err)
 			return err
@@ -45,14 +50,12 @@ func Start(cfg config.Config) error {
 
 		if sendToDrive {
 			go running.UntilSuccess(ctx, log, "test", func(ctx context.Context) (bool, error) {
-
 				link, err := google.Update(path, connect, folderIDList, cfg)
 				chLink <- link
 				var success bool
 				if err == nil {
 					success = true
 				}
-
 				return success, err
 			}, time.Millisecond*100, time.Millisecond*150)
 

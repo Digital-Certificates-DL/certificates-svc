@@ -12,3 +12,15 @@ type User struct {
 	Signature          string
 	DigitalCertificate string
 }
+
+func (u *User) SetSignature(signature string) {
+	u.Signature = signature
+}
+
+func (u *User) SetDataHash(hash string) {
+	u.DataHash = hash
+	if u.TxHash == "-" {
+		u.TxHash = hash[:10]
+	}
+
+}

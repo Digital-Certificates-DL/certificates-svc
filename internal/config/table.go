@@ -7,7 +7,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
-type Tabler interface {
+type TableConfiger interface {
 	Table() *Table
 }
 
@@ -16,18 +16,18 @@ type Table struct {
 	Result string `fig:"result" `
 }
 
-func NewTabler(getter kv.Getter) Tabler {
-	return &tabler{
+func NewTableConfiger(getter kv.Getter) TableConfiger {
+	return &tableConfiger{
 		getter: getter,
 	}
 }
 
-type tabler struct {
+type tableConfiger struct {
 	getter kv.Getter
 	once   comfig.Once
 }
 
-func (c *tabler) Table() *Table {
+func (c *tableConfiger) Table() *Table {
 	return c.once.Do(func() interface{} {
 		raw := kv.MustGetStringMap(c.getter, "tables")
 		config := Table{}

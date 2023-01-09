@@ -9,7 +9,7 @@ const varIntProtoVer uint32 = 0
 
 const magicMessage = "\x18Bitcoin Signed Message:\n"
 
-func CreateMagicMessage(message string) string {
+func (s Signature) CreateMagicMessage(message string) string {
 	buffer := bytes.Buffer{}
 	buffer.Grow(wire.VarIntSerializeSize(uint64(len(message))))
 

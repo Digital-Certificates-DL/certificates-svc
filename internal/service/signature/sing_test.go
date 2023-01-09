@@ -30,12 +30,15 @@ func TestSign(t *testing.T) {
 	for _, user := range users {
 		msg := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 		fmt.Println(msg)
-		signature1, pub, address, err := Sign(keyWif, msg)
+
+		signauture := NewSignature(keyWif, msg)
+
+		sign, pub, address, err := signauture.Sign()
 		if err != nil {
 			log.Println(err)
 		}
 
-		log.Printf("%x", signature1)
+		log.Printf("%x", sign)
 
 		wantAddress := resultAddress
 		wantPub := resultPubKey

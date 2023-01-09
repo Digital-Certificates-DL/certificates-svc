@@ -7,7 +7,7 @@ import (
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
-type Googler interface {
+type GoogleConfiger interface {
 	Google() *Google
 }
 
@@ -19,7 +19,7 @@ type Google struct {
 	Enable     bool   `fig:"enable"`
 }
 
-func NewGoogler(getter kv.Getter) Googler {
+func NewGoogler(getter kv.Getter) GoogleConfiger {
 	return &googler{
 		getter: getter,
 	}

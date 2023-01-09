@@ -10,13 +10,25 @@ import (
 	"github.com/decred/dcrd/dcrec/secp256k1/v4/ecdsa"
 )
 
-func Sign(key string, hashText string) ([]byte, []byte, []byte, error) {
-	wifKey, err := btcutil.DecodeWIF(key)
+type Signature struct {
+	msg string
+	key string
+}
+
+func NewSignature(msg, key string) Signature {
+	return Signature{
+		msg: msg,
+		key: key,
+	}
+}
+
+func (s Signature) Sign() ([]byte, []byte, []byte, error) {
+	wifKey, err := btcutil.DecodeWIF(s.key)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	msg := CreateMagicMessage(hashText)
+	msgWithSuf := s.CreateMagicMessage(s.msg)
 
 	private, public := btcec.PrivKeyFromBytes(wifKey.PrivKey.Serialize())
 
@@ -24,13 +36,13 @@ func Sign(key string, hashText string) ([]byte, []byte, []byte, error) {
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	messageHash := chainhash.DoubleHashB([]byte(msg))
+	messageHash := chainhash.DoubleHashB([]byte(msgWithSuf))
 
 	sign := ecdsa.SignCompact(private, messageHash, false)
-	return []byte(fmt.Sprint(base64.RawStdEncoding.EncodeToString(sign), "=")), pub.SerializeUncompressed(), GenerateAddress(pub), err
+	return []byte(fmt.Sprint(base64.RawStdEncoding.EncodeToString(sign), "=")), pub.SerializeUncompressed(), s.GenerateAddress(pub), err
 }
 
-func GenerateAddress(key *btcec.PublicKey) []byte {
+func (s Signature) GenerateAddress(key *btcec.PublicKey) []byte {
 
 	mainNetAddrUn, err := btcutil.NewAddressPubKey(key.SerializeUncompressed(), &chaincfg.MainNetParams)
 	if err != nil {

@@ -6,18 +6,18 @@ import (
 )
 
 type Config interface {
-	Tabler
+	TableConfiger
 	QRCoder
 	Signer
-	Googler
+	GoogleConfiger
 	comfig.Logger
 	TemplatesConfiger
 }
 
 type config struct {
-	Tabler
+	TableConfiger
 	Signer
-	Googler
+	GoogleConfiger
 	TemplatesConfiger
 	comfig.Logger
 	QRCoder
@@ -29,9 +29,9 @@ func New(getter kv.Getter) Config {
 		getter:            getter,
 		TemplatesConfiger: NewTemplatesConfiger(getter),
 		QRCoder:           NewQRCoder(getter),
-		Googler:           NewGoogler(getter),
+		GoogleConfiger:    NewGoogler(getter),
 		Signer:            NewKeyer(getter),
-		Tabler:            NewTabler(getter),
+		TableConfiger:     NewTableConfiger(getter),
 		Logger:            comfig.NewLogger(getter, comfig.LoggerOpts{}),
 	}
 }

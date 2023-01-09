@@ -100,6 +100,14 @@ func Parse(pathToFile string) ([]*data.User, error) {
 		userInfo.Date = row[0]
 		userInfo.Participant = row[1]
 		userInfo.CourseTitle = row[2]
+		userInfo.SerialNumber = row[3]
+		userInfo.Note = row[4]
+		userInfo.Certificate = row[5]
+		userInfo.DataHash = row[6]
+		userInfo.TxHash = row[7]
+		userInfo.Signature = row[8]
+		userInfo.DigitalCertificate = row[9]
+
 		users = append(users, userInfo)
 	}
 	return users, err

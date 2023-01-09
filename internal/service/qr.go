@@ -25,46 +25,58 @@ var shortTitles = map[string]string{
 	"Blockchain and Distributed Systems":                    "distributed_system",
 }
 
-func GenerateQR(user *data.User, cfg config.Config) (string, error) {
+type QR struct {
+	user      *data.User
+	signature signature.Signature
+	cfg       config.Config
+}
 
-	parsedName := strings.Split(user.Participant, " ")
+func NewQR(user *data.User, cfg config.Config, signature signature.Signature) QR {
+	return QR{
+		user:      user,
+		signature: signature,
+		cfg:       cfg,
+	}
+}
+
+func (q QR) GenerateQR() (string, string, string, error) {
+
+	parsedName := strings.Split(q.user.Participant, " ")
 	path := ""
-	if len(parsedName) < 2 {
-		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], cfg.TemplatesConfig()[user.CourseTitle])
+	if len(parsedName) == 2 {
+		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	} else {
-		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], cfg.TemplatesConfig()[user.CourseTitle])
+		path = fmt.Sprintf("certificate_%s_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], parsedName[2], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	}
 
-	pathWithSuffix := fmt.Sprintf(cfg.QRCode().QRPath + path)
+	pathWithSuffix := fmt.Sprintf(q.cfg.QRCode().QRPath + path)
 
 	fi, err := os.Create(pathWithSuffix)
 	if err != nil {
 		log.Println(err)
-		return "", err
+		return "", "", "", err
 	}
 	s := svg.New(fi)
-	aggregatedStr := fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
-	signature, _, address, err := signature.Sign(cfg.Key().Private, aggregatedStr)
-	if err != nil {
+	aggregatedStr := fmt.Sprintf("%s %s %s", q.user.Date, q.user.Participant, q.user.CourseTitle)
+
+	signedMsg, _, address, err := q.signature.Sign()
+	if err != nil { //todo fix log
 		log.Println(err)
-		return "", err
+		return "", "", "", err
 	}
 
-	user.Signature = string(signature)
-	qrCode, _ := qr.Encode(PrepareMsgForQR(aggregatedStr, address, signature), qr.M, qr.Auto)
+	qrCode, _ := qr.Encode(q.PrepareMsgForQR(aggregatedStr, address, signedMsg), qr.M, qr.Auto)
 
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
 
-	user.DigitalCertificate = pathWithSuffix
-
 	s.End()
 
-	return path, nil
+	return path, pathWithSuffix, string(signedMsg), nil
 }
 
-func PrepareMsgForQR(name string, address, signature []byte) string {
+func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {
 	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
 	return msg
 }

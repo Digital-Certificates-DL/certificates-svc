@@ -1,5 +1,6 @@
 log:
   disable_sentry: true
+  level: info
 
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
@@ -9,10 +10,10 @@ google:
   qr_path: "qr"
   api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
   code: "4/0AWgavddEukwpUxaJ8CJBugnCbCf2bzTk4CakxD8IJndksk6EN_K9na94pP-UxT03AR1wnA"
-  enable: true
+  enable: false
 
 tables:
-  result: "test11111.xlsx"
+  result: "test.xlsx"
   input: "certificates.xlsx"
 
 qr_code:
@@ -23,6 +24,7 @@ templates:
   list:
     golang: "Golang programming on fundamental aspects"
     distributed_system: "Blockchain and Distributed Systems"
+    cryptocurrencies: "Cryptocurrencies and Distributed Systems"
     decentralize_technologies: "Basic Level in Decentralized Technologies"
     bitcoin: "Біткоїн та криптовалюти"
     security: "Cryptography and information security theory"
