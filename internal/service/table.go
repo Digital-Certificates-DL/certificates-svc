@@ -3,8 +3,9 @@ package service
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
+	"gitlab.com/distributed_lab/logan/v3/errors"
+	"helper/internal/config"
 	"helper/internal/data"
-	"log"
 	"reflect"
 	"strings"
 )
@@ -22,7 +23,7 @@ var titles = map[string]string{
 	"J": "Digital Certificate",
 }
 
-var usersTag = map[string]string{ //todo will make better
+var usersTag = map[string]string{
 	"A": "Date",
 	"B": "Participant",
 	"C": "CourseTitle",
@@ -62,34 +63,30 @@ func SetRes(users []*data.User, resultFile string) []error {
 	if resultFile == "" {
 		err := f.SaveAs("result.xlsx")
 		if err != nil {
-			log.Println(err)
 			return errs
 		}
 	}
 	err := f.SaveAs(resultFile)
 	if err != nil {
-		log.Println(err)
 		return errs
 	}
 	return nil
 }
 
-func Parse(pathToFile string) ([]*data.User, error) {
+func Parse(pathToFile string, cfg config.Config) ([]*data.User, []error) {
 	users := make([]*data.User, 0)
 	f, err := excelize.OpenFile(pathToFile)
 	defer f.Close()
+	errs := make([]error, 0)
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		return nil, append(errs, errors.Wrap(err, "failed to open file"))
 	}
 
 	list := f.GetSheetList()
 
 	rows, err := f.GetRows(list[0])
 	if err != nil {
-
-		log.Println(err)
-		return nil, err
+		return nil, append(errs, errors.Wrap(err, "failed to get rows from file"))
 	}
 
 	for id, row := range rows {
@@ -97,18 +94,24 @@ func Parse(pathToFile string) ([]*data.User, error) {
 			continue
 		}
 		userInfo := new(data.User)
-		userInfo.Date = row[0]
-		userInfo.Participant = row[1]
-		userInfo.CourseTitle = row[2]
-		userInfo.SerialNumber = row[3]
-		userInfo.Note = row[4]
-		userInfo.Certificate = row[5]
-		userInfo.DataHash = row[6]
-		userInfo.TxHash = row[7]
-		userInfo.Signature = row[8]
-		userInfo.DigitalCertificate = row[9]
 
+		st := reflect.ValueOf(userInfo)
+		st = st.Elem()
+
+		for i, str := range row {
+
+			st.Field(i).SetString(str)
+			cfg.Log().Debug(str, i)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+		}
 		users = append(users, userInfo)
+
 	}
-	return users, err
+	if len(errs) != 0 {
+		return nil, append(errs, errors.Wrap(err, "failed to parse xlsx"))
+	}
+	return users, nil
 }

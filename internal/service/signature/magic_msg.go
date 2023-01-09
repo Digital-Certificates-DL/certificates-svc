@@ -3,20 +3,21 @@ package signature
 import (
 	"bytes"
 	"github.com/btcsuite/btcd/wire"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 )
 
 const varIntProtoVer uint32 = 0
 
 const magicMessage = "\x18Bitcoin Signed Message:\n"
 
-func (s Signature) CreateMagicMessage(message string) string {
+func (s Signature) CreateMagicMessage(message string) (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.Grow(wire.VarIntSerializeSize(uint64(len(message))))
 
 	// If we cannot write the VarInt, just panic since that should never happen
 	if err := wire.WriteVarInt(&buffer, varIntProtoVer, uint64(len(message))); err != nil {
-		panic(err)
+		return "", errors.Wrap(err, "failed to decide or insert size of msg")
 	}
 
-	return magicMessage + buffer.String() + message
+	return magicMessage + buffer.String() + message, nil
 }

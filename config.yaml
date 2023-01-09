@@ -1,6 +1,6 @@
 log:
   disable_sentry: true
-  level: info
+  level: debug
 
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"

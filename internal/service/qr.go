@@ -5,10 +5,10 @@ import (
 	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 	"helper/internal/config"
 	"helper/internal/data"
 	"helper/internal/service/signature"
-	"log"
 	"os"
 	"strings"
 )
@@ -43,26 +43,26 @@ func (q QR) GenerateQR() (string, string, string, error) {
 
 	parsedName := strings.Split(q.user.Participant, " ")
 	path := ""
-	if len(parsedName) == 2 {
-		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], q.cfg.TemplatesConfig()[q.user.CourseTitle])
+	q.cfg.Log().Debug(parsedName)
+	if len(parsedName) < 2 {
+
+		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	} else {
-		path = fmt.Sprintf("certificate_%s_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], parsedName[2], q.cfg.TemplatesConfig()[q.user.CourseTitle])
+		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	}
 
 	pathWithSuffix := fmt.Sprintf(q.cfg.QRCode().QRPath + path)
 
 	fi, err := os.Create(pathWithSuffix)
 	if err != nil {
-		log.Println(err)
-		return "", "", "", err
+		return "", "", "", errors.Wrap(err, "failed to create file by path")
 	}
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", q.user.Date, q.user.Participant, q.user.CourseTitle)
 
 	signedMsg, _, address, err := q.signature.Sign()
-	if err != nil { //todo fix log
-		log.Println(err)
-		return "", "", "", err
+	if err != nil {
+		return "", "", "", errors.Wrap(err, "failed to sign msg")
 	}
 
 	qrCode, _ := qr.Encode(q.PrepareMsgForQR(aggregatedStr, address, signedMsg), qr.M, qr.Auto)
