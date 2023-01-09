@@ -8,7 +8,6 @@ import (
 	"helper/internal/config"
 	"helper/internal/service/google"
 	"helper/internal/service/signature"
-	"net/http"
 	"os"
 	"time"
 )
@@ -29,11 +28,12 @@ func Start(cfg config.Config) error {
 		return errors.New("failed to parse")
 	}
 	sendToDrive := cfg.Google().Enable
-	var connect *http.Client
 
+	var googleClient *google.Google
 	if sendToDrive {
-		connect, sendToDrive = google.Connect(cfg.Google().SecretPath, cfg.Google().Code)
-		folderIDList, err = google.CreateFolder(connect, cfg.Google().QRPath)
+		googleClient = google.NewGoogleClient(cfg)
+		sendToDrive = googleClient.Connect(cfg.Google().SecretPath, cfg.Google().Code)
+		err = googleClient.CreateFolder(cfg.Google().QRPath)
 		if err != nil {
 			cfg.Log().Debug(err)
 			return err
@@ -59,7 +59,7 @@ func Start(cfg config.Config) error {
 
 		if sendToDrive {
 			go running.UntilSuccess(ctx, log, "test", func(ctx context.Context) (bool, error) {
-				link, err := google.Update(path, connect, folderIDList, cfg)
+				link, err := googleClient.Update(path)
 				chLink <- link
 				var success bool
 				if err == nil {

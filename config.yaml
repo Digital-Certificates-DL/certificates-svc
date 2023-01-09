@@ -10,7 +10,7 @@ google:
   qr_path: "qr"
   api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
   code: "4/0AWgavddEukwpUxaJ8CJBugnCbCf2bzTk4CakxD8IJndksk6EN_K9na94pP-UxT03AR1wnA"
-  enable: false
+  enable: true
 
 tables:
   result: "test.xlsx"

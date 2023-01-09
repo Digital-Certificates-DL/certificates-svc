@@ -18,6 +18,5 @@ func (s Signature) CreateMagicMessage(message string) (string, error) {
 	if err := wire.WriteVarInt(&buffer, varIntProtoVer, uint64(len(message))); err != nil {
 		return "", errors.Wrap(err, "failed to decide or insert size of msg")
 	}
-
 	return magicMessage + buffer.String() + message, nil
 }
