@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
+	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"helper/internal/config"
 	"helper/internal/data"
 	"reflect"
 	"strings"
@@ -73,7 +73,7 @@ func SetRes(users []*data.User, resultFile string) []error {
 	return nil
 }
 
-func Parse(pathToFile string, cfg config.Config) ([]*data.User, []error) {
+func Parse(pathToFile string, log *logan.Entry) ([]*data.User, []error) {
 	users := make([]*data.User, 0)
 	f, err := excelize.OpenFile(pathToFile)
 	defer f.Close()
@@ -101,7 +101,7 @@ func Parse(pathToFile string, cfg config.Config) ([]*data.User, []error) {
 		for i, str := range row {
 
 			st.Field(i).SetString(str)
-			cfg.Log().Debug(str, i)
+			log.Debug(str, i)
 			if err != nil {
 				errs = append(errs, err)
 				continue

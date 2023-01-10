@@ -14,30 +14,30 @@ import (
 
 const template = "https://drive.google.com/file/d/%s/view"
 
-var srv *drive.Service
+var srv *drive.Service //todo rewrite it
 
-func (g *Google) Update(name string) (string, error) {
+func (g *Google) Update(path string) (string, bool, error) {
 	var err error
-	if srv == nil {
+	if srv == nil { //todo wrap error
 		srv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
 	}
 
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
-	myQR, err := os.Open(g.cfg.QRCode().QRPath + name)
+	myQR, err := os.Open(g.cfg.QRCode().QRPath + path)
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
 
-	myFile := drive.File{Name: name, Parents: g.folderIDList, MimeType: "image/svg+xml"}
+	myFile := drive.File{Name: path, Parents: g.folderIDList, MimeType: "image/svg+xml"}
 
 	file, err := srv.Files.Create(&myFile).Fields().SupportsAllDrives(true).Media(myQR).Do()
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
 
-	return g.createLink(file.Id), nil
+	return g.createLink(file.Id), true, nil
 
 }
 func (g *Google) createLink(id string) string {

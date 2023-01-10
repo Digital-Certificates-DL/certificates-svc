@@ -13,8 +13,6 @@ const magicMessage = "\x18Bitcoin Signed Message:\n"
 func (s Signature) CreateMagicMessage(message string) (string, error) {
 	buffer := bytes.Buffer{}
 	buffer.Grow(wire.VarIntSerializeSize(uint64(len(message))))
-
-	// If we cannot write the VarInt, just panic since that should never happen
 	if err := wire.WriteVarInt(&buffer, varIntProtoVer, uint64(len(message))); err != nil {
 		return "", errors.Wrap(err, "failed to decide or insert size of msg")
 	}

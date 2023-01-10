@@ -1,10 +1,10 @@
 package google
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
@@ -12,18 +12,24 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type Google struct {
 	client       *http.Client
 	folderIDList []string
 	cfg          config.Config
+	prefixPath   string
 }
 
 func NewGoogleClient(cfg config.Config) *Google {
 	return &Google{
 		cfg: cfg,
+	}
+}
+
+func NewGoogleClientTest(prefixPath string) *Google {
+	return &Google{
+		prefixPath: prefixPath,
 	}
 }
 
@@ -73,31 +79,16 @@ func (g *Google) saveToken(path string, token *oauth2.Token) {
 	json.NewEncoder(f).Encode(token)
 }
 
-func (g *Google) Connect(path, code string) bool {
+func (g *Google) Connect(path, code string) error {
 	b, err := os.ReadFile(path)
 	if err != nil {
-		log.Printf("Unable to read client secret file: %v", err)
-		log.Printf("Could you continue to work without google drive ?")
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
-		if strings.ToLower(text) == "y\n" {
-			return false
-		}
-		return true
+		return errors.Wrap(err, "Unable to read client secret file")
 	}
 
 	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
-		log.Printf("Unable to parse client secret file to config: %v", err)
-		log.Printf("Could you continue to work without google drive ? Press y")
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
-		if strings.ToLower(text) == "y" {
-			return false
-		}
-
-		return true
+		return errors.Wrap(err, "Unable to parse client secret file to config") //todo make better
 	}
 	g.client = g.getClient(config, path, code)
-	return true
+	return nil
 }

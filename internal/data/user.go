@@ -11,6 +11,7 @@ type User struct {
 	TxHash             string
 	Signature          string
 	DigitalCertificate string
+	ID                 int
 }
 
 func (u *User) SetSignature(signature string) {
