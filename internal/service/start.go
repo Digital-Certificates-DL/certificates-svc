@@ -32,7 +32,8 @@ func Start(cfg config.Config) error {
 
 	var googleClient *google.Google
 	if sendToDrive {
-		googleClient = google.NewGoogleClient(cfg)
+		googleClient, err = google.NewGoogleClient(cfg)
+
 		err = googleClient.Connect(cfg.Google().SecretPath, cfg.Google().Code)
 		if err != nil {
 			log.Info("Could you continue to work without google drive? (y)")

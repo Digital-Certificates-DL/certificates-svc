@@ -11,8 +11,7 @@ import (
 
 func TestRunner(t *testing.T) {
 	log := logan.New()
-	//users, _ := Parse("certificates.xlsx", log)
-	//chUsers := make(chan *data.User, len(users))
+
 	ctx, _ := context.WithCancel(context.Background())
 
 	ch := make(chan int, 10)
@@ -34,7 +33,7 @@ func TestRunner(t *testing.T) {
 			return test, err
 		}, time.Millisecond*100, time.Millisecond*150) //todo move config file
 	}
-	//check(ch, cancel, ctx, 10)
+
 	close(ch)
 	fmt.Println("close")
 }

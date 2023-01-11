@@ -8,8 +8,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/option"
 	"helper/internal/config"
-	"log"
 	"net/http"
 	"os"
 )
@@ -19,12 +19,20 @@ type Google struct {
 	folderIDList []string
 	cfg          config.Config
 	prefixPath   string
+
+	srv *drive.Service
 }
 
-func NewGoogleClient(cfg config.Config) *Google {
-	return &Google{
+func NewGoogleClient(cfg config.Config) (*Google, error) {
+	var err error
+	g := &Google{
 		cfg: cfg,
 	}
+	g.srv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create new service")
+	}
+	return g, nil
 }
 
 func NewGoogleClientTest(prefixPath string) *Google {
@@ -33,50 +41,53 @@ func NewGoogleClientTest(prefixPath string) *Google {
 	}
 }
 
-func (g *Google) getClient(config *oauth2.Config, path string, code string) *http.Client {
+func (g *Google) getClient(config *oauth2.Config, path string, code string) (*http.Client, error) {
 	tokFile := path
 	tok, err := g.tokenFromFile(tokFile)
 	if err != nil {
-		tok = g.getTokenFromWeb(config, code)
+		tok, err = g.getTokenFromWeb(config, code)
+		if err != nil {
+			return nil, errors.Wrap(err, "you have to update config ")
+		}
 		g.saveToken(tokFile, tok)
 	}
 
-	return config.Client(context.Background(), tok)
+	return config.Client(context.Background(), tok), nil
 }
 
 // Request a token from the web, then returns the retrieved token.
-func (g *Google) getTokenFromWeb(config *oauth2.Config, code string) *oauth2.Token {
+func (g *Google) getTokenFromWeb(config *oauth2.Config, code string) (*oauth2.Token, error) {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
-
-	tok, err := config.Exchange(context.TODO(), code)
-	if err != nil {
-		log.Fatalf("Unable to retrieve token from web %v", err)
-	}
-	return tok
+	//todo will make without config and  will return tok and error
+	return nil, errors.New("failed to generate token")
 }
 
 // Retrieves a token from a local file.
 func (g *Google) tokenFromFile(file string) (*oauth2.Token, error) {
 	f, err := os.Open("token.json")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to open token's file")
 	}
 	defer f.Close()
 	tok := &oauth2.Token{}
 	err = json.NewDecoder(f).Decode(tok)
-	return tok, err
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to parse file")
+	}
+	return tok, nil
+
 }
 
-func (g *Google) saveToken(path string, token *oauth2.Token) {
-	fmt.Printf("Saving credential file to: %s\n", "token.json")
+func (g *Google) saveToken(path string, token *oauth2.Token) error {
 	f, err := os.OpenFile("token.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Fatalf("Unable to cache oauth token: %v", err)
+		return errors.Wrap(err, "Unable to cache oauth token")
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
+	return nil
 }
 
 func (g *Google) Connect(path, code string) error {
@@ -87,8 +98,11 @@ func (g *Google) Connect(path, code string) error {
 
 	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
 	if err != nil {
-		return errors.Wrap(err, "Unable to parse client secret file to config") //todo make better
+		return errors.Wrap(err, "Unable to parse client secret file to config")
 	}
-	g.client = g.getClient(config, path, code)
+	g.client, err = g.getClient(config, path, code)
+	if err != nil {
+		return errors.Wrap(err, "Unable to get client")
+	}
 	return nil
 }
