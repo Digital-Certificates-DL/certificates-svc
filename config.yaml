@@ -13,7 +13,7 @@ google:
   enable: true
 
 tables:
-  result: "test.xlsx"
+  result: "test123123123.xlsx"
   input: "certificates.xlsx"
 
 qr_code:

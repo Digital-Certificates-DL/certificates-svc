@@ -20,8 +20,8 @@ func (u *User) SetSignature(signature string) {
 
 func (u *User) SetDataHash(hash string) {
 	u.DataHash = hash
-	if u.TxHash == "-" {
-		u.TxHash = hash[:10]
+	if u.TxHash == "-" || u.TxHash == "none" {
+		u.SerialNumber = hash[:20]
 	}
 
 }

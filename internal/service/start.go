@@ -2,7 +2,6 @@ package service
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"helper/internal/config"
@@ -15,7 +14,7 @@ import (
 
 var folderIDList []string
 var err error
-var paths []Paths
+var paths []Path
 
 func Start(cfg config.Config) error {
 	log := cfg.Log()
@@ -52,10 +51,9 @@ func Start(cfg config.Config) error {
 		}
 	}
 
-	ctx := context.Background()
 	for id, user := range users {
 		user.ID = id
-		if user.TxHash != "" || user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" {
+		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" {
 			log.Debug("skip")
 			continue
 		}
@@ -69,34 +67,53 @@ func Start(cfg config.Config) error {
 			cfg.Log().Debug(err)
 			return err
 		}
-		paths = append(paths, Paths{path, id})
+		paths = append(paths, Path{path, id})
 	}
+	input := make(chan Path, 10)
+	output := make(chan Path, len(paths))
 	handlers := make([]Handler, 0)
 	wg := new(sync.WaitGroup)
+	//out := make([]Path, 0)
+
 	if sendToDrive {
+
+		for i := 0; i < 10; i++ {
+			log.Debug("start ", i)
+			handlers = append(handlers, NewHandler(input, output, log, fmt.Sprintf("test-%d", i), googleClient))
+			wg.Add(1)
+			go handlers[i].StartRunner(wg)
+		}
 		for id, path := range paths {
 			log.Debug(id)
-			if id < 10 { //todo move to config
-				log.Debug("start ", id)
-				handlers = append(handlers, NewHandler(ctx, make(chan Paths), log, fmt.Sprintf("test-%d", id), googleClient))
-				handlers[id].SetData(path)
-				wg.Add(1)
-				go handlers[id].StartRunner(wg)
-				continue
-			}
-			handlers[id%10].SetData(path)
+			input <- path
+			log.Debug("input chanel = ")
 		}
 
 	}
-	wg.Wait()
-	paths := make([]Paths, 0)
 	log.Debug("move out go")
-	for _, handler := range handlers {
-		path, _ := handler.Result()
-		paths = append(paths, path...)
-	}
 
-	for _, path := range paths {
+	//func() {
+	//	for {
+	//		select {
+	//		case <-output:
+	//			out = append(out, <-output)
+	//			if len(paths) >= len(out) {
+	//				log.Debug("return ")
+	//				return
+
+	//			}
+	//		default:
+	//			log.Debug("Wait  ========= ")
+	//		}
+	//	}
+	//}()
+	wg.Wait()
+	close(input)
+	for range paths {
+		path, ok := <-output
+		if !ok {
+			break
+		}
 		users[path.ID].DigitalCertificate = path.Path
 	}
 

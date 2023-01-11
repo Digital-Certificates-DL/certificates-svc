@@ -32,7 +32,7 @@ func (g *Google) Update(path string) (string, bool, error) {
 
 	myFile := drive.File{Name: path, Parents: g.folderIDList, MimeType: "image/svg+xml"}
 
-	file, err := srv.Files.Create(&myFile).Fields().SupportsAllDrives(true).Media(myQR).Do()
+	file, err := srv.Files.Create(&myFile).Media(myQR).Do()
 	if err != nil {
 		return "", false, err
 	}
