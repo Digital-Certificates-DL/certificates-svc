@@ -20,7 +20,7 @@ func (u *User) SetSignature(signature string) {
 
 func (u *User) SetDataHash(hash string) {
 	u.DataHash = hash
-	if len(u.TxHash) == 1 {
+	if len(u.TxHash) > 0 && len(u.TxHash) < 5 {
 		u.SerialNumber = hash[:20]
 	}
 

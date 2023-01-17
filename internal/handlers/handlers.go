@@ -40,6 +40,7 @@ func NewHandler(input chan Path, output chan Path, log *logan.Entry, google *goo
 		chOutput:     output,
 		log:          log,
 		googleClient: google,
+		name:         "handler",
 		cancel:       cancel,
 		ctx:          ctxInner,
 	}
@@ -53,15 +54,15 @@ func (h *Handler) StartRunner() {
 			defer h.log.Debug("quit ", i)
 			for path := range h.chInput {
 				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
-					h.log.Debug("in  runner ", name)
 					link, success, err := h.googleClient.Update(path.Path)
 					if err != nil {
-						h.log.Debug(h.name, "--->", "error: ", err)
+						h.log.Error(h.name, "--->", "error: ", err)
 						return false, err
 					}
-					path.Path = link
 
+					path.Path = link
 					h.chOutput <- path
+
 					h.log.Debug("send ", name)
 					return success, err
 				}, time.Millisecond*150, time.Millisecond*180) //todo move config file
@@ -74,8 +75,9 @@ func (h *Handler) StartRunner() {
 func (h *Handler) decrement() {
 	h.running--
 	if h.running == 0 {
-		h.cancel()
+
 		close(h.chOutput)
+		h.cancel()
 		h.log.Debug("ctx done")
 	}
 }
@@ -83,11 +85,12 @@ func (h *Handler) decrement() {
 func (h *Handler) Read(users []*data.User) []*data.User {
 	for {
 		select {
-		case <-h.chOutput:
-			path := <-h.chOutput
+		case path := <-h.chOutput:
 			h.log.Debug("read ")
+
 			users[path.ID].DigitalCertificate = path.Path
 		case <-h.ctx.Done():
+
 			h.log.Info("out ")
 			return users
 		}
@@ -95,10 +98,8 @@ func (h *Handler) Read(users []*data.User) []*data.User {
 }
 
 func (h *Handler) insertData(paths []Path) {
-	for id, path := range paths {
-		h.log.Debug(id, "   ------  ", path)
-		h.chInput <- path //todo error
-		h.log.Debug("input chanel = ")
+	for _, path := range paths {
+		h.chInput <- path
 	}
 	close(h.chInput)
 }

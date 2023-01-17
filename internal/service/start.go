@@ -28,7 +28,7 @@ func Start(cfg config.Config) error {
 
 	for id, user := range users {
 		user.ID = id
-		if len(user.TxHash) > 1 || user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" {
+		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" {
 			log.Debug("skip")
 			continue
 		}
@@ -42,7 +42,7 @@ func Start(cfg config.Config) error {
 		var path string
 		path, user.DigitalCertificate, user.Signature, err = qr.GenerateQR()
 		if err != nil {
-			cfg.Log().Debug(err)
+			cfg.Log().Error(err)
 			return err
 		}
 		log.Info(user.Participant, "local qr path = ", user.DigitalCertificate)
