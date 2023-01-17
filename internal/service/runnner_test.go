@@ -25,7 +25,6 @@ func TestRunner(t *testing.T) {
 					ch <- j
 					return true, nil
 				}
-
 				return false, err
 			}()
 			j++

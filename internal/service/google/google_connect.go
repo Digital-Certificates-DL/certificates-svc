@@ -23,16 +23,12 @@ type Google struct {
 	srv *drive.Service
 }
 
-func NewGoogleClient(cfg config.Config) (*Google, error) {
-	var err error
-	g := &Google{
+func NewGoogleClient(cfg config.Config) *Google {
+
+	g := Google{
 		cfg: cfg,
 	}
-	g.srv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create new service")
-	}
-	return g, nil
+	return &g
 }
 
 func NewGoogleClientTest(prefixPath string) *Google {
@@ -61,7 +57,12 @@ func (g *Google) getTokenFromWeb(config *oauth2.Config, code string) (*oauth2.To
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 	//todo will make without config and  will return tok and error
-	return nil, errors.New("failed to generate token")
+	tok, err := config.Exchange(context.TODO(), code)
+	if err != nil {
+		return nil, errors.New("failed to generate token")
+	}
+
+	return tok, nil
 }
 
 // Retrieves a token from a local file.
@@ -103,6 +104,10 @@ func (g *Google) Connect(path, code string) error {
 	g.client, err = g.getClient(config, path, code)
 	if err != nil {
 		return errors.Wrap(err, "Unable to get client")
+	}
+	g.srv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
+	if err != nil {
+		return errors.Wrap(err, "failed to create new service")
 	}
 	return nil
 }

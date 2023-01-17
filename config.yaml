@@ -9,11 +9,11 @@ google:
   secret_path: "./client_secret.json"
   qr_path: "qr"
   api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
-  code: "4/0AWgavdepHKpF60qU_ff8gfW6FiOVtfePwjGbOFPGD7UULBOExDA4MxBoEaKERg4d8hGc8A"
+  code: "4/0AWgavdeg9nX34wv4ufGJKArwnaI6fr3pPCal6ZKfMztLLGIzRa7-tyfK52IUCZojcxOpLw"
   enable: true
 
 tables:
-  result: "test123123123.xlsx"
+  result: "test.xlsx"
   input: "certificates.xlsx"
 
 qr_code:
