@@ -84,10 +84,9 @@ func (h *Handler) Read(users []*data.User) []*data.User {
 	for {
 		select {
 		case <-h.chOutput:
-			path := <-h.chOutput //todo error
+			path := <-h.chOutput
 			h.log.Debug("read ")
 			users[path.ID].DigitalCertificate = path.Path
-
 		case <-h.ctx.Done():
 			h.log.Info("out ")
 			return users
