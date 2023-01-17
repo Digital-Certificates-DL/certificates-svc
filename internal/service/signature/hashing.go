@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func (s Signature) Hashing() string {
-	sum := sha256.Sum256([]byte(s.msg))
+func (s Signature) Hashing(msg string) string {
+	sum := sha256.Sum256([]byte(msg))
 	return fmt.Sprintf("%x", sum[:])
 }

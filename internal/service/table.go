@@ -37,6 +37,7 @@ var usersTag = map[string]string{
 }
 
 func SetRes(users []*data.User, resultFile string) []error {
+
 	errs := make([]error, 0)
 	f := excelize.NewFile()
 	defer f.Close()

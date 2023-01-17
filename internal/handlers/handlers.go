@@ -11,6 +11,7 @@ import (
 	"helper/internal/service/google"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type Path struct {
 }
 
 type Handler struct {
+	mu           sync.Mutex
 	running      int
 	chInput      chan Path
 	chOutput     chan Path
@@ -48,24 +50,22 @@ func NewHandler(input chan Path, output chan Path, log *logan.Entry, google *goo
 
 func (h *Handler) StartRunner() {
 	for i := 0; i < h.running; i++ {
-		h.log.Debug("start ", i)
+		h.log.Info("start ", i)
 		go func(name string) {
 			defer h.decrement()
 			defer h.log.Debug("quit ", i)
 			for path := range h.chInput {
 				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
-					link, success, err := h.googleClient.Update(path.Path)
+					link, err := h.googleClient.Update(path.Path)
 					if err != nil {
 						h.log.Error(h.name, "--->", "error: ", err)
 						return false, err
 					}
-
 					path.Path = link
 					h.chOutput <- path
-
 					h.log.Debug("send ", name)
-					return success, err
-				}, time.Millisecond*150, time.Millisecond*180) //todo move config file
+					return true, err
+				}, time.Millisecond*150, time.Millisecond*180)
 			}
 		}(fmt.Sprintf("%s-%d", h.name, i))
 
@@ -73,9 +73,10 @@ func (h *Handler) StartRunner() {
 }
 
 func (h *Handler) decrement() {
+	h.mu.Lock()
 	h.running--
+	h.mu.Unlock()
 	if h.running == 0 {
-
 		close(h.chOutput)
 		h.cancel()
 		h.log.Debug("ctx done")
@@ -86,12 +87,10 @@ func (h *Handler) Read(users []*data.User) []*data.User {
 	for {
 		select {
 		case path := <-h.chOutput:
-			h.log.Debug("read ")
-
+			h.log.Debug("read")
 			users[path.ID].DigitalCertificate = path.Path
 		case <-h.ctx.Done():
-
-			h.log.Info("out ")
+			h.log.Info("out")
 			return users
 		}
 	}
@@ -129,17 +128,14 @@ func Drive(cfg config.Config, log *logan.Entry, paths []Path, users []*data.User
 	if sendToDrive {
 		err = googleClient.CreateFolder(cfg.Google().QRPath)
 		if err != nil {
-			cfg.Log().Debug(err)
+			cfg.Log().Error(err)
 			return users, err
 		}
 		handler := NewHandler(input, output, log, googleClient, 10, ctx)
 		handler.StartRunner()
 		go handler.insertData(paths)
-
 		users = handler.Read(users)
 	}
-
-	log.Debug("move out go")
 
 	return users, err
 }

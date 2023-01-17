@@ -12,47 +12,48 @@ import (
 )
 
 type Signature struct {
-	msg string
-	key string
+	address []byte
+	pubKey  *btcec.PublicKey
+	key     *btcec.PrivateKey
 }
 
-func NewSignature(msg, key string) Signature {
-	return Signature{
-		msg: msg,
-		key: key,
-	}
-}
-
-func (s Signature) Sign() ([]byte, []byte, []byte, error) {
-	wifKey, err := btcutil.DecodeWIF(s.key)
+func NewSignature(key string) (Signature, error) {
+	wifKey, err := btcutil.DecodeWIF(key)
 	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "unsupported type of key")
+		return Signature{}, errors.Wrap(err, "unsupported type of key")
+	}
+	private, public := btcec.PrivKeyFromBytes(wifKey.PrivKey.Serialize())
+	pub, err := btcec.ParsePubKey(public.SerializeUncompressed())
+	if err != nil {
+		return Signature{}, errors.Wrap(err, "failed to parse pub key")
 	}
 
-	msgWithSuf, err := s.CreateMagicMessage(s.msg)
+	sign := Signature{
+		key:    private,
+		pubKey: pub,
+	}
+
+	address, err := sign.GenerateAddress()
+	if err != nil {
+		return Signature{}, errors.Wrap(err, "failed to generate address")
+	}
+	sign.address = address
+	return sign, nil
+
+}
+
+func (s Signature) Sign(msg string) ([]byte, []byte, []byte, error) {
+	msgWithSuf, err := s.CreateMagicMessage(msg)
 	if err != nil {
 		return nil, nil, nil, errors.Wrap(err, "failed to prepare msg")
 	}
-
-	private, public := btcec.PrivKeyFromBytes(wifKey.PrivKey.Serialize())
-
-	pub, err := btcec.ParsePubKey(public.SerializeUncompressed())
-	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "failed to parse pub key")
-	}
 	messageHash := chainhash.DoubleHashB([]byte(msgWithSuf))
-
-	sign := ecdsa.SignCompact(private, messageHash, false)
-	address, err := s.GenerateAddress(pub)
-	if err != nil {
-		return nil, nil, nil, errors.Wrap(err, "failed to generate address")
-	}
-	return []byte(fmt.Sprint(base64.RawStdEncoding.EncodeToString(sign), "=")), pub.SerializeUncompressed(), address, err
+	sign := ecdsa.SignCompact(s.key, messageHash, false)
+	return []byte(fmt.Sprint(base64.RawStdEncoding.EncodeToString(sign), "=")), s.pubKey.SerializeUncompressed(), s.address, err
 }
 
-func (s Signature) GenerateAddress(key *btcec.PublicKey) ([]byte, error) {
-
-	mainNetAddrUn, err := btcutil.NewAddressPubKey(key.SerializeUncompressed(), &chaincfg.MainNetParams)
+func (s Signature) GenerateAddress() ([]byte, error) {
+	mainNetAddrUn, err := btcutil.NewAddressPubKey(s.pubKey.SerializeUncompressed(), &chaincfg.MainNetParams)
 	if err != nil {
 		return nil, errors.Wrap(err, "unsupported params")
 	}

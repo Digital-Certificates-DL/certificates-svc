@@ -26,16 +26,16 @@ var shortTitles = map[string]string{
 }
 
 type QR struct {
-	user      *data.User
-	signature signature.Signature
-	cfg       config.Config
+	user *data.User
+	sign signature.Signature
+	cfg  config.Config
 }
 
-func NewQR(user *data.User, cfg config.Config, signature signature.Signature) QR {
+func NewQR(user *data.User, cfg config.Config, sign signature.Signature) QR {
 	return QR{
-		user:      user,
-		signature: signature,
-		cfg:       cfg,
+		user: user,
+		sign: sign,
+		cfg:  cfg,
 	}
 }
 
@@ -60,7 +60,7 @@ func (q QR) GenerateQR() (string, string, string, error) {
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", q.user.Date, q.user.Participant, q.user.CourseTitle)
 
-	signedMsg, _, address, err := q.signature.Sign()
+	signedMsg, _, address, err := q.sign.Sign(aggregatedStr)
 	if err != nil {
 		return "", "", "", errors.Wrap(err, "failed to sign msg")
 	}
@@ -70,9 +70,7 @@ func (q QR) GenerateQR() (string, string, string, error) {
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
-
 	s.End()
-
 	return path, pathWithSuffix, string(signedMsg), nil
 }
 
