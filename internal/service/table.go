@@ -89,7 +89,6 @@ func Parse(pathToFile string, log *logan.Entry) ([]*data.User, []error) {
 	if err != nil {
 		return nil, append(errs, errors.Wrap(err, "failed to get rows from file"))
 	}
-
 	for id, row := range rows {
 		if id < 1 {
 			continue
@@ -98,9 +97,7 @@ func Parse(pathToFile string, log *logan.Entry) ([]*data.User, []error) {
 
 		st := reflect.ValueOf(userInfo)
 		st = st.Elem()
-
 		for i, str := range row {
-
 			st.Field(i).SetString(str)
 			log.Debug(str, i)
 			if err != nil {

@@ -42,7 +42,7 @@ func Start(cfg config.Config) error {
 		qr := NewQR(user, cfg, sign)
 		hash := sign.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 		if hash != "" {
-			log.Info(user.Participant, "hash = ", hash)
+			log.Info(user.Participant, " hash = ", hash)
 		}
 		user.SetDataHash(hash)
 		var path string
@@ -51,7 +51,7 @@ func Start(cfg config.Config) error {
 			log.Error(err)
 			return err
 		}
-		log.Info(user.Participant, "local qr path = ", user.DigitalCertificate)
+		log.Debug(user.Participant, "local qr path = ", user.DigitalCertificate)
 		paths = append(paths, handlers.Path{Path: path, ID: id})
 	}
 

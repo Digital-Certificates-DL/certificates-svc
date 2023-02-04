@@ -1,6 +1,6 @@
 log:
   disable_sentry: true
-  level: debug
+  level: info
 
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
@@ -9,7 +9,7 @@ google:
   secret_path: "./client_secret.json"
   qr_path: "qr"
   api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
-  code: "4/0AWgavdeg9nX34wv4ufGJKArwnaI6fr3pPCal6ZKfMztLLGIzRa7-tyfK52IUCZojcxOpLw"
+  code: "4/0AWtgzh4rceQqcqOUafIyo_QKNC-xefkrfZ5qVdKJbVFR9vVT4Apx8vnu-HVa3ro6DXDgmA"
   enable: true
 
 tables:

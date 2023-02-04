@@ -32,6 +32,7 @@ type Handler struct {
 	ctx          context.Context
 	cancel       context.CancelFunc
 	googleClient *google.Google
+	count        int32
 }
 
 func NewHandler(input chan Path, output chan Path, log *logan.Entry, google *google.Google, ran int, ctx context.Context) Handler {
@@ -50,7 +51,7 @@ func NewHandler(input chan Path, output chan Path, log *logan.Entry, google *goo
 
 func (h *Handler) StartRunner() {
 	for i := 0; i < h.running; i++ {
-		h.log.Info("start ", i)
+		h.log.Debug("start ", i)
 		go func(name string) {
 			defer h.decrement()
 			defer h.log.Debug("quit ", i)
@@ -64,6 +65,7 @@ func (h *Handler) StartRunner() {
 					path.Path = link
 					h.chOutput <- path
 					h.log.Debug("send ", name)
+					h.count++
 					return true, err
 				}, time.Millisecond*150, time.Millisecond*180)
 			}
@@ -90,7 +92,7 @@ func (h *Handler) Read(users []*data.User) []*data.User {
 			h.log.Debug("read")
 			users[path.ID].DigitalCertificate = path.Path
 		case <-h.ctx.Done():
-			h.log.Info("out")
+			h.log.Debug("out")
 			return users
 		}
 	}
@@ -135,6 +137,7 @@ func Drive(cfg config.Config, log *logan.Entry, paths []Path, users []*data.User
 		handler.StartRunner()
 		go handler.insertData(paths)
 		users = handler.Read(users)
+		log.Info("sent to drive: ", handler.count)
 	}
 
 	return users, err
