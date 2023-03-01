@@ -2,14 +2,17 @@ log:
   disable_sentry: true
   level: info
 
+listener:
+  addr: :7898
+
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
 
 google:
-  secret_path: "./client_secret.json"
+  secret_path: "./client.json"
   qr_path: "qr"
   api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
-  code: "4/0AWtgzh4rceQqcqOUafIyo_QKNC-xefkrfZ5qVdKJbVFR9vVT4Apx8vnu-HVa3ro6DXDgmA"
+  code: "4/0AWtgzh4wlNySzD6d2ui09uPg_y7xDKkfVp7EqJw9L11vFOa4jmF2ROnkbU9l8IHk05GfMQ"
   enable: true
 
 tables:
@@ -31,4 +34,10 @@ templates:
     database: "Theory of database organization and basic SQL"
     blockchain: "Beginner at theoretical aspects blockchain technology"
 
+cop:
+  disabled: true
+  endpoint: "http://..."
+  upstream: "http://..."
+  service_name: css
+  service_port: 80
 

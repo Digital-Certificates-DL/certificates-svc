@@ -115,7 +115,7 @@ func Drive(cfg config.Config, log *logan.Entry, paths []Path, users []*data.User
 	if sendToDrive {
 		googleClient = google.NewGoogleClient(cfg)
 
-		err = googleClient.Connect(cfg.Google().SecretPath, cfg.Google().Code)
+		err = googleClient.ConnectToDrive(cfg.Google().SecretPath, cfg.Google().Code)
 		if err != nil {
 			log.Info("Could you continue to work without google drive? (y)")
 			reader := bufio.NewReader(os.Stdin)

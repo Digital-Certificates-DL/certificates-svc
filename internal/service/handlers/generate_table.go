@@ -46,7 +46,8 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 		}
 
 		qr := qr.NewQR(user, helpers.Config(r), sign)
-		hash := sign.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
+		hash := sign.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)) //todo signing in frontend and return it in back
+
 		if hash != "" {
 			helpers.Log(r).Info(user.Participant, " hash = ", hash)
 		}

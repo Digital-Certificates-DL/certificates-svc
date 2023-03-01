@@ -16,12 +16,12 @@ func (s *service) router(cfg config.Config) chi.Router {
 		ape.LoganMiddleware(s.log),
 		ape.CtxMiddleware(
 			helpers.CtxLog(s.log),
-			//helpers.CtxBlobsQ(pg.NewBlobsQ(cfg.DB())),
-
+			helpers.CtxConfig(cfg),
 		),
 	)
 	r.Route("/integrations/storage", func(r chi.Router) {
 		r.Post("/blobs", handlers.GenerateTable)
+		r.Get("/test", handlers.Test)
 	})
 	return r
 }

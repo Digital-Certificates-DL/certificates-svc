@@ -19,7 +19,7 @@ func (g *Google) Update(path string) (string, error) {
 
 	myFile := drive.File{Name: path, Parents: g.folderIDList, MimeType: "image/svg+xml"}
 
-	file, err := g.srv.Files.Create(&myFile).Media(myQR).Do()
+	file, err := g.driveSrv.Files.Create(&myFile).Media(myQR).Do()
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to upload file to drive")
 	}
@@ -33,7 +33,7 @@ func (g *Google) createLink(id string) string {
 }
 
 func (g *Google) CreateFolder(folderPath string) error {
-	createFolder, err := g.srv.Files.Create(&drive.File{Name: folderPath + " " + time.Now().String(), MimeType: "application/vnd.google-apps.folder"}).Do()
+	createFolder, err := g.driveSrv.Files.Create(&drive.File{Name: folderPath + " " + time.Now().String(), MimeType: "application/vnd.google-apps.folder"}).Do()
 	if err != nil {
 		return errors.Wrap(err, "Unable to create folder")
 	}
@@ -45,7 +45,7 @@ func (g *Google) CreateFolder(folderPath string) error {
 
 func (g *Google) GetFiles() ([]*drive.File, error) {
 
-	r, err := g.srv.Files.List().PageSize(10).
+	r, err := g.driveSrv.Files.List().PageSize(10).
 		Fields("nextPageToken, files(id, name)").Do()
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to get files")

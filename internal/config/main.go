@@ -14,6 +14,7 @@ type Config interface {
 	GoogleConfiger
 	comfig.Logger
 	TemplatesConfiger
+	comfig.Listenerer
 	types.Copuser
 }
 
@@ -26,11 +27,13 @@ type config struct {
 	QRCoder
 	types.Copuser
 	getter kv.Getter
+	comfig.Listenerer
 }
 
 func New(getter kv.Getter) Config {
 	return &config{
 		getter:            getter,
+		Listenerer:        comfig.NewListenerer(getter),
 		Copuser:           copus.NewCopuser(getter),
 		TemplatesConfiger: NewTemplatesConfiger(getter),
 		QRCoder:           NewQRCoder(getter),

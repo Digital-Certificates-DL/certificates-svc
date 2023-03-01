@@ -9,6 +9,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
+	sheets "google.golang.org/api/sheets/v4"
 	"helper/internal/config"
 	"net/http"
 	"os"
@@ -20,7 +21,8 @@ type Google struct {
 	cfg          config.Config
 	prefixPath   string
 
-	srv *drive.Service
+	driveSrv *drive.Service
+	sheetSrv *sheets.Service
 }
 
 func NewGoogleClient(cfg config.Config) *Google {
@@ -91,7 +93,7 @@ func (g *Google) saveToken(path string, token *oauth2.Token) error {
 	return nil
 }
 
-func (g *Google) Connect(path, code string) error {
+func (g *Google) ConnectToDrive(path, code string) error {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return errors.Wrap(err, "Unable to read client secret file")
@@ -105,7 +107,37 @@ func (g *Google) Connect(path, code string) error {
 	if err != nil {
 		return errors.Wrap(err, "Unable to get client")
 	}
-	g.srv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
+	g.driveSrv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
+	if err != nil {
+		return errors.Wrap(err, "failed to create new service")
+	}
+	return nil
+}
+
+func (g *Google) ConnectSheetByKey(apiKey string) (*sheets.Service, error) {
+	sheetsService, err := sheets.NewService(context.Background(), option.WithAPIKey(apiKey))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to connect")
+	}
+	return sheetsService, nil
+}
+
+func (g *Google) ConnectTOSheet(path, code string) error {
+
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return errors.Wrap(err, "Unable to read client secret file")
+	}
+
+	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsScope)
+	if err != nil {
+		return errors.Wrap(err, "Unable to parse client secret file to config")
+	}
+	g.client, err = g.getClient(config, path, code)
+	if err != nil {
+		return errors.Wrap(err, "Unable to get client")
+	}
+	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.client))
 	if err != nil {
 		return errors.Wrap(err, "failed to create new service")
 	}
