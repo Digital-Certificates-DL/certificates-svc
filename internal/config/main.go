@@ -2,6 +2,8 @@ package config
 
 import (
 	"gitlab.com/distributed_lab/kit/comfig"
+	"gitlab.com/distributed_lab/kit/copus"
+	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/kit/kv"
 )
 
@@ -12,6 +14,7 @@ type Config interface {
 	GoogleConfiger
 	comfig.Logger
 	TemplatesConfiger
+	types.Copuser
 }
 
 type config struct {
@@ -21,12 +24,14 @@ type config struct {
 	TemplatesConfiger
 	comfig.Logger
 	QRCoder
+	types.Copuser
 	getter kv.Getter
 }
 
 func New(getter kv.Getter) Config {
 	return &config{
 		getter:            getter,
+		Copuser:           copus.NewCopuser(getter),
 		TemplatesConfiger: NewTemplatesConfiger(getter),
 		QRCoder:           NewQRCoder(getter),
 		GoogleConfiger:    NewGoogler(getter),
