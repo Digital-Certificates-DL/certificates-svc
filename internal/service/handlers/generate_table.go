@@ -4,39 +4,52 @@ import (
 	"fmt"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
+	"helper/internal/data"
 	"helper/internal/handlers"
+	"helper/internal/service/google"
 	"helper/internal/service/helpers"
 	"helper/internal/service/qr"
 	"helper/internal/service/requests"
 	"helper/internal/service/signature"
-	"helper/internal/service/table"
+	"log"
 	"net/http"
 	"os"
 )
 
 func GenerateTable(w http.ResponseWriter, r *http.Request) {
 	var paths []handlers.Path
-	_, err := requests.NewGenerateTable(r)
+	request, err := requests.NewGenerateTable(r)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to parse request")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 
-	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo  remove it
+	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo maybe remove it
 
-	users, errs := table.Parse(helpers.Config(r).Table().Input, helpers.Config(r).Log())
+	client := google.NewGoogleClient(helpers.Config(r))
+	err = client.ConnectTOSheet(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	users, errs := client.ParseFromWeb(request.Id, "A1:H", helpers.Config(r).Log())
 	if errs != nil {
 		helpers.Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
+
+	//todo make signature in front and use gorutines
 	sign, err := signature.NewSignature(helpers.Config(r).Key().Private)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to create signature")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
+	var usersResult []*data.User
+
 	for id, user := range users {
 		user.ID = id
 		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" {
@@ -59,23 +72,22 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 			ape.Render(w, problems.InternalError())
 			return
 		}
-		//log.Debug(user.Participant, "local qr path = ", user.DigitalCertificate)
 		paths = append(paths, handlers.Path{Path: path, ID: id})
+		usersResult = append(usersResult, user)
 	}
 
 	//todo  add new event that handle error with connect to drive
-
-	if sendToDrive := helpers.Config(r).Google().Enable; sendToDrive {
-		users, err = handlers.Drive(helpers.Config(r), helpers.Log(r), paths, users)
-		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to send date to drive")
-			ape.Render(w, problems.InternalError())
-			return
-		}
-	}
+	//if sendToDrive := helpers.Config(r).Google().Enable; sendToDrive {
+	//	users, err = handlers.Drive(helpers.Config(r), helpers.Log(r), paths, users)
+	//	if err != nil {
+	//		helpers.Log(r).WithError(err).Error("failed to send date to drive")
+	//		ape.Render(w, problems.InternalError())
+	//		return
+	//	}
+	//}
 
 	helpers.Log(r).Info("creating table")
-	errs = table.SetRes(users, helpers.Config(r).Table().Result)
+	errs = client.SetRes(usersResult, request.Id)
 	if errs != nil {
 		helpers.Log(r).Error("failed to send date to drive: Errors: ", errs)
 		ape.Render(w, problems.InternalError())

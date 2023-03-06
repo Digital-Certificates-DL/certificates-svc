@@ -21,6 +21,8 @@ type Google struct {
 	cfg          config.Config
 	prefixPath   string
 
+	sheetID string
+
 	driveSrv *drive.Service
 	sheetSrv *sheets.Service
 }

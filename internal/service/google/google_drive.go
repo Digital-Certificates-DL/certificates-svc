@@ -11,19 +11,15 @@ import (
 const template = "https://drive.google.com/file/d/%s/view"
 
 func (g *Google) Update(path string) (string, error) {
-
 	myQR, err := os.Open(g.cfg.QRCode().QRPath + path)
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to open file")
 	}
-
 	myFile := drive.File{Name: path, Parents: g.folderIDList, MimeType: "image/svg+xml"}
-
 	file, err := g.driveSrv.Files.Create(&myFile).Media(myQR).Do()
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to upload file to drive")
 	}
-
 	return g.createLink(file.Id), nil
 
 }

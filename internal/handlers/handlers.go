@@ -49,7 +49,9 @@ func NewHandler(input chan Path, output chan Path, log *logan.Entry, google *goo
 	}
 }
 
-func (h *Handler) StartRunner() {
+//function func(ctx context.Context, log *logan.Entry, name string, runner func(ctx2 context.Context)) (bool, error)
+
+func (h *Handler) StartDriveRunner() { //todo do more useful
 	for i := 0; i < h.running; i++ {
 		h.log.Debug("start ", i)
 		go func(name string) {
@@ -70,7 +72,30 @@ func (h *Handler) StartRunner() {
 				}, time.Millisecond*150, time.Millisecond*180)
 			}
 		}(fmt.Sprintf("%s-%d", h.name, i))
+	}
+}
 
+func (h *Handler) StartSheetRunner() { //todo do more useful
+	for i := 0; i < h.running; i++ {
+		h.log.Debug("start ", i)
+		go func(name string) {
+			defer h.decrement()
+			defer h.log.Debug("quit ", i)
+			for path := range h.chInput {
+				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
+					link, err := h.googleClient.Update(path.Path)
+					if err != nil {
+						h.log.Error(h.name, "--->", "error: ", err)
+						return false, err
+					}
+					path.Path = link
+					h.chOutput <- path
+					h.log.Debug("send ", name)
+					h.count++
+					return true, err
+				}, time.Millisecond*150, time.Millisecond*180)
+			}
+		}(fmt.Sprintf("%s-%d", h.name, i))
 	}
 }
 
@@ -134,7 +159,7 @@ func Drive(cfg config.Config, log *logan.Entry, paths []Path, users []*data.User
 			return users, err
 		}
 		handler := NewHandler(input, output, log, googleClient, 10, ctx)
-		handler.StartRunner()
+		handler.StartDriveRunner()
 		go handler.insertData(paths)
 		users = handler.Read(users)
 		log.Info("sent to drive: ", handler.count)

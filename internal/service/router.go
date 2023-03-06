@@ -21,7 +21,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 	)
 	r.Route("/integrations/storage", func(r chi.Router) {
 		r.Post("/blobs", handlers.GenerateTable)
-		r.Get("/test", handlers.Test)
+
 	})
 	return r
 }

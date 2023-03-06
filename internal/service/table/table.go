@@ -6,35 +6,10 @@ import (
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"helper/internal/data"
+	"helper/internal/service/helpers"
 	"reflect"
 	"strings"
 )
-
-var titles = map[string]string{
-	"A": "Date",
-	"B": "Participant",
-	"C": "Course Title",
-	"D": "Serial Number",
-	"E": "Note",
-	"F": "Certificate",
-	"G": "Data Hash",
-	"H": "Transaction Hash",
-	"I": "Signature",
-	"J": "Digital Certificate",
-}
-
-var usersTag = map[string]string{
-	"A": "Date",
-	"B": "Participant",
-	"C": "CourseTitle",
-	"D": "SerialNumber",
-	"E": "Note",
-	"F": "Certificate",
-	"G": "DataHash",
-	"H": "TxHash",
-	"I": "Signature",
-	"J": "DigitalCertificate",
-}
 
 func SetRes(users []*data.User, resultFile string) []error {
 
@@ -44,7 +19,7 @@ func SetRes(users []*data.User, resultFile string) []error {
 	sheepList := f.GetSheetList()
 	for id, user := range users {
 		if id == 0 {
-			for key, val := range titles {
+			for key, val := range helpers.Titles {
 				err := f.SetCellValue(sheepList[0], fmt.Sprintf("%s%d", strings.ToUpper(key), id+1), strings.ToTitle(val))
 				if err != nil {
 					errs = append(errs, err)
@@ -53,7 +28,7 @@ func SetRes(users []*data.User, resultFile string) []error {
 			}
 		}
 		t := reflect.ValueOf(*user)
-		for key, val := range usersTag {
+		for key, val := range helpers.UsersTag {
 			err := f.SetCellValue(sheepList[0], fmt.Sprintf("%s%d", strings.ToUpper(key), id+2), t.FieldByName(val).String())
 			if err != nil {
 				errs = append(errs, err)
