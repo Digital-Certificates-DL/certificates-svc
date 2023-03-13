@@ -19,8 +19,9 @@ func (s *service) router(cfg config.Config) chi.Router {
 			helpers.CtxConfig(cfg),
 		),
 	)
-	r.Route("/integrations/storage", func(r chi.Router) {
-		r.Post("/blobs", handlers.GenerateTable)
+	r.Route("/integrations/css", func(r chi.Router) {
+		r.Post("/generate", handlers.GenerateTable)
+		r.Get("/template", handlers.CreateTemplate)
 
 	})
 	return r

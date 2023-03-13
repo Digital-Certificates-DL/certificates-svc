@@ -13,6 +13,7 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/pkg/errors v0.9.1
+	github.com/signintech/gopdf v0.16.1
 	github.com/xuri/excelize/v2 v2.6.1
 	gitlab.com/distributed_lab/ape v1.7.1
 	gitlab.com/distributed_lab/figure v2.1.0+incompatible
@@ -48,6 +49,7 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
+	github.com/phpdave11/gofpdi v1.0.14-0.20211212211723-1f10f9844311 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
@@ -62,9 +64,10 @@ require (
 	gitlab.com/distributed_lab/lorem v0.2.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
+	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20221227171554-f9683d7f8bef // indirect
 	google.golang.org/grpc v1.51.0 // indirect
