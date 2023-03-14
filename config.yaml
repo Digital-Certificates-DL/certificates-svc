@@ -11,8 +11,8 @@ signature:
 google:
   secret_path: "./client.json"
   qr_path: "qr"
-  api_key: "AIzaSyAX5pLvCS9GQ23YFWvfpH__4nXo4BuqBUM"
-  code: "4/0AWtgzh4wlNySzD6d2ui09uPg_y7xDKkfVp7EqJw9L11vFOa4jmF2ROnkbU9l8IHk05GfMQ"
+  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ-c"
+  code: "4/0AWtgzh7AVlaau4iaYkYe_EBMEP-7h7PnDJoMw6Wv9du26DX99yKZZcr5Iw1uANXk_sl1pg"
   enable: true
 
 tables:

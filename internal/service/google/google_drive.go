@@ -1,22 +1,20 @@
 package google
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
 	"google.golang.org/api/drive/v3"
-	"os"
 	"time"
 )
 
 const template = "https://drive.google.com/file/d/%s/view"
 
-func (g *Google) Update(path string) (string, error) {
-	myQR, err := os.Open(g.cfg.QRCode().QRPath + path)
-	if err != nil {
-		return "", errors.Wrap(err, "Failed to open file")
-	}
-	myFile := drive.File{Name: path, Parents: g.folderIDList, MimeType: "image/svg+xml"}
-	file, err := g.driveSrv.Files.Create(&myFile).Media(myQR).Do()
+// "image/svg+xml" todo delete it
+
+func (g *Google) Update(name string, encodedFile []byte, mimeType string) (string, error) {
+	myFile := drive.File{Name: name, Parents: g.folderIDList, MimeType: mimeType}
+	file, err := g.driveSrv.Files.Create(&myFile).Media(bytes.NewReader(encodedFile)).Do()
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to upload file to drive")
 	}

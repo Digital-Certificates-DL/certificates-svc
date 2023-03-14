@@ -1,30 +1,31 @@
 package handlers
 
 import (
-	"bufio"
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
 	"helper/internal/config"
 	"helper/internal/data"
 	"helper/internal/service/google"
-	"os"
-	"strings"
 	"sync"
 	"time"
 )
 
-type Path struct {
-	Path string
+type FilesBytes struct {
+	File []byte
 	ID   int
+	Name string
+	Type string
+	Link string
 }
 
 type Handler struct {
 	mu           sync.Mutex
 	running      int
-	chInput      chan Path
-	chOutput     chan Path
+	chInput      chan FilesBytes
+	chOutput     chan FilesBytes
 	minTime      time.Duration
 	maxTime      time.Duration
 	name         string
@@ -35,7 +36,7 @@ type Handler struct {
 	count        int32
 }
 
-func NewHandler(input chan Path, output chan Path, log *logan.Entry, google *google.Google, ran int, ctx context.Context) Handler {
+func NewHandler(input chan FilesBytes, output chan FilesBytes, log *logan.Entry, google *google.Google, ran int, ctx context.Context) Handler {
 	ctxInner, cancel := context.WithCancel(ctx)
 	return Handler{
 		running:      ran,
@@ -59,12 +60,12 @@ func (h *Handler) StartDriveRunner() { //todo do more useful
 			defer h.log.Debug("quit ", i)
 			for path := range h.chInput {
 				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
-					link, err := h.googleClient.Update(path.Path)
+					link, err := h.googleClient.Update(path.Name, path.File, path.Type)
 					if err != nil {
 						h.log.Error(h.name, "--->", "error: ", err)
 						return false, err
 					}
-					path.Path = link
+					path.Link = link
 					h.chOutput <- path
 					h.log.Debug("send ", name)
 					h.count++
@@ -75,29 +76,30 @@ func (h *Handler) StartDriveRunner() { //todo do more useful
 	}
 }
 
-func (h *Handler) StartSheetRunner() { //todo do more useful
-	for i := 0; i < h.running; i++ {
-		h.log.Debug("start ", i)
-		go func(name string) {
-			defer h.decrement()
-			defer h.log.Debug("quit ", i)
-			for path := range h.chInput {
-				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
-					link, err := h.googleClient.Update(path.Path)
-					if err != nil {
-						h.log.Error(h.name, "--->", "error: ", err)
-						return false, err
-					}
-					path.Path = link
-					h.chOutput <- path
-					h.log.Debug("send ", name)
-					h.count++
-					return true, err
-				}, time.Millisecond*150, time.Millisecond*180)
-			}
-		}(fmt.Sprintf("%s-%d", h.name, i))
-	}
-}
+//
+//func (h *Handler) StartSheetRunner() { //todo do more useful
+//	for i := 0; i < h.running; i++ {
+//		h.log.Debug("start ", i)
+//		go func(name string) {
+//			defer h.decrement()
+//			defer h.log.Debug("quit ", i)
+//			for path := range h.chInput {
+//				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
+//					link, err := h.googleClient.Update(path.FilesBytes)
+//					if err != nil {
+//						h.log.Error(h.name, "--->", "error: ", err)
+//						return false, err
+//					}
+//					path.FilesBytes = link
+//					h.chOutput <- path
+//					h.log.Debug("send ", name)
+//					h.count++
+//					return true, err
+//				}, time.Millisecond*150, time.Millisecond*180)
+//			}
+//		}(fmt.Sprintf("%s-%d", h.name, i))
+//	}
+//}
 
 func (h *Handler) decrement() {
 	h.mu.Lock()
@@ -115,7 +117,7 @@ func (h *Handler) Read(users []*data.User) []*data.User {
 		select {
 		case path := <-h.chOutput:
 			h.log.Debug("read")
-			users[path.ID].DigitalCertificate = path.Path
+			users[path.ID].DigitalCertificate = path.Link
 		case <-h.ctx.Done():
 			h.log.Debug("out")
 			return users
@@ -123,40 +125,24 @@ func (h *Handler) Read(users []*data.User) []*data.User {
 	}
 }
 
-func (h *Handler) insertData(paths []Path) {
+func (h *Handler) insertData(paths []FilesBytes) {
 	for _, path := range paths {
 		h.chInput <- path
 	}
 	close(h.chInput)
 }
 
-func Drive(cfg config.Config, log *logan.Entry, paths []Path, users []*data.User) ([]*data.User, error) {
+func Drive(googleClient *google.Google, cfg config.Config, log *logan.Entry, paths []FilesBytes, users []*data.User) ([]*data.User, error) {
 	var err error
-	input := make(chan Path)
-	output := make(chan Path)
+	input := make(chan FilesBytes)
+	output := make(chan FilesBytes)
 	sendToDrive := cfg.Google().Enable
 
-	var googleClient *google.Google
-	if sendToDrive {
-		googleClient = google.NewGoogleClient(cfg)
-
-		err = googleClient.ConnectToDrive(cfg.Google().SecretPath, cfg.Google().Code)
-		if err != nil {
-			log.Info("Could you continue to work without google drive? (y)")
-			reader := bufio.NewReader(os.Stdin)
-			text, _ := reader.ReadString('\n')
-			if strings.ToLower(text) != "y\n" {
-				sendToDrive = true
-			}
-		}
-	}
 	ctx := context.Background()
-
 	if sendToDrive {
 		err = googleClient.CreateFolder(cfg.Google().QRPath)
 		if err != nil {
-			cfg.Log().Error(err)
-			return users, err
+			return users, errors.Wrap(err, "failed to create folder")
 		}
 		handler := NewHandler(input, output, log, googleClient, 10, ctx)
 		handler.StartDriveRunner()

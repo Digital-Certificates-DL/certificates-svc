@@ -11,6 +11,7 @@ import (
 	"google.golang.org/api/option"
 	sheets "google.golang.org/api/sheets/v4"
 	"helper/internal/config"
+	"log"
 	"net/http"
 	"os"
 )
@@ -95,13 +96,13 @@ func (g *Google) saveToken(path string, token *oauth2.Token) error {
 	return nil
 }
 
-func (g *Google) ConnectToDrive(path, code string) error {
+func (g *Google) Connect(path, code string) error {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return errors.Wrap(err, "Unable to read client secret file")
 	}
 
-	config, err := google.ConfigFromJSON(b, drive.DriveFileScope)
+	config, err := google.ConfigFromJSON(b, drive.DriveScope, sheets.SpreadsheetsScope)
 	if err != nil {
 		return errors.Wrap(err, "Unable to parse client secret file to config")
 	}
@@ -110,6 +111,7 @@ func (g *Google) ConnectToDrive(path, code string) error {
 		return errors.Wrap(err, "Unable to get client")
 	}
 	g.driveSrv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
+	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.client))
 	if err != nil {
 		return errors.Wrap(err, "failed to create new service")
 	}
@@ -124,24 +126,38 @@ func (g *Google) ConnectSheetByKey(apiKey string) (*sheets.Service, error) {
 	return sheetsService, nil
 }
 
-func (g *Google) ConnectTOSheet(path, code string) error {
+//
+//func (g *Google) ConnectTOSheet(path, code string) error {
+//
+//	b, err := os.ReadFile(path)
+//	if err != nil {
+//		return errors.Wrap(err, "Unable to read client secret file")
+//	}
+//
+//	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsScope)
+//	if err != nil {
+//		return errors.Wrap(err, "Unable to parse client secret file to config")
+//	}
+//	g.clientSheet, err = g.getClient(config, path, code)
+//	if err != nil {
+//		return errors.Wrap(err, "Unable to get client")
+//	}
+//	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.clientSheet))
+//	if err != nil {
+//		return errors.Wrap(err, "failed to create new service")
+//	}
+//	return nil
+//}
 
-	b, err := os.ReadFile(path)
+func (g *Google) UpdateTable(position string, value []string, spreadsheetId string) error { //todo move to google_sheets
+	values := stringToInterface(value)
+	var vr sheets.ValueRange
+	vr.Values = append(vr.Values, values)
+	_, err := g.sheetSrv.Spreadsheets.Values.Update(spreadsheetId, position, &vr).ValueInputOption("RAW").Do()
 	if err != nil {
-		return errors.Wrap(err, "Unable to read client secret file")
+		log.Println(err)
+		return errors.Wrap(err, "failed to update sheet")
 	}
 
-	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsScope)
-	if err != nil {
-		return errors.Wrap(err, "Unable to parse client secret file to config")
-	}
-	g.client, err = g.getClient(config, path, code)
-	if err != nil {
-		return errors.Wrap(err, "Unable to get client")
-	}
-	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.client))
-	if err != nil {
-		return errors.Wrap(err, "failed to create new service")
-	}
 	return nil
 }

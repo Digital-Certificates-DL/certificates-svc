@@ -4,6 +4,7 @@ type User struct {
 	Date               string
 	Participant        string
 	CourseTitle        string
+	Points             string
 	SerialNumber       string
 	Note               string
 	Certificate        string

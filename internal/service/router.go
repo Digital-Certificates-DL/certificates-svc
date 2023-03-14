@@ -22,6 +22,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 	r.Route("/integrations/css", func(r chi.Router) {
 		r.Post("/generate", handlers.GenerateTable)
 		r.Get("/template", handlers.CreateTemplate)
+		r.Get("/test", handlers.Test)
 
 	})
 	return r

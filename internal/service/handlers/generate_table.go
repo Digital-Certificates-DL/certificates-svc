@@ -17,7 +17,7 @@ import (
 )
 
 func GenerateTable(w http.ResponseWriter, r *http.Request) {
-	var paths []handlers.Path
+	var paths []handlers.FilesBytes
 	request, err := requests.NewGenerateTable(r)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to parse request")
@@ -28,13 +28,19 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo maybe remove it
 
 	client := google.NewGoogleClient(helpers.Config(r))
-	err = client.ConnectTOSheet(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
+	err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	users, errs := client.ParseFromWeb(request.Id, "A1:H", helpers.Config(r).Log())
+	//err = client.ConnectToDrive(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
+	//if err != nil {
+	//	log.Println(err)
+	//	return
+	//}
+
+	users, errs := client.ParseFromWeb(request.Id, "A1:K", helpers.Config(r).Log())
 	if errs != nil {
 		helpers.Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))
@@ -64,6 +70,7 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 		if hash != "" {
 			helpers.Log(r).Info(user.Participant, " hash = ", hash)
 		}
+
 		user.SetDataHash(hash)
 		var path string
 		path, user.DigitalCertificate, user.Signature, err = qr.GenerateQR()
@@ -72,19 +79,21 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 			ape.Render(w, problems.InternalError())
 			return
 		}
-		paths = append(paths, handlers.Path{Path: path, ID: id})
+		_ = path
+		paths = append(paths, handlers.FilesBytes{File: nil, ID: id}) //todo
+		//paths = append(paths, handlers.FilesBytes{File: path, ID: id}) //todo
 		usersResult = append(usersResult, user)
 	}
 
 	//todo  add new event that handle error with connect to drive
-	//if sendToDrive := helpers.Config(r).Google().Enable; sendToDrive {
-	//	users, err = handlers.Drive(helpers.Config(r), helpers.Log(r), paths, users)
-	//	if err != nil {
-	//		helpers.Log(r).WithError(err).Error("failed to send date to drive")
-	//		ape.Render(w, problems.InternalError())
-	//		return
-	//	}
-	//}
+	if sendToDrive := helpers.Config(r).Google().Enable; sendToDrive {
+		users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), paths, users)
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to send date to drive")
+			ape.Render(w, problems.InternalError())
+			return
+		}
+	}
 
 	helpers.Log(r).Info("creating table")
 	errs = client.SetRes(usersResult, request.Id)
