@@ -11,7 +11,6 @@ import (
 	"google.golang.org/api/option"
 	sheets "google.golang.org/api/sheets/v4"
 	"helper/internal/config"
-	"log"
 	"net/http"
 	"os"
 )
@@ -61,7 +60,7 @@ func (g *Google) getTokenFromWeb(config *oauth2.Config, code string) (*oauth2.To
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
-	//todo will make without config and  will return tok and error
+	//todo make without config
 	tok, err := config.Exchange(context.TODO(), code)
 	if err != nil {
 		return nil, errors.New("failed to generate token")
@@ -124,17 +123,4 @@ func (g *Google) ConnectSheetByKey(apiKey string) (*sheets.Service, error) {
 		return nil, errors.Wrap(err, "failed to connect")
 	}
 	return sheetsService, nil
-}
-
-func (g *Google) UpdateTable(position string, value []string, spreadsheetId string) error { //todo move to google_sheets
-	values := stringToInterface(value)
-	var vr sheets.ValueRange
-	vr.Values = append(vr.Values, values)
-	_, err := g.sheetSrv.Spreadsheets.Values.Update(spreadsheetId, position, &vr).ValueInputOption("RAW").Do()
-	if err != nil {
-		log.Println(err)
-		return errors.Wrap(err, "failed to update sheet")
-	}
-
-	return nil
 }

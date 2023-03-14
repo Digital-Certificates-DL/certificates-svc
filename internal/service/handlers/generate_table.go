@@ -31,6 +31,7 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 	}
 
 	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo maybe remove it
+	defer os.RemoveAll(helpers.Config(r).QRCode().QRPath)
 
 	client := google.NewGoogleClient(helpers.Config(r))
 	err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
@@ -64,7 +65,7 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(user)
 		qr := qr.NewQR(user, helpers.Config(r), sign)
-		hash := sign.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)) //todo signing in frontend and return it in back
+		hash := sign.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
 		if hash != "" {
 			helpers.Log(r).Info(user.Participant, " hash = ", hash)
@@ -80,7 +81,7 @@ func GenerateTable(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: id, Type: "image/svg+xml"}) //todo fix it
+		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: id, Type: "image/svg+xml"})
 
 		req := pdf.DefaultTemplate
 		log.Println("user", user)

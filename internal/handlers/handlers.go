@@ -51,9 +51,7 @@ func NewHandler(input chan FilesBytes, output chan FilesBytes, log *logan.Entry,
 	}
 }
 
-//function func(ctx context.Context, log *logan.Entry, name string, runner func(ctx2 context.Context)) (bool, error)
-
-func (h *Handler) StartDriveRunner() { //todo do more useful
+func (h *Handler) StartDriveRunner() {
 	for i := 0; i < h.running; i++ {
 		h.log.Debug("start ", i)
 		go func(name string) {

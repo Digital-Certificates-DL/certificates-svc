@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/logan/v3"
+	"google.golang.org/api/sheets/v4"
 	"helper/internal/data"
 	"log"
 	"reflect"
@@ -77,6 +78,19 @@ func (g *Google) SetRes(users []*data.User, sheetID string) []error {
 			continue
 		}
 	}
+	return nil
+}
+
+func (g *Google) UpdateTable(position string, value []string, spreadsheetId string) error {
+	values := stringToInterface(value)
+	var vr sheets.ValueRange
+	vr.Values = append(vr.Values, values)
+	_, err := g.sheetSrv.Spreadsheets.Values.Update(spreadsheetId, position, &vr).ValueInputOption("RAW").Do()
+	if err != nil {
+		log.Println(err)
+		return errors.Wrap(err, "failed to update sheet")
+	}
+
 	return nil
 }
 
