@@ -26,3 +26,9 @@ func (u *User) SetDataHash(hash string) {
 	}
 
 }
+
+//func PrepareUsersForSend(allUsers, newUsers []*User) []*User{
+//	for id, user := range newUsers{
+//
+//	}
+//}

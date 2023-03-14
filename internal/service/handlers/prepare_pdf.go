@@ -30,7 +30,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetNote(req.Data.Note.X, req.Data.Note.Y, req.Data.Note.Size, req.Data.Note.Font)
 	file.SetQR(req.Data.QR.X, req.Data.QR.Y, req.Data.QR.Size, req.Data.QR.High, req.Data.Width)
 
-	pdfBytes, err := file.Prepare(pdf.DefaultData)
+	pdfBytes, _, err := file.Prepare(pdf.DefaultData, helpers.Config(r))
 	if err != nil {
 		helpers.Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 		ape.Render(w, problems.InternalError())

@@ -126,29 +126,6 @@ func (g *Google) ConnectSheetByKey(apiKey string) (*sheets.Service, error) {
 	return sheetsService, nil
 }
 
-//
-//func (g *Google) ConnectTOSheet(path, code string) error {
-//
-//	b, err := os.ReadFile(path)
-//	if err != nil {
-//		return errors.Wrap(err, "Unable to read client secret file")
-//	}
-//
-//	config, err := google.ConfigFromJSON(b, sheets.SpreadsheetsScope)
-//	if err != nil {
-//		return errors.Wrap(err, "Unable to parse client secret file to config")
-//	}
-//	g.clientSheet, err = g.getClient(config, path, code)
-//	if err != nil {
-//		return errors.Wrap(err, "Unable to get client")
-//	}
-//	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.clientSheet))
-//	if err != nil {
-//		return errors.Wrap(err, "failed to create new service")
-//	}
-//	return nil
-//}
-
 func (g *Google) UpdateTable(position string, value []string, spreadsheetId string) error { //todo move to google_sheets
 	values := stringToInterface(value)
 	var vr sheets.ValueRange

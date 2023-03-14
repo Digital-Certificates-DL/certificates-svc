@@ -62,14 +62,6 @@ func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry)
 }
 
 func (g *Google) SetRes(users []*data.User, sheetID string) []error {
-	//todo add handler
-	//input := make(chan handlers.File)
-	//output := make(chan handlers.File)
-	//ctx := context.Background()
-	//handler := handlers.NewHandler(input, output, g.cfg.Log(), g, 10, ctx)
-	//handler.StartSheetRunner()
-	//go handler.insertData(users)
-	//users = handler.Read(users)
 
 	errs := make([]error, 0)
 	for _, user := range users {
@@ -78,8 +70,8 @@ func (g *Google) SetRes(users []*data.User, sheetID string) []error {
 
 		dataForSend = append(dataForSend, user.SerialNumber, user.Note, user.Certificate, user.DataHash, user.TxHash, user.Signature, user.DigitalCertificate)
 
-		err := g.UpdateTable(fmt.Sprint("sheet1!D", user.ID+2), dataForSend, sheetID)
-		time.Sleep(1 * time.Millisecond)
+		err := g.UpdateTable(fmt.Sprint("sheet1!E", user.ID+2), dataForSend, sheetID)
+		time.Sleep(4 * time.Millisecond)
 		if err != nil {
 			errs = append(errs, err)
 			continue

@@ -39,13 +39,11 @@ func NewQR(user *data.User, cfg config.Config, sign signature.Signature) QR {
 	}
 }
 
-func (q QR) GenerateQR() (string, string, string, error) {
-
+func (q QR) GenerateQR() ([]byte, string, string, error) {
 	parsedName := strings.Split(q.user.Participant, " ")
 	path := ""
 	q.cfg.Log().Debug(parsedName)
 	if len(parsedName) < 2 {
-
 		path = fmt.Sprintf("certificate_%s_%s_QR_codecreate.svg", parsedName[0], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	} else {
 		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], q.cfg.TemplatesConfig()[q.user.CourseTitle])
@@ -54,15 +52,16 @@ func (q QR) GenerateQR() (string, string, string, error) {
 	pathWithSuffix := fmt.Sprintf(q.cfg.QRCode().QRPath + path)
 
 	fi, err := os.Create(pathWithSuffix)
+
 	if err != nil {
-		return "", "", "", errors.Wrap(err, "failed to create file by path")
+		return nil, "", "", errors.Wrap(err, "failed to create file by path")
 	}
 	s := svg.New(fi)
 	aggregatedStr := fmt.Sprintf("%s %s %s", q.user.Date, q.user.Participant, q.user.CourseTitle)
 
 	signedMsg, _, address, err := q.sign.Sign(aggregatedStr)
 	if err != nil {
-		return "", "", "", errors.Wrap(err, "failed to sign msg")
+		return nil, "", "", errors.Wrap(err, "failed to sign msg")
 	}
 
 	qrCode, _ := qr.Encode(q.PrepareMsgForQR(aggregatedStr, address, signedMsg), qr.M, qr.Auto)
@@ -71,7 +70,15 @@ func (q QR) GenerateQR() (string, string, string, error) {
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
 	s.End()
-	return path, pathWithSuffix, string(signedMsg), nil
+	file, err := os.ReadFile(pathWithSuffix)
+	if err != nil {
+		return nil, "", "", errors.Wrap(err, "failed to read file")
+	}
+	err = os.Remove(pathWithSuffix)
+	if err != nil {
+		return nil, "", "", errors.Wrap(err, "failed to remove file")
+	}
+	return file, path, string(signedMsg), nil
 }
 
 func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {

@@ -1,9 +1,13 @@
 package pdf
 
 import (
+	"fmt"
+	"helper/internal/config"
+
 	//"github.com/karmdip-mi/go-fitz"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
+	"strings"
 )
 
 type PDF struct {
@@ -41,6 +45,71 @@ type PDFData struct {
 	Exam         string
 	Level        string
 	Note         string
+}
+
+var DefaultTemplate = PDF{
+	High:  500,
+	Width: 500,
+	Name: Field{
+		X:    12,
+		Y:    12,
+		Size: 12,
+		Font: "arial",
+	},
+	Course: Field{
+		X:    12,
+		Y:    100,
+		Size: 12,
+		Font: "arial",
+	},
+	Credits: Field{
+		X:    12,
+		Y:    344,
+		Size: 12,
+		Font: "arial",
+	},
+	Points: Field{
+		X:    12,
+		Y:    122,
+		Size: 12,
+		Font: "arial",
+	},
+	SerialNumber: Field{
+		X:    345,
+		Y:    12,
+		Size: 12,
+		Font: "arial",
+	},
+	Date: Field{
+		X:    14,
+		Y:    12,
+		Size: 12,
+		Font: "arial",
+	},
+	QR: Field{
+		X:     162,
+		Y:     143,
+		High:  200,
+		Width: 200,
+	},
+	Exam: Field{
+		X:    12,
+		Y:    44,
+		Size: 12,
+		Font: "arial",
+	},
+	Level: Field{
+		X:    123,
+		Y:    12,
+		Size: 12,
+		Font: "arial",
+	},
+	Note: Field{
+		X:    12,
+		Y:    466,
+		Size: 12,
+		Font: "arial",
+	},
 }
 
 var DefaultData = PDFData{
@@ -187,18 +256,18 @@ func (p *PDF) SetNote(x, y float64, size int, font string) {
 	p.Note = fl
 }
 
-func (p *PDF) Prepare(data PDFData) ([]byte, error) {
+func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	var err error
 
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 
-	err = pdf.AddTTFFont("arial", "arial.ttf")
+	err = pdf.AddTTFFont("arial", "staff/font/arial.ttf")
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to add font")
+		return nil, "", errors.Wrap(err, "failed to add font")
 	}
-	tpl1 := pdf.ImportPage("template.pdf", 1, "/MediaBox")
+	tpl1 := pdf.ImportPage("staff/templates/template.pdf", 1, "/MediaBox")
 
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 0, 0)
@@ -207,45 +276,46 @@ func (p *PDF) Prepare(data PDFData) ([]byte, error) {
 	pdf.SetLineWidth(0.1)
 
 	///////// name
-	err = pdf.SetFont(p.Name.Font, "", p.Name.Size)
+	err = pdf.SetFont("arial", "", p.Name.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Name.X)
 	pdf.SetY(p.Name.Y)
 	pdf.Cell(nil, data.Name)
-
+	fmt.Println("set")
 	///////////// Course
-	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
+	err = pdf.SetFont("arial", "", p.Course.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Course.X)
 	pdf.SetY(p.Course.Y)
 	pdf.Cell(nil, data.Course)
 
 	///////////// credits
-	err = pdf.SetFont(p.Credits.Font, "", p.Credits)
+	err = pdf.SetFont("arial", "", p.Credits.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
 	pdf.Cell(nil, data.Credits)
 
 	///////////// Points
-	err = pdf.SetFont(p.Points.Font, "", p.Points.Size)
+	err = pdf.SetFont("arial", "", p.Points.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
+
 	}
 	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
 	pdf.Cell(nil, data.Points)
 
 	///////////// SerialNumber
-	err = pdf.SetFont(p.SerialNumber.Font, "", p.SerialNumber.Size)
+	err = pdf.SetFont("arial", "", p.SerialNumber.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 
 	pdf.SetX(p.SerialNumber.X)
@@ -255,7 +325,7 @@ func (p *PDF) Prepare(data PDFData) ([]byte, error) {
 	///////////// Date
 	err = pdf.SetFont(p.Date.Font, "", p.Date.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 
 	pdf.SetX(p.Date.X)
@@ -265,7 +335,7 @@ func (p *PDF) Prepare(data PDFData) ([]byte, error) {
 	///////////// Course
 	err = pdf.SetFont("arial", "", p.Course.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Course.X)
 	pdf.SetY(p.Course.Y)
@@ -278,7 +348,7 @@ func (p *PDF) Prepare(data PDFData) ([]byte, error) {
 	///////////// Exam
 	err = pdf.SetFont(p.Exam.Font, "", p.Exam.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Exam.X)
 	pdf.SetY(p.Exam.Y)
@@ -287,7 +357,7 @@ func (p *PDF) Prepare(data PDFData) ([]byte, error) {
 	///////////// Level
 	err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Level.X)
 	pdf.SetY(p.Level.Y)
@@ -296,12 +366,25 @@ func (p *PDF) Prepare(data PDFData) ([]byte, error) {
 	///////////// Note
 	err = pdf.SetFont(p.Note.Font, "", p.Note.Size)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to set font")
+		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Note.X)
 	pdf.SetY(p.Note.Y)
 	pdf.Cell(nil, data.Note)
 
 	//pdf.WritePdf("example.pdf")
-	return pdf.GetBytesPdf(), nil
+	parsedName := strings.Split(data.Name, " ")
+	name := ""
+	if len(parsedName) < 2 {
+		name = fmt.Sprintf("certificate_%s_%s.pdf", parsedName[0], cfg.TemplatesConfig()[data.Course])
+	} else {
+		name = fmt.Sprintf("certificate_%s_%s_%s.pdf", parsedName[0], parsedName[1], cfg.TemplatesConfig()[data.Course])
+	}
+	return pdf.GetBytesPdf(), name, nil
+}
+
+func (p *PDF) ParsePoints(point string) (string, string) {
+	splitedStr := strings.Split(point, "/")
+	return splitedStr[0], splitedStr[1]
+
 }

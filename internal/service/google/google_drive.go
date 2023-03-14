@@ -10,8 +10,6 @@ import (
 
 const template = "https://drive.google.com/file/d/%s/view"
 
-// "image/svg+xml" todo delete it
-
 func (g *Google) Update(name string, encodedFile []byte, mimeType string) (string, error) {
 	myFile := drive.File{Name: name, Parents: g.folderIDList, MimeType: mimeType}
 	file, err := g.driveSrv.Files.Create(&myFile).Media(bytes.NewReader(encodedFile)).Do()
