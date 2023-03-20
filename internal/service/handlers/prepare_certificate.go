@@ -6,6 +6,7 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"helper/internal/data"
 	"helper/internal/handlers"
+	"helper/internal/service/google"
 	"helper/internal/service/helpers"
 	"helper/internal/service/pdf"
 	"helper/internal/service/qr"
@@ -19,13 +20,22 @@ const SENDQR = "qr"
 const SENDCERTIFICATE = "certificate"
 
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
+	request, err := requests.NewPrepareCertificates(r)
+
 	var usersResult []*data.User
 	var files []handlers.FilesBytes
 	var filesCert []handlers.FilesBytes
-	users, err := requests.NewUsers(r)
-	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo maybe remove it
+
+	client := google.NewGoogleClient(helpers.Config(r))
+	err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm)
 	defer os.RemoveAll(helpers.Config(r).QRCode().QRPath)
-	for id, user := range users {
+	for id, user := range request.Data {
 		user.ID = id
 		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" || user.SerialNumber != "" {
 			helpers.Log(r).Debug("has already")
@@ -33,8 +43,8 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		log.Println(user)
-		qr := qr.NewQR(user, helpers.Config(r), user.Signature)
-		hash := sign.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
+		qr := qr.NewQR(user, helpers.Config(r))
+		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
 		if hash != "" {
 			helpers.Log(r).Info(user.Participant, " hash = ", hash)
@@ -43,7 +53,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		user.SetDataHash(hash)
 		var file []byte
 		name := ""
-		file, name, user.Signature, err = qr.GenerateQR()
+		file, name, err = qr.GenerateQR(request.Address)
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to generate qr")
 			ape.Render(w, problems.InternalError())
@@ -79,14 +89,14 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		usersResult = append(usersResult, user)
 	}
 
-	users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), files, users, SENDQR)
+	request.Data, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), files, request.Data, SENDQR)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), filesCert, users, SENDCERTIFICATE)
+	request.Data, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), filesCert, request.Data, SENDCERTIFICATE)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
@@ -94,7 +104,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.Log(r).Info("creating table")
-	errs = client.SetRes(usersResult, request.Id)
+	errs := client.SetRes(usersResult, request.Url)
 	if errs != nil {
 		helpers.Log(r).Error("failed to send date to drive: Errors: ", errs)
 		ape.Render(w, problems.InternalError())

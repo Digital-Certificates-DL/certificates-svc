@@ -1,5 +1,10 @@
 package data
 
+import (
+	"crypto/sha256"
+	"fmt"
+)
+
 type User struct {
 	Date               string
 	Participant        string
@@ -26,6 +31,11 @@ func (u *User) SetDataHash(hash string) {
 		u.SerialNumber = hash[:20]
 	}
 
+}
+
+func (u *User) Hashing(msg string) string {
+	sum := sha256.Sum256([]byte(msg))
+	return fmt.Sprintf("%x", sum[:])
 }
 
 //func PrepareUsersForSend(allUsers, newUsers []*User) []*User{

@@ -7,17 +7,19 @@ import (
 	"net/http"
 )
 
-//type User struct {
-//	Id   string `json:"id"`
-//	Msg  string `json:"msg"`
-//	Sign string `json:"sign"`
-//}
+type PrepareCertificates struct {
+	Data []*data.User //todo update model
+	//Data    resources.User //todo update model
+	Address []byte
+	Url     string
+}
 
-func NewUsers(r *http.Request) ([]*data.User, error) {
-	response := make([]*data.User, 0)
-	err := json.NewDecoder(r.Body).Decode(&response)
+func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
+	response := PrepareCertificates{}
+	response.Data = make([]*data.User, 0)
+	err := json.NewDecoder(r.Body).Decode(&response.Data)
 	if err != nil {
-		return []*data.User{}, errors.Wrap(err, "failed to decode data")
+		return PrepareCertificates{}, errors.Wrap(err, "failed to decode data")
 	}
 	return response, err
 }
