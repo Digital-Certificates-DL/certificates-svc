@@ -8,7 +8,6 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"helper/internal/config"
 	"helper/internal/data"
-	"helper/internal/service/signature"
 	"os"
 	"strings"
 )
@@ -27,19 +26,17 @@ var shortTitles = map[string]string{
 
 type QR struct {
 	user *data.User
-	sign signature.Signature
 	cfg  config.Config
 }
 
-func NewQR(user *data.User, cfg config.Config, sign signature.Signature) QR {
+func NewQR(user *data.User, cfg config.Config) QR {
 	return QR{
 		user: user,
-		sign: sign,
 		cfg:  cfg,
 	}
 }
 
-func (q QR) GenerateQR() ([]byte, string, string, error) {
+func (q QR) GenerateQR(address []byte) ([]byte, string, error) {
 	parsedName := strings.Split(q.user.Participant, " ")
 	path := ""
 	q.cfg.Log().Debug(parsedName)
@@ -48,23 +45,14 @@ func (q QR) GenerateQR() ([]byte, string, string, error) {
 	} else {
 		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	}
-
 	pathWithSuffix := fmt.Sprintf(q.cfg.QRCode().QRPath + path)
-
 	fi, err := os.Create(pathWithSuffix)
 
 	if err != nil {
-		return nil, "", "", errors.Wrap(err, "failed to create file by path")
+		return nil, "", errors.Wrap(err, "failed to create file by path")
 	}
 	s := svg.New(fi)
-	aggregatedStr := fmt.Sprintf("%s %s %s", q.user.Date, q.user.Participant, q.user.CourseTitle)
-
-	signedMsg, _, address, err := q.sign.Sign(aggregatedStr)
-	if err != nil {
-		return nil, "", "", errors.Wrap(err, "failed to sign msg")
-	}
-
-	qrCode, _ := qr.Encode(q.PrepareMsgForQR(aggregatedStr, address, signedMsg), qr.M, qr.Auto)
+	qrCode, _ := qr.Encode(q.PrepareMsgForQR(q.user.Msg, address, []byte(q.user.Signature)), qr.M, qr.Auto)
 
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
@@ -72,13 +60,13 @@ func (q QR) GenerateQR() ([]byte, string, string, error) {
 	s.End()
 	file, err := os.ReadFile(pathWithSuffix)
 	if err != nil {
-		return nil, "", "", errors.Wrap(err, "failed to read file")
+		return nil, "", errors.Wrap(err, "failed to read file")
 	}
 	err = os.Remove(pathWithSuffix)
 	if err != nil {
-		return nil, "", "", errors.Wrap(err, "failed to remove file")
+		return nil, "", errors.Wrap(err, "failed to remove file")
 	}
-	return file, path, string(signedMsg), nil
+	return file, path, nil
 }
 
 func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {

@@ -1,0 +1,72 @@
+allOf:
+  - $ref: '#/components/schemas/UserKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+         - Date
+         - CourseTitle
+         - Points
+         - Participant
+         - SerialNumber
+         - Note
+         - Certificate
+         - DataHash
+         - TxHash
+         - Signature
+         - DigitalCertificate
+         - ID
+         - Msg
+        properties:
+          Date:
+            type: string
+            format: string
+            example: "02.12.2022"
+          CourseTitle:
+            type: string
+            format: string
+            example: "Title of course"
+          Points:
+            type: string
+            format: string
+            example: "99"
+          Participant:
+            type: string
+            format: string
+            example: "99"
+          SerialNumber:
+            type: string
+            format: string
+            example: "0xhhhhhhhhhhhhhhhhhhhhhhh"
+          Note:
+            type: string
+            format: string
+            example: string
+          Certificate:
+            type: string
+            format: string
+            example: string
+          DataHash:
+            type: string
+            format: string
+            example: string
+          TxHash:
+            type: string
+            format: string
+            example: string
+          Signature:
+            type: string
+            format: string
+            example: string
+          ID:
+            type: string
+            format: string
+            example: string
+          Msg:
+            type: string
+            format: string
+            example: string
+

@@ -13,6 +13,7 @@ type User struct {
 	Signature          string
 	DigitalCertificate string
 	ID                 int
+	Msg                string
 }
 
 func (u *User) SetSignature(signature string) {

@@ -1,0 +1,42 @@
+post:
+  tags:
+    - User
+  summary: user
+  operationId: user
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/UsersGetRequest'
+  responses:
+    '201':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                $ref: '#/components/schemas/User'
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/responses/BadRequest"
+    '500':
+      $ref: "#/components/responses/InternalError"
