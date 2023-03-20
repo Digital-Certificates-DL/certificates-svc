@@ -61,10 +61,14 @@ allOf:
             type: string
             format: string
             example: string
-          ID:
+          DigitalCertificate:
             type: string
             format: string
             example: string
+          ID:
+            type: number
+            format: int64
+            example: 1
           Msg:
             type: string
             format: string

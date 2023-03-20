@@ -1,50 +1,20 @@
-type: array
-items:
-  anyOf:
-    - $ref: '#/components/schemas/User'
-#      todo fix it
-
-#  type: object
-#  required:
-#    - attributes
-#  properties:
-#    attributes:
-#      type: object
-#      required:
-#        - Date
-#        - CourseTitle
-#        - Points
-#        - Participant
-#        - SerialNumber
-#        - Note
-#        - Certificate
-#        - DataHash
-#        - TxHash
-#        - Signature
-#        - DigitalCertificate
-#        - ID
-#        - Msg
-
-
-#properties:
-#  items:
-#    type: object
-#    required:
-#      - attributes
-#    properties:
-#      attributes:
-#        type: object
-#        required:
-#          - Date
-#          - CourseTitle
-#          - Points
-#          - Participant
-#          - SerialNumber
-#          - Note
-#          - Certificate
-#          - DataHash
-#          - TxHash
-#          - Signature
-#          - DigitalCertificate
-#          - ID
-#          - Msg
+type: object
+required:
+  - data
+  - url
+  - address
+properties:
+  data:
+    type: array
+    items:
+      anyOf:
+        - $ref: '#/components/schemas/User'
+          description: "user"
+  url:
+    type: string
+    format: string
+    example: "url"
+  address:
+    type: string
+    format: string
+    example: "bc3241dhf..."

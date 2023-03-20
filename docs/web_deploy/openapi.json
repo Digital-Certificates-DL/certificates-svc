@@ -305,13 +305,34 @@
         }
       },
       "PdfsCreateRequest": {
-        "type": "array",
-        "items": {
-          "anyOf": [
-            {
-              "$ref": "#/components/schemas/UserKey"
+        "type": "object",
+        "required": [
+          "data",
+          "url",
+          "address"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/User",
+                  "description": "user"
+                }
+              ]
             }
-          ]
+          },
+          "url": {
+            "type": "string",
+            "format": "string",
+            "example": "url"
+          },
+          "address": {
+            "type": "string",
+            "format": "string",
+            "example": "bc3241dhf..."
+          }
         }
       },
       "User": {
@@ -393,10 +414,15 @@
                     "format": "string",
                     "example": "string"
                   },
-                  "ID": {
+                  "DigitalCertificate": {
                     "type": "string",
                     "format": "string",
                     "example": "string"
+                  },
+                  "ID": {
+                    "type": "number",
+                    "format": "int64",
+                    "example": 1
                   },
                   "Msg": {
                     "type": "string",

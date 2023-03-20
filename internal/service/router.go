@@ -19,7 +19,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			helpers.CtxConfig(cfg),
 		),
 	)
-	r.Route("/integrations/css", func(r chi.Router) {
+	r.Route("/integrations/ccp", func(r chi.Router) {
 		r.Post("/", handlers.GetUsers)
 		r.Post("/certificate", handlers.PrepareCertificate)
 		r.Get("/template", handlers.CreateTemplate)

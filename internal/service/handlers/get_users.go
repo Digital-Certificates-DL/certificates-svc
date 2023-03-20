@@ -48,7 +48,7 @@ func newActionResponse(users []*data.User) resources.UserListResponse {
 			},
 			Attributes: resources.UserAttributes{
 				Certificate:  user.Certificate,
-				ID:           fmt.Sprintf("%x", user.ID),
+				ID:           int64(user.ID),
 				Points:       user.Points,
 				Participant:  user.Participant,
 				Msg:          user.Msg,

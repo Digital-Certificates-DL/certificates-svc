@@ -207,10 +207,26 @@ components:
             - session_token_not_found
             - session_token_invalid
     PdfsCreateRequest:
-      type: array
-      items:
-        anyOf:
-          - $ref: '#/components/schemas/UserKey'
+      type: object
+      required:
+        - data
+        - url
+        - address
+      properties:
+        data:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/User'
+                description: user
+        url:
+          type: string
+          format: string
+          example: url
+        address:
+          type: string
+          format: string
+          example: bc3241dhf...
     User:
       allOf:
         - $ref: '#/components/schemas/UserKey'
@@ -275,10 +291,14 @@ components:
                   type: string
                   format: string
                   example: string
-                ID:
+                DigitalCertificate:
                   type: string
                   format: string
                   example: string
+                ID:
+                  type: number
+                  format: int64
+                  example: 1
                 Msg:
                   type: string
                   format: string
