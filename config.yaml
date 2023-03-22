@@ -8,6 +8,14 @@ listener:
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
 
+
+networks:
+  rpc_eth: "https://goerli.infura.io/v3/45efc27205e746adb3a1d6c3da69a7ba"
+  ipfs: "https://ipfs.infura.io:5001"
+  ipfs_pr_id: "2LgGs3QZ5Ndz065ZVu4xoSTWzcU"
+  ipfs_pr_key: "4afcd5182cb6e849fa72726d44f77186"
+
+
 google:
   secret_path: "./client.json"
   qr_path: "qr"

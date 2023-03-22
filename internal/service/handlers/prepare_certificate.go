@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"helper/internal/data"
-	"helper/internal/handlers"
-	"helper/internal/service/google"
-	"helper/internal/service/helpers"
-	"helper/internal/service/pdf"
-	"helper/internal/service/qr"
-	"helper/internal/service/requests"
+	"gitlab.com/tokend/course-certificates/ccp/internal/handlers"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/qr"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +21,6 @@ const SENDCERTIFICATE = "certificate"
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	request, err := requests.NewPrepareCertificates(r)
 	users := request.PrepareUsers()
-	var usersResult []*data.User
 	var files []handlers.FilesBytes
 	var filesCert []handlers.FilesBytes
 
@@ -36,13 +34,12 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm)
 	defer os.RemoveAll(helpers.Config(r).QRCode().QRPath)
 	for id, user := range users {
-		user.ID = id
-		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" || user.SerialNumber != "" {
-			helpers.Log(r).Debug("has already")
-			//todo maybe add render
-			continue
-		}
-		log.Println(user)
+		//user.ID = id
+		//if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" || user.SerialNumber != "" {
+		//	helpers.Log(r).Debug("has already")
+		//	//todo maybe add render
+		//	continue
+		//}
 		qr := qr.NewQR(user, helpers.Config(r))
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
@@ -86,17 +83,17 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		filesCert = append(filesCert, handlers.FilesBytes{File: fileBytes, Name: name, ID: int(user.ID), Type: "application/pdf"})
-		usersResult = append(usersResult, user)
+		//usersResult = append(usersResult, user)
 	}
 
-	usersResult, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), files, usersResult, SENDQR)
+	users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), files, users, SENDQR)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	usersResult, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), filesCert, usersResult, SENDCERTIFICATE)
+	users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), filesCert, users, SENDCERTIFICATE)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
@@ -104,7 +101,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.Log(r).Info("creating table")
-	errs := client.SetRes(usersResult, request.Pdf.Url)
+	errs := client.SetRes(users, request.Pdf.Url)
 	if errs != nil {
 		helpers.Log(r).Error("failed to send date to drive: Errors: ", errs)
 		ape.Render(w, problems.InternalError())

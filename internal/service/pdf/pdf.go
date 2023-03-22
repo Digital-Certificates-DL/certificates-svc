@@ -2,8 +2,8 @@ package pdf
 
 import (
 	"fmt"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gopkg.in/gographics/imagick.v3/imagick"
-	"helper/internal/config"
 	//"github.com/karmdip-mi/go-fitz"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"

@@ -3,7 +3,7 @@ package requests
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
-	"helper/internal/service/pdf"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"net/http"
 )
 

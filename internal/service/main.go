@@ -4,7 +4,7 @@ import (
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"helper/internal/config"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"net"
 	"net/http"
 )

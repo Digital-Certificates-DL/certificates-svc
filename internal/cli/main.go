@@ -4,8 +4,8 @@ import (
 	"github.com/alecthomas/kingpin"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3"
-	"helper/internal/config"
-	"helper/internal/service"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service"
 )
 
 func Run(args []string) bool {

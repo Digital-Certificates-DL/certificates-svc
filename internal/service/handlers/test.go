@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"helper/internal/service/google"
-	"helper/internal/service/helpers"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"log"
 	"net/http"
 )

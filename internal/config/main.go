@@ -16,6 +16,7 @@ type Config interface {
 	TemplatesConfiger
 	comfig.Listenerer
 	types.Copuser
+	NetworksConfiger
 }
 
 type config struct {
@@ -26,6 +27,7 @@ type config struct {
 	comfig.Logger
 	QRCoder
 	types.Copuser
+	NetworksConfiger
 	getter kv.Getter
 	comfig.Listenerer
 }
@@ -40,6 +42,7 @@ func New(getter kv.Getter) Config {
 		GoogleConfiger:    NewGoogler(getter),
 		Signer:            NewKeyer(getter),
 		TableConfiger:     NewTableConfiger(getter),
+		NetworksConfiger:  NewEthRPCConfiger(getter),
 		Logger:            comfig.NewLogger(getter, comfig.LoggerOpts{}),
 	}
 }

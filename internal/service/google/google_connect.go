@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"gitlab.com/distributed_lab/logan/v3/errors"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	sheets "google.golang.org/api/sheets/v4"
-	"helper/internal/config"
 	"net/http"
 	"os"
 )

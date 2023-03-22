@@ -6,8 +6,8 @@ import (
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"helper/internal/config"
-	"helper/internal/data"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
+	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"os"
 	"strings"
 )

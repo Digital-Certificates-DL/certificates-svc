@@ -4,9 +4,9 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"helper/internal/service/helpers"
-	"helper/internal/service/pdf"
-	"helper/internal/service/requests"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"net/http"
 )
 

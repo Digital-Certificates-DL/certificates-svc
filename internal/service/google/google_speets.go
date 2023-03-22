@@ -3,9 +3,7 @@ package google
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"gitlab.com/distributed_lab/logan/v3"
 	"google.golang.org/api/sheets/v4"
-	"helper/internal/data"
 	"log"
 	"reflect"
 	"time"

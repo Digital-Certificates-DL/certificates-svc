@@ -3,8 +3,8 @@ package requests
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
-	"helper/internal/data"
-	"helper/resources"
+	"gitlab.com/tokend/course-certificates/ccp/internal/data"
+	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
 )
 

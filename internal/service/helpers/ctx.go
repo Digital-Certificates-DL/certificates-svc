@@ -2,10 +2,8 @@ package helpers
 
 import (
 	"context"
-	"helper/internal/config"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"net/http"
-
-	"gitlab.com/distributed_lab/logan/v3"
 )
 
 type ctxKey int

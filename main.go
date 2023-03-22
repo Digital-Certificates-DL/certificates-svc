@@ -1,7 +1,7 @@
 package main
 
 import (
-	"helper/internal/cli"
+	"gitlab.com/tokend/course-certificates/ccp/internal/cli"
 	"os"
 )
 
