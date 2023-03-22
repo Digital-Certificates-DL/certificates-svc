@@ -2,8 +2,8 @@ package pdf
 
 import (
 	"fmt"
+	"gopkg.in/gographics/imagick.v3/imagick"
 	"helper/internal/config"
-
 	//"github.com/karmdip-mi/go-fitz"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
@@ -387,4 +387,25 @@ func (p *PDF) ParsePoints(point string) (string, string) {
 	splitedStr := strings.Split(point, "/")
 	return splitedStr[0], splitedStr[1]
 
+}
+
+func (p *PDF) PDFToImg(pdfData []byte) ([]byte, error) {
+	imagick.Initialize()
+	defer imagick.Terminate()
+	mw := imagick.NewMagickWand()
+	defer mw.Destroy()
+	err := mw.ReadImageBlob(pdfData)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read pdf")
+	}
+	mw.SetIteratorIndex(0) // This being the page offset
+	err = mw.SetImageFormat("jpg")
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to set image format")
+	}
+	image := mw.GetImageBlob()
+	if image != nil {
+		return image, nil
+	}
+	return image, errors.New("failed to get image blob")
 }

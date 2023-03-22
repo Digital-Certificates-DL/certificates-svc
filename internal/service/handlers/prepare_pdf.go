@@ -36,7 +36,12 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.InternalError())
 		return
 	}
-
-	ape.Render(w, pdfBytes)
+	image, err := file.PDFToImg(pdfBytes)
+	if err != nil {
+		helpers.Log(r).Error(errors.Wrap(err, "failed to convert pdf to image"))
+		ape.Render(w, problems.InternalError())
+		return
+	}
+	ape.Render(w, image)
 
 }

@@ -12,7 +12,7 @@ google:
   secret_path: "./client.json"
   qr_path: "qr"
   api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ-c"
-  code: "4/0AWtgzh7AVlaau4iaYkYe_EBMEP-7h7PnDJoMw6Wv9du26DX99yKZZcr5Iw1uANXk_sl1pg"
+  code: "4/0AWtgzh5cAb2ZYTXGSsf6OQlOftLQryfNTxkgrDoKiLq7bpr9HTOUy55wYwTxC_7w32Na_Q"
   enable: true
 
 tables:

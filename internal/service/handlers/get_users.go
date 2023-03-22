@@ -35,6 +35,9 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//header.Add()
+	//header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	//header.Add("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
 	ape.Render(w, newActionResponse(users)) //todo make better
 }
 
