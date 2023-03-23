@@ -20,6 +20,11 @@ const SENDCERTIFICATE = "certificate"
 
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	request, err := requests.NewPrepareCertificates(r)
+	if err != nil {
+		helpers.Log(r).WithError(err).Error("failed to connect")
+		ape.Render(w, problems.InternalError())
+		return
+	}
 	users := request.PrepareUsers()
 	var files []handlers.FilesBytes
 	var filesCert []handlers.FilesBytes
@@ -27,19 +32,14 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	client := google.NewGoogleClient(helpers.Config(r))
 	err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
 	if err != nil {
-		log.Println(err)
+		helpers.Log(r).WithError(err).Error("failed to connect")
+		ape.Render(w, problems.InternalError())
 		return
 	}
 
 	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm)
 	defer os.RemoveAll(helpers.Config(r).QRCode().QRPath)
-	for id, user := range users {
-		//user.ID = id
-		//if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" || user.SerialNumber != "" {
-		//	helpers.Log(r).Debug("has already")
-		//	//todo maybe add render
-		//	continue
-		//}
+	for _, user := range users {
 		qr := qr.NewQR(user, helpers.Config(r))
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
@@ -50,14 +50,14 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		user.SetDataHash(hash)
 		var file []byte
 		name := ""
-		file, name, err = qr.GenerateQR([]byte(request.Pdf.Address))
+		file, name, err = qr.GenerateQR([]byte(request.Data.Address))
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to generate qr")
 			ape.Render(w, problems.InternalError())
 			return
 		}
 
-		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: id, Type: "image/svg+xml"})
+		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
 		req := pdf.DefaultTemplate
 		log.Println("user", user)
@@ -82,18 +82,17 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 			ape.Render(w, problems.BadRequest(err))
 			return
 		}
-		filesCert = append(filesCert, handlers.FilesBytes{File: fileBytes, Name: name, ID: int(user.ID), Type: "application/pdf"})
-		//usersResult = append(usersResult, user)
+		filesCert = append(filesCert, handlers.FilesBytes{File: fileBytes, Name: name, ID: user.ID, Type: "application/pdf"})
 	}
 
-	users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), files, users, SENDQR)
+	users, err = handlers.Drive(client, helpers.Log(r), files, users, SENDQR, helpers.Config(r).Google().QRPath)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	users, err = handlers.Drive(client, helpers.Config(r), helpers.Log(r), filesCert, users, SENDCERTIFICATE)
+	users, err = handlers.Drive(client, helpers.Log(r), filesCert, users, SENDCERTIFICATE, helpers.Config(r).Google().PdfPath)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
@@ -101,7 +100,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.Log(r).Info("creating table")
-	errs := client.SetRes(users, request.Pdf.Url)
+	errs := client.SetRes(users, request.Data.Url)
 	if errs != nil {
 		helpers.Log(r).Error("failed to send date to drive: Errors: ", errs)
 		ape.Render(w, problems.InternalError())

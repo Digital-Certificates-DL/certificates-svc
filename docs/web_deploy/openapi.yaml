@@ -269,14 +269,9 @@ components:
       type: object
       required:
         - img
-        - address
         - description
         - name
       properties:
-        address:
-          type: string
-          format: string
-          example: '0x000000000000000000000000000000'
         name:
           type: string
           format: string

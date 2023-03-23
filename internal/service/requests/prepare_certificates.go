@@ -6,25 +6,27 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
+	"strings"
 )
 
 type PrepareCertificates struct {
-	Pdf resources.PdfsCreateRequest //todo update model
+	Data resources.PdfsCreateRequest //todo update model
 }
 
 func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 	response := PrepareCertificates{}
-	response.Pdf.Data = make([]*resources.User, 0)
-	err := json.NewDecoder(r.Body).Decode(&response.Pdf)
+	//response.Data.Data = make([]*resources.User, 0)
+	err := json.NewDecoder(r.Body).Decode(&response)
 	if err != nil {
 		return PrepareCertificates{}, errors.Wrap(err, "failed to decode data")
 	}
+	response.Data.Url = response.parse()
 	return response, err
 }
 
 func (p PrepareCertificates) PrepareUsers() []*data.User {
 	result := make([]*data.User, 0)
-	for _, user := range p.Pdf.Data {
+	for _, user := range p.Data.Data {
 		resUser := data.User{
 			ID:                 int(user.Attributes.ID),
 			Date:               user.Attributes.Date,
@@ -43,4 +45,10 @@ func (p PrepareCertificates) PrepareUsers() []*data.User {
 		result = append(result, &resUser)
 	}
 	return result
+}
+
+func (g *PrepareCertificates) parse() string {
+	id := strings.Replace(g.Data.Url, "https://docs.google.com/spreadsheets/d/", "", 1)
+	id = strings.Replace(id, "/", "", 1)
+	return id
 }

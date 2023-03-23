@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/pkg/errors"
+	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
-	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -90,8 +91,13 @@ func (h *Handler) Read(users []*data.User, flag string) []*data.User {
 		select {
 		case path := <-h.chOutput:
 			h.log.Debug("read")
-			users[path.ID] = h.setLink(users[path.ID], path, flag)
-
+			for id, u := range users {
+				if u.ID == path.ID {
+					users[id] = h.setLink(users[id], path, flag)
+					log.Println("break: ", flag)
+					break
+				}
+			}
 		case <-h.ctx.Done():
 			h.log.Debug("out")
 			return users
@@ -118,14 +124,14 @@ func (h *Handler) insertData(files []FilesBytes) {
 	close(h.chInput)
 }
 
-func Drive(googleClient *google.Google, cfg config.Config, log *logan.Entry, files []FilesBytes, users []*data.User, flag string) ([]*data.User, error) {
+func Drive(googleClient *google.Google, log *logan.Entry, files []FilesBytes, users []*data.User, flag string, folderName string) ([]*data.User, error) {
 	var err error
 	input := make(chan FilesBytes)
 	output := make(chan FilesBytes)
 
 	ctx := context.Background()
 
-	err = googleClient.CreateFolder(cfg.Google().QRPath)
+	err = googleClient.CreateFolder(folderName)
 	if err != nil {
 		return users, errors.Wrap(err, "failed to create folder")
 	}

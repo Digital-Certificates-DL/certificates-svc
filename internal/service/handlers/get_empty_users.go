@@ -39,11 +39,10 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		user.ID = id
 		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" || user.SerialNumber != "" {
 			helpers.Log(r).Debug("has already")
-			//todo maybe add render
 			continue
 		}
+		user.Msg = fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 		emptyUsers = append(emptyUsers, user)
-
 	}
 
 	ape.Render(w, newActionResponse(emptyUsers)) //todo make better

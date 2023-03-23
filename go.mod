@@ -1,6 +1,6 @@
 module gitlab.com/tokend/course-certificates/ccp
 
-go 1.20
+go 1.19
 
 require (
 	github.com/aaronarduino/goqrsvg v0.0.0-20220419053939-17e843f1dd40
@@ -23,7 +23,6 @@ require (
 	gitlab.com/distributed_lab/running v1.6.0
 	golang.org/x/oauth2 v0.6.0
 	google.golang.org/api v0.114.0
-	gopkg.in/gographics/imagick.v3 v3.4.2
 )
 
 require (

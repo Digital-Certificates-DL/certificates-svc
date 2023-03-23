@@ -3,7 +3,7 @@ package pdf
 import (
 	"fmt"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
-	"gopkg.in/gographics/imagick.v3/imagick"
+	//"gopkg.in/gographics/imagick.v3/imagick"
 	//"github.com/karmdip-mi/go-fitz"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
@@ -389,23 +389,23 @@ func (p *PDF) ParsePoints(point string) (string, string) {
 
 }
 
-func (p *PDF) PDFToImg(pdfData []byte) ([]byte, error) {
-	imagick.Initialize()
-	defer imagick.Terminate()
-	mw := imagick.NewMagickWand()
-	defer mw.Destroy()
-	err := mw.ReadImageBlob(pdfData)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read pdf")
-	}
-	mw.SetIteratorIndex(0) // This being the page offset
-	err = mw.SetImageFormat("jpg")
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to set image format")
-	}
-	image := mw.GetImageBlob()
-	if image != nil {
-		return image, nil
-	}
-	return image, errors.New("failed to get image blob")
-}
+//func (p *PDF) PDFToImg(pdfData []byte) ([]byte, error) {
+//	imagick.Initialize()
+//	defer imagick.Terminate()
+//	mw := imagick.NewMagickWand()
+//	defer mw.Destroy()
+//	err := mw.ReadImageBlob(pdfData)
+//	if err != nil {
+//		return nil, errors.Wrap(err, "failed to read pdf")
+//	}
+//	mw.SetIteratorIndex(0) // This being the page offset
+//	err = mw.SetImageFormat("jpg")
+//	if err != nil {
+//		return nil, errors.Wrap(err, "failed to set image format")
+//	}
+//	image := mw.GetImageBlob()
+//	if image != nil {
+//		return image, nil
+//	}
+//	return image, errors.New("failed to get image blob")
+//}

@@ -16,6 +16,7 @@ type Google struct {
 	ApiKey     string `fig:"api_key"`
 	SecretPath string `fig:"secret_path"`
 	QRPath     string `fig:"qr_path"`
+	PdfPath    string `fig:"pdf_path"`
 	Enable     bool   `fig:"enable"`
 }
 
