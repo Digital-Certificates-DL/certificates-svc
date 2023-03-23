@@ -1,0 +1,15 @@
+allOf:
+  - $ref: '#/components/schemas/IpfsFile'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - url
+        properties:
+          url:
+            type: string
+            format: string
+            example: "ipfs://..."

@@ -50,6 +50,49 @@ paths:
                       $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+  /integrations/ccp-svc/ipfs:
+    post:
+      tags:
+        - Ipfs
+      summary: ipfs
+      operationId: ipfs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  type: object
+                  $ref: '#/components/schemas/IpfsFileUploadRequest'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/IpfsFile'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /integrations/ccp-svc/pdf:
     post:
       tags:
@@ -206,6 +249,58 @@ components:
           enum:
             - session_token_not_found
             - session_token_invalid
+    IpfsFile:
+      allOf:
+        - $ref: '#/components/schemas/IpfsFile'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: string
+                  example: 'ipfs://...'
+    IpfsFileUploadRequest:
+      type: object
+      required:
+        - img
+        - address
+        - description
+        - name
+      properties:
+        address:
+          type: string
+          format: string
+          example: '0x000000000000000000000000000000'
+        name:
+          type: string
+          format: string
+          example: Name
+        img:
+          type: object
+          format: string
+        description:
+          type: string
+          format: string
+          example: Some description
+    IpfsKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum:
+            - ipfs
+        id:
+          type: string
+          example: '1'
     PdfsCreateRequest:
       type: object
       required:

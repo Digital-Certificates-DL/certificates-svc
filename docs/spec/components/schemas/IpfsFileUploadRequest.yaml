@@ -1,0 +1,18 @@
+type: object
+required:
+  - img
+  - description
+  - name
+properties:
+  name:
+    type: string
+    format: string
+    example: "Name"
+  img:
+    type: object
+    format: string
+  description:
+    type: string
+    format: string
+    example: "Some description"
+

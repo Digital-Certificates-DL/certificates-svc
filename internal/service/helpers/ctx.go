@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"net/http"
 )
