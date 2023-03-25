@@ -42,6 +42,8 @@ templates:
     security: "Cryptography and information security theory"
     database: "Theory of database organization and basic SQL"
     blockchain: "Beginner at theoretical aspects blockchain technology"
+    solidity: ""
+
 
 cop:
   disabled: true

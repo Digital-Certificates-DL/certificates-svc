@@ -1,7 +1,4 @@
-# cloud.google.com/go/compute v1.18.0
-## explicit; go 1.19
-cloud.google.com/go/compute/internal
-# cloud.google.com/go/compute/metadata v0.2.3
+# cloud.google.com/go/compute/metadata v0.2.0
 ## explicit; go 1.19
 cloud.google.com/go/compute/metadata
 # github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6
@@ -122,19 +119,9 @@ github.com/golang/protobuf/ptypes/timestamp
 # github.com/google/jsonapi v0.0.0-20200226002910-c8283f632fb7
 ## explicit
 github.com/google/jsonapi
-# github.com/google/uuid v1.3.0
+# github.com/googleapis/gax-go/v2 v2.0.5
 ## explicit
-github.com/google/uuid
-# github.com/googleapis/enterprise-certificate-proxy v0.2.3
-## explicit; go 1.19
-github.com/googleapis/enterprise-certificate-proxy/client
-github.com/googleapis/enterprise-certificate-proxy/client/util
-# github.com/googleapis/gax-go/v2 v2.7.1
-## explicit; go 1.19
 github.com/googleapis/gax-go/v2
-github.com/googleapis/gax-go/v2/apierror
-github.com/googleapis/gax-go/v2/apierror/internal/proto
-github.com/googleapis/gax-go/v2/internal
 # github.com/gorilla/websocket v1.5.0
 ## explicit; go 1.12
 github.com/gorilla/websocket
@@ -257,6 +244,11 @@ github.com/signintech/gopdf/fontmaker/core
 # github.com/sirupsen/logrus v1.9.0
 ## explicit; go 1.13
 github.com/sirupsen/logrus
+# github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+## explicit; go 1.13
+github.com/skip2/go-qrcode
+github.com/skip2/go-qrcode/bitset
+github.com/skip2/go-qrcode/reedsolomon
 # github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572
 ## explicit
 github.com/spacemonkeygo/spacelog
@@ -380,19 +372,18 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# google.golang.org/api v0.114.0
-## explicit; go 1.19
+# google.golang.org/api v0.22.0
+## explicit; go 1.11
 google.golang.org/api/drive/v3
 google.golang.org/api/googleapi
 google.golang.org/api/googleapi/transport
 google.golang.org/api/internal
-google.golang.org/api/internal/cert
 google.golang.org/api/internal/gensupport
-google.golang.org/api/internal/impersonate
 google.golang.org/api/internal/third_party/uritemplates
 google.golang.org/api/option
 google.golang.org/api/option/internaloption
 google.golang.org/api/sheets/v4
+google.golang.org/api/transport/cert
 google.golang.org/api/transport/http
 google.golang.org/api/transport/http/internal/propagation
 # google.golang.org/appengine v1.6.7
@@ -407,12 +398,10 @@ google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4
-## explicit; go 1.19
-google.golang.org/genproto/googleapis/rpc/code
-google.golang.org/genproto/googleapis/rpc/errdetails
+# google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+## explicit; go 1.11
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.53.0
+# google.golang.org/grpc v1.52.0-dev
 ## explicit; go 1.17
 google.golang.org/grpc
 google.golang.org/grpc/attributes

@@ -1,12 +1,12 @@
 package pdf
 
 import (
+	"bytes"
 	"fmt"
-	"gitlab.com/tokend/course-certificates/ccp/internal/config"
-	//"gopkg.in/gographics/imagick.v3/imagick"
-	//"github.com/karmdip-mi/go-fitz"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
+	"gitlab.com/tokend/course-certificates/ccp/internal/config"
+	"image"
 	"strings"
 )
 
@@ -41,75 +41,75 @@ type PDFData struct {
 	Points       string
 	SerialNumber string
 	Date         string
-	QR           string
+	QR           []byte
 	Exam         string
 	Level        string
 	Note         string
 }
 
 var DefaultTemplate = PDF{
-	High:  500,
-	Width: 500,
+	High:  595,
+	Width: 842,
 	Name: Field{
-		X:    12,
-		Y:    12,
-		Size: 12,
-		Font: "arial",
+		X:    200,
+		Y:    217,
+		Size: 28,
+		Font: "semibold",
 	},
 	Course: Field{
-		X:    12,
-		Y:    100,
-		Size: 12,
-		Font: "arial",
+		X:    61,
+		Y:    259,
+		Size: 14,
+		Font: "semibold",
 	},
-	Credits: Field{
-		X:    12,
-		Y:    344,
+	Credits: Field{ //todo get from front and save to db
+		X:    70,
+		Y:    56,
 		Size: 12,
-		Font: "arial",
+		Font: "regular",
 	},
 	Points: Field{
-		X:    12,
-		Y:    122,
+		X:    70,
+		Y:    79,
 		Size: 12,
-		Font: "arial",
+		Font: "regular",
 	},
 	SerialNumber: Field{
-		X:    345,
-		Y:    12,
+		X:    572,
+		Y:    56,
 		Size: 12,
-		Font: "arial",
+		Font: "regular",
 	},
 	Date: Field{
-		X:    14,
-		Y:    12,
+		X:    641,
+		Y:    79,
 		Size: 12,
-		Font: "arial",
+		Font: "regular",
 	},
 	QR: Field{
-		X:     162,
-		Y:     143,
-		High:  200,
-		Width: 200,
+		X:     658,
+		Y:     106,
+		High:  114,
+		Width: 114,
 	},
 	Exam: Field{
-		X:    12,
-		Y:    44,
+		X:    300,
+		Y:    350,
 		Size: 12,
 		Font: "arial",
 	},
 	Level: Field{
-		X:    123,
-		Y:    12,
-		Size: 12,
-		Font: "arial",
+		X:    300,
+		Y:    277,
+		Size: 14,
+		Font: "semibold",
 	},
-	Note: Field{
-		X:    12,
-		Y:    466,
-		Size: 12,
-		Font: "arial",
-	},
+	//Note: Field{
+	//	X:    12,
+	//	Y:    466,
+	//	Size: 12,
+	//	Font: "arial",
+	//},
 }
 
 var DefaultData = PDFData{
@@ -119,7 +119,7 @@ var DefaultData = PDFData{
 	Points:       "100",
 	SerialNumber: "694d0f5a7afe6fbc99cb",
 	Date:         "30.05.2018",
-	QR:           "drive.google.com/file/d/13VFwbzYvHdoVPIJpVFS5zVhfay1iYguY/view",
+	QR:           nil,
 	Exam:         "passed",
 	Level:        "graduated with honors",
 	Note:         "************************************************",
@@ -132,7 +132,7 @@ func NewPDF(high, width float64) *PDF {
 	}
 }
 
-func NewData(name, course, credits, points, serialNumber, date, qr, exam, level, note string) PDFData {
+func NewData(name, course, credits, points, serialNumber, date string, qr []byte, exam, level, note string) PDFData {
 	return PDFData{
 		Name:         name,
 		Course:       course,
@@ -245,16 +245,17 @@ func (p *PDF) SetExam(x, y float64, size int, font string) {
 	p.Exam = fl
 }
 
-func (p *PDF) SetNote(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Note = fl
-}
+//
+//func (p *PDF) SetNote(x, y float64, size int, font string) {
+//	fl := Field{
+//		X:    x,
+//		Y:    y,
+//		Size: size,
+//		Font: font,
+//	}
+//
+//	p.Note = fl
+//}
 
 func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	var err error
@@ -263,20 +264,35 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 
+	pdf.SetTextColor(255, 255, 255)
 	err = pdf.AddTTFFont("arial", "staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to add font")
 	}
-	tpl1 := pdf.ImportPage("staff/templates/template.pdf", 1, "/MediaBox")
+
+	err = pdf.AddTTFFont("italic", "staff/font/Inter-Italic.ttf")
+	if err != nil {
+		return nil, "", errors.Wrap(err, "failed to add font")
+	}
+	err = pdf.AddTTFFont("regular", "staff/font/Inter-Regular.ttf")
+	if err != nil {
+		return nil, "", errors.Wrap(err, "failed to add Inter-Regular")
+	}
+	err = pdf.AddTTFFont("semibold", "staff/font/Inter-SemiBold.ttf")
+	if err != nil {
+		return nil, "", errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
+	}
+	templateImg := cfg.TemplatesConfig()[data.Course]
+	tpl1 := pdf.ImportPage(fmt.Sprintf("staff/templates/%s.pdf", templateImg), 1, "/MediaBox") //todo use  bytes
 
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 0, 0)
 
 	// Color the page
-	pdf.SetLineWidth(0.1)
+	//pdf.SetLineWidth(0.1)
 
 	///////// name
-	err = pdf.SetFont("arial", "", p.Name.Size)
+	err = pdf.SetFont(p.Name.Font, "", p.Name.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
@@ -285,7 +301,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	pdf.Cell(nil, data.Name)
 	fmt.Println("set")
 	///////////// Course
-	err = pdf.SetFont("arial", "", p.Course.Size)
+	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
@@ -294,26 +310,26 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	pdf.Cell(nil, data.Course)
 
 	///////////// credits
-	err = pdf.SetFont("arial", "", p.Credits.Size)
+	err = pdf.SetFont(p.Credits.Font, "", p.Credits.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
-	pdf.Cell(nil, data.Credits)
+	pdf.Cell(nil, fmt.Sprintf(data.Credits))
 
 	///////////// Points
-	err = pdf.SetFont("arial", "", p.Points.Size)
+	err = pdf.SetFont(p.Points.Font, "", p.Points.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 
 	}
 	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
-	pdf.Cell(nil, data.Points)
+	pdf.Cell(nil, fmt.Sprintf("Count of points: %s", data.Points))
 
 	///////////// SerialNumber
-	err = pdf.SetFont("arial", "", p.SerialNumber.Size)
+	err = pdf.SetFont(p.SerialNumber.Font, "", p.SerialNumber.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
@@ -330,21 +346,27 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 
 	pdf.SetX(p.Date.X)
 	pdf.SetY(p.Date.Y)
-	pdf.Cell(nil, data.Date)
+	pdf.Cell(nil, fmt.Sprintf("Issued on: %s", data.Date))
 
 	///////////// Course
-	err = pdf.SetFont("arial", "", p.Course.Size)
+	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
+	//pdf.SetTextColor()
 	pdf.SetX(p.Course.X)
 	pdf.SetY(p.Course.Y)
-	pdf.Cell(nil, data.Course)
+	pdf.Cell(nil, fmt.Sprintf("has successfully completed Course \"%s\"", data.Course))
 
 	///////////// QR
-
-	pdf.Image(data.QR, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.Width, H: p.QR.High})
-
+	img, _, err := image.Decode(bytes.NewReader(data.QR))
+	if err != nil {
+		return nil, "", errors.Wrap(err, "failed to convert bytes to image")
+	}
+	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 100, H: 100})
+	if err != nil {
+		return nil, "", errors.Wrap(err, "failed to set image")
+	}
 	///////////// Exam
 	err = pdf.SetFont(p.Exam.Font, "", p.Exam.Size)
 	if err != nil {
@@ -352,7 +374,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	}
 	pdf.SetX(p.Exam.X)
 	pdf.SetY(p.Exam.Y)
-	pdf.Cell(nil, data.Exam)
+	pdf.Cell(nil, fmt.Sprintf("Exam passed %s", data.Exam))
 
 	///////////// Level
 	err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
@@ -361,18 +383,8 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	}
 	pdf.SetX(p.Level.X)
 	pdf.SetY(p.Level.Y)
-	pdf.Cell(nil, data.Level)
+	pdf.Cell(nil, fmt.Sprintf("Level: %s", data.Level))
 
-	///////////// Note
-	err = pdf.SetFont(p.Note.Font, "", p.Note.Size)
-	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
-	}
-	pdf.SetX(p.Note.X)
-	pdf.SetY(p.Note.Y)
-	pdf.Cell(nil, data.Note)
-
-	//pdf.WritePdf("example.pdf")
 	parsedName := strings.Split(data.Name, " ")
 	name := ""
 	if len(parsedName) < 2 {
@@ -386,7 +398,6 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 func (p *PDF) ParsePoints(point string) (string, string) {
 	splitedStr := strings.Split(point, "/")
 	return splitedStr[0], splitedStr[1]
-
 }
 
 //func (p *PDF) PDFToImg(pdfData []byte) ([]byte, error) {

@@ -25,12 +25,13 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetCredits(req.Data.Credits.X, req.Data.Credits.Y, req.Data.Credits.Size, req.Data.Credits.Font)
 	file.SetExam(req.Data.Exam.X, req.Data.Exam.Y, req.Data.Exam.Size, req.Data.Exam.Font)
 	file.SetLevel(req.Data.Level.X, req.Data.Level.Y, req.Data.Level.Size, req.Data.Level.Font)
-	file.SetNote(req.Data.Note.X, req.Data.Note.Y, req.Data.Note.Size, req.Data.Note.Font)
+	file.SetSerialNumber(req.Data.SerialNumber.X, req.Data.SerialNumber.Y, req.Data.SerialNumber.Size, req.Data.SerialNumber.Font)
 	file.SetPoints(req.Data.Points.X, req.Data.Points.Y, req.Data.Points.Size, req.Data.Points.Font)
-	file.SetNote(req.Data.Note.X, req.Data.Note.Y, req.Data.Note.Size, req.Data.Note.Font)
+	//file.SetNote(req.Data.Note.X, req.Data.Note.Y, req.Data.Note.Size, req.Data.Note.Font)
 	file.SetQR(req.Data.QR.X, req.Data.QR.Y, req.Data.QR.Size, req.Data.QR.High, req.Data.Width)
+	d := pdf.DefaultData
 
-	pdfBytes, _, err := file.Prepare(pdf.DefaultData, helpers.Config(r))
+	pdfBytes, _, err := file.Prepare(d, helpers.Config(r))
 	if err != nil {
 		helpers.Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 		ape.Render(w, problems.InternalError())

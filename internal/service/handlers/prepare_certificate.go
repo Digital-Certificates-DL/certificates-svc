@@ -50,7 +50,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		user.SetDataHash(hash)
 		var file []byte
 		name := ""
-		file, name, err = qr.GenerateQR([]byte(request.Data.Address))
+		file, img, name, err := qr.GenerateQR([]byte(request.Data.Address))
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to generate qr")
 			ape.Render(w, problems.InternalError())
@@ -68,14 +68,14 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		certificate.SetCredits(req.Credits.X, req.Credits.Y, req.Credits.Size, req.Credits.Font)
 		certificate.SetExam(req.Exam.X, req.Exam.Y, req.Exam.Size, req.Exam.Font)
 		certificate.SetLevel(req.Level.X, req.Level.Y, req.Level.Size, req.Level.Font)
-		certificate.SetNote(req.Note.X, req.Note.Y, req.Note.Size, req.Note.Font)
+		//certificate.SetNote(req.Note.X, req.Note.Y, req.Note.Size, req.Note.Font)
+		certificate.SetSerialNumber(req.SerialNumber.X, req.SerialNumber.Y, req.SerialNumber.Size, req.SerialNumber.Font)
 		certificate.SetPoints(req.Points.X, req.Points.Y, req.Points.Size, req.Points.Font)
-		certificate.SetNote(req.Note.X, req.Note.Y, req.Note.Size, req.Note.Font)
 		certificate.SetQR(req.QR.X, req.QR.Y, req.QR.Size, req.QR.High, req.Width)
 
-		credits, point := certificate.ParsePoints(user.Points)
-		log.Println(credits, point)
-		data := pdf.NewData(user.Participant, user.CourseTitle, credits, point, user.SerialNumber, user.Date, user.DigitalCertificate, user.Note, "", "")
+		//credits, point := certificate.ParsePoints(user.Points)
+
+		data := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, err := certificate.Prepare(data, helpers.Config(r))
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to create pdf")

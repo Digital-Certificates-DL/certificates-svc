@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
+	"image/color"
+
 	"github.com/boombuler/barcode/qr"
+	qrcode "github.com/skip2/go-qrcode"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"os"
+
 	"strings"
 )
 
@@ -36,7 +40,7 @@ func NewQR(user *data.User, cfg config.Config) QR {
 	}
 }
 
-func (q QR) GenerateQR(address []byte) ([]byte, string, error) {
+func (q QR) GenerateQR(address []byte) ([]byte, []byte, string, error) {
 	parsedName := strings.Split(q.user.Participant, " ")
 	path := ""
 	q.cfg.Log().Debug(parsedName)
@@ -49,27 +53,44 @@ func (q QR) GenerateQR(address []byte) ([]byte, string, error) {
 	fi, err := os.Create(pathWithSuffix)
 
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to create file by path")
+		return nil, nil, "", errors.Wrap(err, "failed to create file by path")
 	}
 	s := svg.New(fi)
-	qrCode, _ := qr.Encode(q.PrepareMsgForQR(q.user.Msg, address, []byte(q.user.Signature)), qr.M, qr.Auto)
+	msg := q.PrepareMsgForQR(q.user.Msg, address, []byte(q.user.Signature))
 
+	qrCode, _ := qr.Encode(msg, qr.M, qr.Auto)
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
 	qs.WriteQrSVG(s)
+
 	s.End()
+
+	img, err := q.pngQR(msg)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "failed to generate jpeg")
+	}
 	file, err := os.ReadFile(pathWithSuffix)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to read file")
+		return nil, nil, "", errors.Wrap(err, "failed to read file")
 	}
 	err = os.Remove(pathWithSuffix)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to remove file")
+		return nil, nil, "", errors.Wrap(err, "failed to remove file")
 	}
-	return file, path, nil
+	return file, img, path, nil
 }
 
 func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {
 	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
 	return msg
+}
+
+func (q QR) pngQR(msg string) ([]byte, error) {
+	back := color.RGBA{R: 0, G: 0, B: 0, A: 0}
+	color := color.NRGBA{}
+	err := qrcode.WriteColorFile(msg, qrcode.Highest, 400, back, color)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
