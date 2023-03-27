@@ -75,7 +75,7 @@ var DefaultTemplate = PDF{
 		Font: "regular",
 	},
 	SerialNumber: Field{
-		X:    572,
+		X:    641,
 		Y:    56,
 		Size: 12,
 		Font: "regular",
@@ -94,7 +94,7 @@ var DefaultTemplate = PDF{
 	},
 	Exam: Field{
 		X:    300,
-		Y:    350,
+		Y:    300,
 		Size: 12,
 		Font: "arial",
 	},
@@ -296,18 +296,10 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
-	pdf.SetX(p.Name.X)
+	pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.Size))
 	pdf.SetY(p.Name.Y)
 	pdf.Cell(nil, data.Name)
 	fmt.Println("set")
-	///////////// Course
-	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
-	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
-	}
-	pdf.SetX(p.Course.X)
-	pdf.SetY(p.Course.Y)
-	pdf.Cell(nil, data.Course)
 
 	///////////// credits
 	err = pdf.SetFont(p.Credits.Font, "", p.Credits.Size)
@@ -354,36 +346,42 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
 	//pdf.SetTextColor()
-	pdf.SetX(p.Course.X)
+
 	pdf.SetY(p.Course.Y)
-	pdf.Cell(nil, fmt.Sprintf("has successfully completed Course \"%s\"", data.Course))
+	titles := cfg.TitlesConfig()
+	isLevel, title, level := p.checkLevel(titles[templateImg])
+	pdf.SetX(p.centralizeTitle(title, p.Width, p.Course.Size))
+	pdf.Cell(nil, title)
 
 	///////////// QR
 	img, _, err := image.Decode(bytes.NewReader(data.QR))
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to convert bytes to image")
 	}
-	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 100, H: 100})
+	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 114, H: 114})
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set image")
 	}
-	///////////// Exam
+	/////////////// Exam
 	err = pdf.SetFont(p.Exam.Font, "", p.Exam.Size)
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to set font")
 	}
-	pdf.SetX(p.Exam.X)
+	pdf.SetX(p.centralizeTitle(cfg.ExamsConfig()[data.Exam], p.Width, p.Exam.Size))
 	pdf.SetY(p.Exam.Y)
-	pdf.Cell(nil, fmt.Sprintf("Exam passed %s", data.Exam))
+	pdf.Cell(nil, cfg.ExamsConfig()[data.Exam])
 
 	///////////// Level
-	err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
-	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+	if isLevel {
+		err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
+		if err != nil {
+			return nil, "", errors.Wrap(err, "failed to set font")
+		}
+		pdf.SetX(p.Course.X + float64(p.prepareLevel(level, title)))
+		pdf.SetY(p.Level.Y)
+		pdf.Cell(nil, level)
+
 	}
-	pdf.SetX(p.Level.X)
-	pdf.SetY(p.Level.Y)
-	pdf.Cell(nil, fmt.Sprintf("Level: %s", data.Level))
 
 	parsedName := strings.Split(data.Name, " ")
 	name := ""
@@ -398,6 +396,28 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 func (p *PDF) ParsePoints(point string) (string, string) {
 	splitedStr := strings.Split(point, "/")
 	return splitedStr[0], splitedStr[1]
+}
+
+func (p *PDF) prepareLevel(level, title string) float64 {
+	titleW := len(title) * p.Course.Size
+	return float64(titleW - len(level)*p.Level.Size/2)
+}
+
+func (p *PDF) centralizeName(str string, width float64, size int) float64 {
+	return (width/2 - (float64(size*len(str))*0.5)/2)
+}
+
+func (p *PDF) centralizeTitle(str string, width float64, size int) float64 {
+
+	return (width/2 - (float64(size*len(str))*0.5)/2)
+
+}
+func (p *PDF) checkLevel(title string) (bool, string, string) {
+	strs := strings.Split(title, "Level:")
+	if len(strs) > 1 {
+		return true, strs[0], fmt.Sprint("Level:", strs[1])
+	}
+	return false, strs[0], ""
 }
 
 //func (p *PDF) PDFToImg(pdfData []byte) ([]byte, error) {

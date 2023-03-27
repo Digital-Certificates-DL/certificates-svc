@@ -69,9 +69,9 @@ func (g *Google) SetRes(users []*data.User, sheetID string) []error {
 
 		dataForSend := make([]string, 0)
 
-		dataForSend = append(dataForSend, user.SerialNumber, user.Note, user.Certificate, user.DataHash, user.TxHash, user.Signature, user.DigitalCertificate)
+		dataForSend = append(dataForSend, user.SerialNumber, user.Certificate, user.DataHash, user.TxHash, user.Signature, user.DigitalCertificate)
 
-		err := g.UpdateTable(fmt.Sprint("Sheet1!E", user.ID+2), dataForSend, sheetID)
+		err := g.UpdateTable(fmt.Sprint("Sheet1!F", user.ID+2), dataForSend, sheetID)
 		time.Sleep(4 * time.Millisecond)
 		if err != nil {
 			errs = append(errs, err)

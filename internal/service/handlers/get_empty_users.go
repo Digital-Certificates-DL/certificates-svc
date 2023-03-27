@@ -37,7 +37,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	emptyUsers := make([]*data.User, 0)
 	for id, user := range users {
 		user.ID = id
-		if user.DataHash != "" || user.Signature != "" || user.DigitalCertificate != "" || user.Certificate != "" || user.SerialNumber != "" {
+		if user.Certificate != "" {
 			helpers.Log(r).Debug("has already")
 			continue
 		}

@@ -16,14 +16,18 @@ type Config interface {
 	TemplatesConfiger
 	comfig.Listenerer
 	types.Copuser
+	TitlesConfiger
 	NetworksConfiger
+	ExamsConfiger
 }
 
 type config struct {
 	TableConfiger
 	Signer
+	TitlesConfiger
 	GoogleConfiger
 	TemplatesConfiger
+	ExamsConfiger
 	comfig.Logger
 	QRCoder
 	types.Copuser
@@ -35,6 +39,8 @@ type config struct {
 func New(getter kv.Getter) Config {
 	return &config{
 		getter:            getter,
+		ExamsConfiger:     NewExamsConfiger(getter),
+		TitlesConfiger:    NewTitlesConfiger(getter),
 		Listenerer:        comfig.NewListenerer(getter),
 		Copuser:           copus.NewCopuser(getter),
 		TemplatesConfiger: NewTemplatesConfiger(getter),

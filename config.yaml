@@ -42,8 +42,28 @@ templates:
     security: "Cryptography and information security theory"
     database: "Theory of database organization and basic SQL"
     blockchain: "Beginner at theoretical aspects blockchain technology"
-    solidity: ""
+    solidity: "Basic aspects of programing with Solidity"
 
+
+titles:
+  list:
+    golang: "has successfully completed GoLang programming Course on fundamental aspects"
+    distributed_system: "Blockchain and Distributed Systems"
+    cryptocurrencies: "Cryptocurrencies and Distributed Systems"
+    decentralize_technologies: "Basic Level in Decentralized Technologies"
+    bitcoin: "Біткоїн та криптовалюти"
+    security: "has successfully completed Course \"Cryptography\" on theoretical aspects"
+    database:  "has successfully completed Course \"Database Organization\" on theoretical aspects of database design and basic SQL"
+    blockchain: "has successfully completed Course \"Blockchain and Decentralized Technologies\" Level: \"beginner at theoretical aspects\""
+    solidity: "has successfully completed Course \"Basic aspects of programing with Solidity\""
+    defi: "has successfully completed Course \"Basic theory about decentralized finance\""
+
+exams:
+  list:
+    "": "Exam passed"
+    "graduated with honors": "Exam passed with honors"
+    "Listener only": "Listener only. Exam not passed"
+    "Basic level": "Basic level"
 
 cop:
   disabled: true
