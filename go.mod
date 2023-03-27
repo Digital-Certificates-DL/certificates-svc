@@ -24,6 +24,7 @@ require (
 	gitlab.com/distributed_lab/running v1.6.0
 	golang.org/x/oauth2 v0.6.0
 	google.golang.org/api v0.22.0
+	gopkg.in/gographics/imagick.v3 v3.4.2
 )
 
 require (

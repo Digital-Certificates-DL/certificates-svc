@@ -86,11 +86,25 @@ func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {
 }
 
 func (q QR) pngQR(msg string) ([]byte, error) {
-	back := color.RGBA{R: 0, G: 0, B: 0, A: 0}
-	color := color.NRGBA{}
-	err := qrcode.WriteColorFile(msg, qrcode.Highest, 400, back, color)
+	back := color.RGBA{
+		R: 0,
+		G: 18,
+		B: 54,
+		A: 255,
+	}
+	front := color.RGBA{
+		R: 63,
+		G: 151,
+		B: 255,
+		A: 255,
+	}
+	err := qrcode.WriteColorFile(msg, qrcode.Highest, 400, back, front, "testqr.png")
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	file, err := os.ReadFile("testqr.png")
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
 }
