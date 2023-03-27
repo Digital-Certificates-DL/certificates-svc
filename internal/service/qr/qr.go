@@ -56,7 +56,7 @@ func (q QR) GenerateQR(address []byte) ([]byte, []byte, string, error) {
 		return nil, nil, "", errors.Wrap(err, "failed to create file by path")
 	}
 	s := svg.New(fi)
-	msg := q.PrepareMsgForQR(q.user.Msg, address, []byte(q.user.Signature))
+	msg := q.PrepareMsgForQR(q.user.Msg, []byte("1BooKnbm48Eabw3FdPgTSudt9u4YTWKBvf"), []byte(q.user.Signature))
 
 	qrCode, _ := qr.Encode(msg, qr.M, qr.Auto)
 	qs := goqrsvg.NewQrSVG(qrCode, 5)

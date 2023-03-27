@@ -404,7 +404,7 @@ func (p *PDF) prepareLevel(level, title string) float64 {
 }
 
 func (p *PDF) centralizeName(str string, width float64, size int) float64 {
-	return (width/2 - (float64(size*len(str))*0.5)/2)
+	return (width/2 - (float64(size*len(str))*0.54)/2)
 }
 
 func (p *PDF) centralizeTitle(str string, width float64, size int) float64 {
