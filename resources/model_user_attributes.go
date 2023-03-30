@@ -6,6 +6,7 @@ package resources
 
 type UserAttributes struct {
 	Certificate        string `json:"Certificate"`
+	CertificateImg     []byte `json:"CertificateImg"`
 	CourseTitle        string `json:"CourseTitle"`
 	DataHash           string `json:"DataHash"`
 	Date               string `json:"Date"`

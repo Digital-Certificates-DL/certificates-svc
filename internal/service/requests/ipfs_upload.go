@@ -8,7 +8,7 @@ import (
 )
 
 type UploadFileToIPFS struct {
-	Data resources.IpfsFileUploadRequest
+	Data resources.IpfsFileUploadRequest //todo replace string to []byte
 }
 
 func NewUploadFileToIPFS(r *http.Request) (UploadFileToIPFS, error) {

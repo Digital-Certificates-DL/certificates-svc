@@ -32,5 +32,5 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ape.Render(w, newActionResponse(users))
+	ape.Render(w, newUserResponse(users))
 }

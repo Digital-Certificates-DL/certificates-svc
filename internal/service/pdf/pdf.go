@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
+	"gopkg.in/gographics/imagick.v2/imagick"
 	"image"
 	"strings"
 )
@@ -95,8 +96,8 @@ var DefaultTemplate = PDF{
 	Exam: Field{
 		X:    300,
 		Y:    300,
-		Size: 12,
-		Font: "arial",
+		Size: 15,
+		Font: "italic",
 	},
 	Level: Field{
 		X:    300,
@@ -245,19 +246,7 @@ func (p *PDF) SetExam(x, y float64, size int, font string) {
 	p.Exam = fl
 }
 
-//
-//func (p *PDF) SetNote(x, y float64, size int, font string) {
-//	fl := Field{
-//		X:    x,
-//		Y:    y,
-//		Size: size,
-//		Font: font,
-//	}
-//
-//	p.Note = fl
-//}
-
-func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
+func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, error) {
 	var err error
 
 	pdf := gopdf.GoPdf{}
@@ -265,22 +254,17 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	pdf.AddPage()
 
 	pdf.SetTextColor(255, 255, 255)
-	err = pdf.AddTTFFont("arial", "staff/font/arial.ttf")
-	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to add font")
-	}
-
 	err = pdf.AddTTFFont("italic", "staff/font/Inter-Italic.ttf")
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to add font")
+		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
 	err = pdf.AddTTFFont("regular", "staff/font/Inter-Regular.ttf")
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to add Inter-Regular")
+		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
 	err = pdf.AddTTFFont("semibold", "staff/font/Inter-SemiBold.ttf")
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
+		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
 	templateImg := cfg.TemplatesConfig()[data.Course]
 	tpl1 := pdf.ImportPage(fmt.Sprintf("staff/templates/%s.pdf", templateImg), 1, "/MediaBox") //todo use  bytes
@@ -294,7 +278,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////// name
 	err = pdf.SetFont(p.Name.Font, "", p.Name.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.Size))
 	pdf.SetY(p.Name.Y)
@@ -304,7 +288,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////////// credits
 	err = pdf.SetFont(p.Credits.Font, "", p.Credits.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
@@ -313,7 +297,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////////// Points
 	err = pdf.SetFont(p.Points.Font, "", p.Points.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 
 	}
 	pdf.SetX(p.Points.X)
@@ -323,7 +307,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////////// SerialNumber
 	err = pdf.SetFont(p.SerialNumber.Font, "", p.SerialNumber.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 
 	pdf.SetX(p.SerialNumber.X)
@@ -333,7 +317,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////////// Date
 	err = pdf.SetFont(p.Date.Font, "", p.Date.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 
 	pdf.SetX(p.Date.X)
@@ -343,7 +327,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////////// Course
 	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 	//pdf.SetTextColor()
 
@@ -356,16 +340,16 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	///////////// QR
 	img, _, err := image.Decode(bytes.NewReader(data.QR))
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to convert bytes to image")
+		return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
 	}
 	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 114, H: 114})
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set image")
+		return nil, "", nil, errors.Wrap(err, "failed to set image")
 	}
 	/////////////// Exam
 	err = pdf.SetFont(p.Exam.Font, "", p.Exam.Size)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "failed to set font")
+		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 	pdf.SetX(p.centralizeTitle(cfg.ExamsConfig()[data.Exam], p.Width, p.Exam.Size))
 	pdf.SetY(p.Exam.Y)
@@ -375,7 +359,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	if isLevel {
 		err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
 		if err != nil {
-			return nil, "", errors.Wrap(err, "failed to set font")
+			return nil, "", nil, errors.Wrap(err, "failed to set font")
 		}
 		pdf.SetX(p.Course.X + float64(p.prepareLevel(level, title)))
 		pdf.SetY(p.Level.Y)
@@ -390,7 +374,13 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, error) {
 	} else {
 		name = fmt.Sprintf("certificate_%s_%s_%s.pdf", parsedName[0], parsedName[1], cfg.TemplatesConfig()[data.Course])
 	}
-	return pdf.GetBytesPdf(), name, nil
+	pdfBlob := pdf.GetBytesPdf()
+	imgBlob, err := Convert("png", pdfBlob)
+	if err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to  convert pdf to png")
+	}
+	return pdfBlob, name, imgBlob, nil
+
 }
 
 func (p *PDF) ParsePoints(point string) (string, string) {
@@ -420,23 +410,16 @@ func (p *PDF) checkLevel(title string) (bool, string, string) {
 	return false, strs[0], ""
 }
 
-//func (p *PDF) PDFToImg(pdfData []byte) ([]byte, error) {
-//	imagick.Initialize()
-//	defer imagick.Terminate()
-//	mw := imagick.NewMagickWand()
-//	defer mw.Destroy()
-//	err := mw.ReadImageBlob(pdfData)
-//	if err != nil {
-//		return nil, errors.Wrap(err, "failed to read pdf")
-//	}
-//	mw.SetIteratorIndex(0) // This being the page offset
-//	err = mw.SetImageFormat("jpg")
-//	if err != nil {
-//		return nil, errors.Wrap(err, "failed to set image format")
-//	}
-//	image := mw.GetImageBlob()
-//	if image != nil {
-//		return image, nil
-//	}
-//	return image, errors.New("failed to get image blob")
-//}
+func Convert(imgType string, blob []byte) ([]byte, error) {
+	imagick.Initialize()
+	defer imagick.Terminate()
+	mw := imagick.NewMagickWand()
+	defer mw.Destroy()
+	mw.ReadImageBlob(blob)
+	mw.SetIteratorIndex(0)
+	err := mw.SetImageFormat(imgType)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to set  format")
+	}
+	return mw.GetImageBlob(), nil
+}

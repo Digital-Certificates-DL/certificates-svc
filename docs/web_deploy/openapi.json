@@ -501,7 +501,8 @@
                   "Signature",
                   "DigitalCertificate",
                   "ID",
-                  "Msg"
+                  "Msg",
+                  "CertificateImg"
                 ],
                 "properties": {
                   "Date": {
@@ -566,8 +567,11 @@
                   },
                   "Msg": {
                     "type": "string",
-                    "format": "string",
-                    "example": "string"
+                    "format": "string"
+                  },
+                  "CertificateImg": {
+                    "type": "string",
+                    "format": "byte"
                   }
                 }
               }

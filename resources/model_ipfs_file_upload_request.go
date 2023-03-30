@@ -6,6 +6,6 @@ package resources
 
 type IpfsFileUploadRequest struct {
 	Description string `json:"description"`
-	Img         string `json:"img"`
+	Img         []byte `json:"img"`
 	Name        string `json:"name"`
 }

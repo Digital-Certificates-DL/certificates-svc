@@ -10,8 +10,8 @@ type User struct {
 	Participant        string
 	CourseTitle        string
 	Points             string
-	SerialNumber       string
 	Note               string
+	SerialNumber       string
 	Certificate        string
 	DataHash           string
 	TxHash             string
@@ -19,6 +19,7 @@ type User struct {
 	DigitalCertificate string
 	ID                 int
 	Msg                string
+	ImageCertificate   []byte
 }
 
 func (u *User) SetSignature(signature string) {

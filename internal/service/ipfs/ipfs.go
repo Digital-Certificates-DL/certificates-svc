@@ -61,7 +61,7 @@ func (i Connector) PrepareJSON(tokenName, tokenDescription, imagePath string) ([
 	return erc721JSON, nil
 }
 
-func (i Connector) PrepareImage(imagePath string) ([]byte, error) {
+func (i Connector) PrepareImageyPath(imagePath string) ([]byte, error) {
 	path, err := filepath.Abs("main.go")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get absolute path")

@@ -340,6 +340,7 @@ components:
                 - DigitalCertificate
                 - ID
                 - Msg
+                - CertificateImg
               properties:
                 Date:
                   type: string
@@ -392,7 +393,9 @@ components:
                 Msg:
                   type: string
                   format: string
-                  example: string
+                CertificateImg:
+                  type: string
+                  format: byte
     UserKey:
       type: object
       required:

@@ -45,10 +45,10 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		emptyUsers = append(emptyUsers, user)
 	}
 
-	ape.Render(w, newActionResponse(emptyUsers)) //todo make better
+	ape.Render(w, newUserResponse(emptyUsers)) //todo make better
 }
 
-func newActionResponse(users []*data.User) resources.UserListResponse {
+func newUserResponse(users []*data.User) resources.UserListResponse {
 	usersData := make([]resources.User, 0)
 	for _, user := range users {
 		resp := resources.User{

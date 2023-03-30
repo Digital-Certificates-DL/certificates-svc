@@ -20,6 +20,7 @@ allOf:
          - DigitalCertificate
          - ID
          - Msg
+         - CertificateImg
         properties:
           Date:
             type: string
@@ -72,5 +73,7 @@ allOf:
           Msg:
             type: string
             format: string
-            example: string
+          CertificateImg:
+            type: string
+            format: byte
 

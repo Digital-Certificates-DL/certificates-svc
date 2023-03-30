@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
+	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/internal/handlers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/qr"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
+	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"log"
 	"net/http"
 	"os"
@@ -76,12 +78,13 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		//credits, point := certificate.ParsePoints(user.Points)
 
 		data := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
-		fileBytes, name, err := certificate.Prepare(data, helpers.Config(r))
+		fileBytes, name, certificateImg, err := certificate.Prepare(data, helpers.Config(r))
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to create pdf")
 			ape.Render(w, problems.BadRequest(err))
 			return
 		}
+		user.ImageCertificate = certificateImg
 		filesCert = append(filesCert, handlers.FilesBytes{File: fileBytes, Name: name, ID: user.ID, Type: "application/pdf"})
 	}
 
@@ -106,5 +109,30 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	return
+
+	ape.Render(w, newUserWithImgResponse(users))
+}
+
+func newUserWithImgResponse(users []*data.User) resources.UserListResponse {
+	usersData := make([]resources.User, 0)
+	for _, user := range users {
+		resp := resources.User{
+			Key: resources.Key{
+				ID:   fmt.Sprintf("%x", user.ID),
+				Type: resources.USER,
+			},
+			Attributes: resources.UserAttributes{
+				Participant:    user.Participant,
+				Date:           user.Date,
+				CourseTitle:    user.CourseTitle,
+				CertificateImg: user.ImageCertificate,
+			},
+		}
+		usersData = append(usersData, resp)
+	}
+
+	return resources.UserListResponse{
+		Data: usersData,
+	}
+
 }

@@ -31,19 +31,13 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetQR(req.Data.QR.X, req.Data.QR.Y, req.Data.QR.Size, req.Data.QR.High, req.Data.Width)
 	d := pdf.DefaultData
 
-	pdfBytes, _, err := file.Prepare(d, helpers.Config(r))
+	_, _, imgBytes, err := file.Prepare(d, helpers.Config(r))
 	if err != nil {
 		helpers.Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	//image, err := file.PDFToImg(pdfBytes)
-	//if err != nil {
-	//	helpers.Log(r).Error(errors.Wrap(err, "failed to convert pdf to image"))
-	//	ape.Render(w, problems.InternalError())
-	//	return
-	//}
-	//ape.Render(w, image)
-	ape.Render(w, pdfBytes)
+
+	ape.Render(w, imgBytes) //todo wrap it
 
 }
