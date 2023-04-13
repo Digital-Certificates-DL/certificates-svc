@@ -7,7 +7,6 @@ require (
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/boombuler/barcode v1.0.1
-	github.com/btcsuite/btcd v0.23.4
 	github.com/ethereum/go-ethereum v1.11.5
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.2.1
@@ -24,7 +23,7 @@ require (
 	gitlab.com/distributed_lab/running v1.6.0
 	golang.org/x/oauth2 v0.6.0
 	google.golang.org/api v0.22.0
-	gopkg.in/gographics/imagick.v3 v3.4.2
+	gopkg.in/gographics/imagick.v2 v2.6.2
 )
 
 require (
@@ -34,7 +33,6 @@ require (
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
-	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 // indirect
 	github.com/certifi/gocertifi v0.0.0-20200211180108-c7c1fbc02894 // indirect
 	github.com/crackcomm/go-gitignore v0.0.0-20170627025303-887ab5e44cc3 // indirect
 	github.com/deckarep/golang-set/v2 v2.1.0 // indirect
@@ -97,7 +95,6 @@ require (
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/grpc v1.52.0-dev // indirect
 	google.golang.org/protobuf v1.29.1 // indirect
-	gopkg.in/gographics/imagick.v2 v2.6.2 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
