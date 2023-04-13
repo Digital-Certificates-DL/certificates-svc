@@ -34,6 +34,7 @@ func UploadFileToIpfs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ape.Render(w, newIpfsUploadResponse(preparedURI))
+	helpers.Log(r).Debug(newIpfsUploadResponse(preparedURI))
 }
 
 func newIpfsUploadResponse(uri string) resources.IpfsFile {

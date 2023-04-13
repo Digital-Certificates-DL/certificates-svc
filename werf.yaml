@@ -1,0 +1,36 @@
+configVersion: 1
+project: "backend"
+---
+image: builder
+from: golang:1.17-alpine
+docker:
+  WORKDIR: /go/src/tokend/course-certificates/ccp
+git:
+  - add: /
+    to: /go/src/tokend/course-certificates/ccp
+    stageDependencies:
+      setup:
+        - "**/*"
+shell:
+  install:
+    - apk add git build-base
+  setup:
+    - export CGO_ENABLED=0
+    - export GO111MODULE=off
+    - export GOOS=linux
+    - go build  -o /usr/local/bin/ccp /go/src/tokend/course-certificates/ccp
+
+---
+image: service
+from: alpine:3.14.6
+docker:
+  ENTRYPOINT: ccp
+shell:
+  setup:
+    - apk add --no-cache ca-certificates
+import:
+  - image: builder
+    add: /usr/local/bin/ccp
+    to: /usr/local/bin/ccp
+    after: setup
+

@@ -20,8 +20,9 @@ google:
   secret_path: "./client.json"
   qr_path: "qr"
   pdf_path: "pdf"
-  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ-c"
-  code: "4/0AWtgzh5cAb2ZYTXGSsf6OQlOftLQryfNTxkgrDoKiLq7bpr9HTOUy55wYwTxC_7w32Na_Q"
+  api_key: ""
+#  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
+  code: "4/0AVHEtk6MJFVB7UgPB9oWaHI_7U3SEV4CN4uwMgONa-QnBhH4loqhambA5EAIz1cA74jkDQ"
   enable: true
 
 tables:

@@ -25,7 +25,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 	r.Route("/integrations/ccp", func(r chi.Router) {
 		r.Post("/", handlers.GetUsers)
 		r.Post("/empty", handlers.GetUsersEmpty)
-		r.Post("/certificate/", handlers.PrepareCertificate)
+		r.Post("/certificate", handlers.PrepareCertificate)
 		r.Get("/template/", handlers.CreateTemplate)
 		r.Post("/ipfs/", handlers.UploadFileToIpfs)
 		r.Get("/test", handlers.Test)

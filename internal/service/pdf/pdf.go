@@ -48,7 +48,7 @@ type PDFData struct {
 	Note         string
 }
 
-var DefaultTemplate = PDF{
+var DefaultTemplateNormal = PDF{
 	High:  595,
 	Width: 842,
 	Name: Field{
@@ -111,6 +111,53 @@ var DefaultTemplate = PDF{
 	//	Size: 12,
 	//	Font: "arial",
 	//},
+}
+var DefaultTemplateTall = PDF{
+	High:  1190,
+	Width: 1684,
+	Name: Field{
+		Size: 56,
+		Font: "semibold",
+	},
+	Course: Field{
+		Size: 28,
+		Font: "semibold",
+	},
+	Credits: Field{ //todo get from front and save to db
+		X:    70,
+		Y:    56,
+		Size: 12,
+		Font: "regular",
+	},
+	Points: Field{
+		X:    140,
+		Y:    158,
+		Size: 12,
+		Font: "regular",
+	},
+	SerialNumber: Field{
+		X:    1144,
+		Y:    158,
+		Size: 24,
+		Font: "regular",
+	},
+	Date: Field{
+		X:    1282,
+		Y:    158,
+		Size: 24,
+		Font: "regular",
+	},
+	QR: Field{
+		X:     1316,
+		Y:     212,
+		High:  228,
+		Width: 228,
+	},
+	Exam: Field{
+		Y:    1440,
+		Size: 15,
+		Font: "italic",
+	},
 }
 
 var DefaultData = PDFData{
@@ -280,10 +327,10 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
-	pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.Size))
+	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.Size))
 	pdf.SetY(p.Name.Y)
-	pdf.Cell(nil, data.Name)
-	fmt.Println("set")
+	//pdf.Cell(nil, data.Name)
+	pdf.CellWithOption(&gopdf.Rect{W: 830, H: 1190 / 2}, data.Name, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// credits
 	err = pdf.SetFont(p.Credits.Font, "", p.Credits.Size)
@@ -330,12 +377,11 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
 	//pdf.SetTextColor()
-
+	pdf.SetX(0)
 	pdf.SetY(p.Course.Y)
 	titles := cfg.TitlesConfig()
 	isLevel, title, level := p.checkLevel(titles[templateImg])
-	pdf.SetX(p.centralizeTitle(title, p.Width, p.Course.Size))
-	pdf.Cell(nil, title)
+	pdf.CellWithOption(&gopdf.Rect{W: 842, H: 1190 / 2}, title, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// QR
 	img, _, err := image.Decode(bytes.NewReader(data.QR))
@@ -351,19 +397,18 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
-	pdf.SetX(p.centralizeTitle(cfg.ExamsConfig()[data.Exam], p.Width, p.Exam.Size))
+	pdf.SetX(0)
 	pdf.SetY(p.Exam.Y)
-	pdf.Cell(nil, cfg.ExamsConfig()[data.Exam])
-
+	pdf.CellWithOption(&gopdf.Rect{W: 842, H: 1190 / 2}, cfg.ExamsConfig()[data.Exam], gopdf.CellOption{Align: gopdf.Center})
 	///////////// Level
 	if isLevel {
 		err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set font")
 		}
-		pdf.SetX(p.Course.X + float64(p.prepareLevel(level, title)))
+		pdf.SetX(0)
 		pdf.SetY(p.Level.Y)
-		pdf.Cell(nil, level)
+		pdf.CellWithOption(&gopdf.Rect{W: 842, H: 1190 / 2}, level, gopdf.CellOption{Align: gopdf.Center})
 
 	}
 
@@ -415,9 +460,12 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 	defer imagick.Terminate()
 	mw := imagick.NewMagickWand()
 	defer mw.Destroy()
-	mw.ReadImageBlob(blob)
+	err := mw.ReadImageBlob(blob)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to  read  img blob")
+	}
 	mw.SetIteratorIndex(0)
-	err := mw.SetImageFormat(imgType)
+	err = mw.SetImageFormat(imgType)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to set  format")
 	}
