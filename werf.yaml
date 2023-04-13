@@ -13,7 +13,7 @@ git:
         - "**/*"
 shell:
   install:
-    - apt-get -y update
+    - apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
     - apt-get install gcc g++ make git
     - apt-get install libmagickwand-dev
 
