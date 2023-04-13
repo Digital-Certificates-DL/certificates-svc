@@ -2,7 +2,7 @@ configVersion: 1
 project: "backend"
 ---
 image: builder
-from: golang:1.17-alpine
+from: golang:1.19-alpine
 docker:
   WORKDIR: /go/src/gitlab.com/tokend/course-certificates/ccp
 git:
@@ -15,7 +15,7 @@ shell:
   install:
     - apk add git build-base
   setup:
-    - export CGO_ENABLED=0
+    - export CGO_ENABLED=1
     - export GO111MODULE=off
     - export GOOS=linux
     - go build  -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
