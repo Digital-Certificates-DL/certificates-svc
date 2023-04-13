@@ -13,7 +13,7 @@ git:
         - "**/*"
 shell:
   install:
-    - apk --no-cache add gcc g++ make git build-base pkgconfig libmagick++-dev php8-pecl-imagick
+    - apk --no-cache add gcc g++ make git build-base pkgconfig imagemagi
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
