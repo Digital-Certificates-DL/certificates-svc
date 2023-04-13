@@ -13,9 +13,10 @@ git:
         - "**/*"
 shell:
   install:
+    - apt-get update
     - apt-get install gcc g++ make git
     - apt-get install ibmagickwand5 libmagickwand-dev libgmp-dev
-#    - apt-get update
+
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
