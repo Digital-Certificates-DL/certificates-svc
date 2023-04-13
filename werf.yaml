@@ -15,7 +15,7 @@ shell:
   install:
     - apt-get update
     - apt-get install gcc g++ make git
-    - apt-get install libmagickwand5 libmagickwand-dev libgmp-dev
+    - apt-get install libmagickwand-dev libgmp-dev
 
   setup:
     - export CGO_ENABLED=1
