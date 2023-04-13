@@ -2,7 +2,7 @@ configVersion: 1
 project: "backend"
 ---
 image: builder
-from: golang:1.19-alpine
+from: golang:1.19.8-buster
 docker:
   WORKDIR: /go/src/gitlab.com/tokend/course-certificates/ccp
 git:
@@ -13,7 +13,7 @@ git:
         - "**/*"
 shell:
   install:
-    - apk --no-cache add gcc g++ make git build-base  imagemagick-dev imagemagick-libs  musl libmagic  imagemagick
+    - apt-get install gcc g++ make git build-base libmagickwand-dev
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
