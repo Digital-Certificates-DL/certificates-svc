@@ -13,7 +13,7 @@ git:
         - "**/*"
 shell:
   install:
-    - apk --no-cache add gcc g++ make git build-base pkgconfig imagemagick imagemagick-dev imagemagick-libs \  musl libmagic
+    - apk --no-cache add gcc g++ make git build-base  imagemagick imagemagick-dev imagemagick-libs  musl libmagic
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
