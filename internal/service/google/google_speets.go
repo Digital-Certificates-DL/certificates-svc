@@ -27,9 +27,12 @@ func (g *Google) GetTable(readRange, spreadsheetId string) error {
 }
 
 func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry) ([]*data.User, []error) {
+	errs := make([]error, 0)
 	resp, err := g.sheetSrv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve data from sheet: %v", err)
+		log.Info("Unable to retrieve data from sheet: %v", err)
+		errs = append(errs, err)
+		return nil, errs
 	}
 
 	if len(resp.Values) == 0 {
@@ -37,7 +40,7 @@ func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry)
 	} else {
 		log.Info(resp.Values)
 	}
-	errs := make([]error, 0)
+
 	users := make([]*data.User, 0)
 	if err != nil {
 		return nil, append(errs, errors.Wrap(err, "failed to open file"))

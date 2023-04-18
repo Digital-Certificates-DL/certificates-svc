@@ -61,7 +61,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 
 		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
-		req := pdf.DefaultTemplateNormal
+		req := pdf.DefaultTemplateTall
 		log.Println("user", user)
 		certificate := pdf.NewPDF(req.High, req.Width)
 		certificate.SetName(req.Name.X, req.Name.Y, req.Name.Size, req.Name.Font)
@@ -77,8 +77,8 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 
 		//credits, point := certificate.ParsePoints(user.Points)
 
-		data := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
-		fileBytes, name, certificateImg, err := certificate.Prepare(data, helpers.Config(r))
+		pdfData := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
+		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, helpers.Config(r))
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to create pdf")
 			ape.Render(w, problems.BadRequest(err))

@@ -116,28 +116,30 @@ var DefaultTemplateTall = PDF{
 	High:  1190,
 	Width: 1684,
 	Name: Field{
+		Y:    434,
 		Size: 56,
 		Font: "semibold",
 	},
 	Course: Field{
+		Y:    518,
 		Size: 28,
 		Font: "semibold",
 	},
 	Credits: Field{ //todo get from front and save to db
-		X:    70,
-		Y:    56,
-		Size: 12,
+		X:    140,
+		Y:    112,
+		Size: 24,
 		Font: "regular",
 	},
 	Points: Field{
 		X:    140,
 		Y:    158,
-		Size: 12,
+		Size: 24,
 		Font: "regular",
 	},
 	SerialNumber: Field{
-		X:    1144,
-		Y:    158,
+		X:    1282,
+		Y:    112,
 		Size: 24,
 		Font: "regular",
 	},
@@ -154,9 +156,14 @@ var DefaultTemplateTall = PDF{
 		Width: 228,
 	},
 	Exam: Field{
-		Y:    1440,
-		Size: 15,
+		Y:    600,
+		Size: 30,
 		Font: "italic",
+	},
+	Level: Field{
+		Y:    554,
+		Size: 28,
+		Font: "semibold",
 	},
 }
 
@@ -330,7 +337,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.Size))
 	pdf.SetY(p.Name.Y)
 	//pdf.Cell(nil, data.Name)
-	pdf.CellWithOption(&gopdf.Rect{W: 830, H: 1190 / 2}, data.Name, gopdf.CellOption{Align: gopdf.Center})
+	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// credits
 	err = pdf.SetFont(p.Credits.Font, "", p.Credits.Size)
@@ -339,7 +346,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
-	pdf.Cell(nil, fmt.Sprintf(data.Credits))
+	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(data.Credits))
 
 	///////////// Points
 	err = pdf.SetFont(p.Points.Font, "", p.Points.Size)
@@ -349,7 +356,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	}
 	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
-	pdf.Cell(nil, fmt.Sprintf("Count of points: %s", data.Points))
+	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", data.Points))
 
 	///////////// SerialNumber
 	err = pdf.SetFont(p.SerialNumber.Font, "", p.SerialNumber.Size)
@@ -369,7 +376,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 
 	pdf.SetX(p.Date.X)
 	pdf.SetY(p.Date.Y)
-	pdf.Cell(nil, fmt.Sprintf("Issued on: %s", data.Date))
+	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Issued on: %s", data.Date))
 
 	///////////// Course
 	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
@@ -381,14 +388,14 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	pdf.SetY(p.Course.Y)
 	titles := cfg.TitlesConfig()
 	isLevel, title, level := p.checkLevel(titles[templateImg])
-	pdf.CellWithOption(&gopdf.Rect{W: 842, H: 1190 / 2}, title, gopdf.CellOption{Align: gopdf.Center})
+	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// QR
 	img, _, err := image.Decode(bytes.NewReader(data.QR))
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
 	}
-	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 114, H: 114})
+	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set image")
 	}
@@ -399,7 +406,8 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Exam.Y)
-	pdf.CellWithOption(&gopdf.Rect{W: 842, H: 1190 / 2}, cfg.ExamsConfig()[data.Exam], gopdf.CellOption{Align: gopdf.Center})
+	ex := cfg.ExamsConfig()
+	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, ex[data.Exam], gopdf.CellOption{Align: gopdf.Center})
 	///////////// Level
 	if isLevel {
 		err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
@@ -408,7 +416,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 		}
 		pdf.SetX(0)
 		pdf.SetY(p.Level.Y)
-		pdf.CellWithOption(&gopdf.Rect{W: 842, H: 1190 / 2}, level, gopdf.CellOption{Align: gopdf.Center})
+		pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, level, gopdf.CellOption{Align: gopdf.Center})
 
 	}
 

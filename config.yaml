@@ -3,7 +3,7 @@ log:
   level: info
 
 listener:
-  addr: :7898
+  addr: :8000
 
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
@@ -22,8 +22,17 @@ google:
   pdf_path: "pdf"
   api_key: ""
 #  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
-  code: "4/0AVHEtk6MJFVB7UgPB9oWaHI_7U3SEV4CN4uwMgONa-QnBhH4loqhambA5EAIz1cA74jkDQ"
+  code: "4/0AVHEtk6P7ufVknYBlfSbo0oymOwwhe82Be5bJrBg_j4rgaxHH1ehzoTaeizcdv5Q5vwGKw"
   enable: true
+#
+#google:
+#  secret_path: "./client.json"
+#  qr_path: "qr"
+#  pdf_path: "pdf"
+#  api_key: ""
+##  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
+#  code: "4/0AVHEtk6nkskIwm0pcZEhcrOpoXZG14GYeuoeQ4akl5HOHJLcuwpDRryMZydgBekmjzgElg"
+#  enable: true
 
 tables:
   result: "test.xlsx"
@@ -44,7 +53,7 @@ templates:
     database: "Theory of database organization and basic SQL"
     blockchain: "Beginner at theoretical aspects blockchain technology"
     solidity: "Basic aspects of programing with Solidity"
-
+    defi: "Basic theory about decentralized finance"
 
 titles:
   list:
@@ -62,9 +71,9 @@ titles:
 exams:
   list:
     "": "Exam passed"
+    "Basic level": "Basic level"
     "graduated with honors": "Exam passed with honors"
     "Listener only": "Listener only. Exam not passed"
-    "Basic level": "Basic level"
 
 cop:
   disabled: true
