@@ -138,9 +138,12 @@ func (g *Google) Connect(path string, clientQ data.ClientQ, name string) (string
 		return link, nil
 	}
 	g.driveSrv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
+	if err != nil {
+		return "", errors.Wrap(err, "failed to create new drive service")
+	}
 	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.client))
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create new service")
+		return "", errors.Wrap(err, "failed to create new sheet service")
 	}
 	return "", nil
 }

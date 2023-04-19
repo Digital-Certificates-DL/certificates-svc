@@ -22,7 +22,7 @@ const SENDCERTIFICATE = "certificate"
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to connect")
+		helpers.Log(r).WithError(err).Error("failed to parse data")
 		ape.Render(w, problems.InternalError())
 		return
 	}
@@ -38,7 +38,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(link) == 0 {
+	if len(link) != 0 {
 		helpers.Log(r).WithError(err).Error("failed to authorize")
 		ape.Render(w, newLinkResponse(link))
 		w.WriteHeader(403)
