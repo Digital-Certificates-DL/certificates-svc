@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/logan/v3"
-	"gitlab.com/tokend/course-certificates/ccp/internal/data"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"google.golang.org/api/sheets/v4"
 	"log"
 	"reflect"
@@ -26,7 +26,7 @@ func (g *Google) GetTable(readRange, spreadsheetId string) error {
 	return nil
 }
 
-func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry) ([]*data.User, []error) {
+func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry) ([]*helpers.User, []error) {
 	errs := make([]error, 0)
 	resp, err := g.sheetSrv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
@@ -41,7 +41,7 @@ func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry)
 		log.Info(resp.Values)
 	}
 
-	users := make([]*data.User, 0)
+	users := make([]*helpers.User, 0)
 	if err != nil {
 		return nil, append(errs, errors.Wrap(err, "failed to open file"))
 	}
@@ -50,7 +50,7 @@ func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry)
 		if id < 1 {
 			continue
 		}
-		userInfo := new(data.User)
+		userInfo := new(helpers.User)
 
 		st := reflect.ValueOf(userInfo)
 		st = st.Elem()
@@ -65,7 +65,7 @@ func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry)
 	return users, nil
 }
 
-func (g *Google) SetRes(users []*data.User, sheetID string) []error {
+func (g *Google) SetRes(users []*helpers.User, sheetID string) []error {
 
 	errs := make([]error, 0)
 	for _, user := range users {

@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
-	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"log"
 	"strings"
 	"sync"
@@ -86,7 +86,7 @@ func (h *Handler) decrement() {
 	}
 }
 
-func (h *Handler) Read(users []*data.User, flag string) []*data.User {
+func (h *Handler) Read(users []*helpers.User, flag string) []*helpers.User {
 	for {
 		select {
 		case path := <-h.chOutput:
@@ -105,7 +105,7 @@ func (h *Handler) Read(users []*data.User, flag string) []*data.User {
 	}
 }
 
-func (h *Handler) setLink(user *data.User, path FilesBytes, flag string) *data.User {
+func (h *Handler) setLink(user *helpers.User, path FilesBytes, flag string) *helpers.User {
 	switch strings.ToLower(flag) {
 	case "qr":
 		user.DigitalCertificate = path.Link
@@ -124,7 +124,7 @@ func (h *Handler) insertData(files []FilesBytes) {
 	close(h.chInput)
 }
 
-func Drive(googleClient *google.Google, log *logan.Entry, files []FilesBytes, users []*data.User, flag string, folderName string) ([]*data.User, error) {
+func Drive(googleClient *google.Google, log *logan.Entry, files []FilesBytes, users []*helpers.User, flag string, folderName string) ([]*helpers.User, error) {
 	var err error
 	input := make(chan FilesBytes)
 	output := make(chan FilesBytes)

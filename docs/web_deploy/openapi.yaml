@@ -293,15 +293,38 @@ components:
           type: string
           enum:
             - ipfs
-        id:
+    Link:
+      allOf:
+        - $ref: '#/components/schemas/LinkKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - link
+              properties:
+                link:
+                  type: string
+                  example: httpL//localhost/*
+    LinkKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
           type: string
-          example: '1'
+          enum:
+            - link
     PdfsCreateRequest:
       type: object
       required:
         - data
         - url
         - address
+        - name
       properties:
         data:
           type: array
@@ -317,6 +340,22 @@ components:
           type: string
           format: string
           example: bc3241dhf...
+        name:
+          type: string
+          format: string
+          example: DL
+    Settings:
+      type: object
+      required:
+        - name
+        - code
+      properties:
+        name:
+          type: string
+          example: ''
+        code:
+          type: string
+          example: ''
     User:
       allOf:
         - $ref: '#/components/schemas/UserKey'
@@ -406,14 +445,15 @@ components:
           type: string
           enum:
             - user
-        id:
-          type: string
-          example: '1'
     UsersGetRequest:
       type: object
       required:
+        - name
         - url
       properties:
+        name:
+          type: string
+          example: ''
         url:
           type: string
           example: ''

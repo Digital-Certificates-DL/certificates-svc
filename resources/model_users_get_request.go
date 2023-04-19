@@ -5,5 +5,6 @@
 package resources
 
 type UsersGetRequest struct {
-	Url string `json:"url"`
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }

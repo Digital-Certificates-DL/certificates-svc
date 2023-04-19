@@ -12,14 +12,15 @@ type GetUsers struct {
 	Data resources.UsersGetRequest
 }
 
-func NewGetUsers(r *http.Request) (string, error) {
+func NewGetUsers(r *http.Request) (GetUsers, error) {
 	//https://docs.google.com/spreadsheets/d/1CYqLid0t90bgGm1HPx5j8q-h_RNVVLPVkot9iJZguuo/edit#gid=1988631106
 	response := GetUsers{}
 	err := json.NewDecoder(r.Body).Decode(&response)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to decode data")
+		return GetUsers{}, errors.Wrap(err, "failed to decode data")
 	}
-	return response.parse(), err
+	response.Data.Url = response.parse()
+	return response, err
 }
 
 func (g *GetUsers) parse() string {

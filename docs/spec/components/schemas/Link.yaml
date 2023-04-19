@@ -1,0 +1,14 @@
+allOf:
+  - $ref: '#/components/schemas/LinkKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - link
+        properties:
+          link:
+            type: string
+            example: "httpL//localhost/*"

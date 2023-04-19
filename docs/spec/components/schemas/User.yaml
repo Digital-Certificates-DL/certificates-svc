@@ -76,4 +76,3 @@ allOf:
           CertificateImg:
             type: string
             format: byte
-

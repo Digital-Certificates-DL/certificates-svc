@@ -2,12 +2,14 @@ log:
   disable_sentry: true
   level: info
 
+db:
+  url: postgres://postgres:password@localhost:5432/ccp?sslmode=disable
+
 listener:
   addr: :8000
 
 signature:
   key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
-
 
 networks:
   rpc_eth: "https://goerli.infura.io/v3/45efc27205e746adb3a1d6c3da69a7ba"
@@ -15,14 +17,13 @@ networks:
   ipfs_pr_id: "2LgGs3QZ5Ndz065ZVu4xoSTWzcU"
   ipfs_pr_key: "4afcd5182cb6e849fa72726d44f77186"
 
-
 google:
   secret_path: "./client.json"
   qr_path: "qr"
   pdf_path: "pdf"
   api_key: ""
 #  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
-  code: "4/0AVHEtk6P7ufVknYBlfSbo0oymOwwhe82Be5bJrBg_j4rgaxHH1ehzoTaeizcdv5Q5vwGKw"
+  code: ""
   enable: true
 #
 #google:

@@ -1,0 +1,12 @@
+type: object
+required:
+  - name
+  - code
+properties:
+  name:
+    type: string
+    example: ""
+  code:
+    type: string
+    example: ""
+

@@ -437,10 +437,48 @@
             "enum": [
               "ipfs"
             ]
+          }
+        }
+      },
+      "Link": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LinkKey"
           },
-          "id": {
+          {
+            "type": "object",
+            "required": [
+              "attributes"
+            ],
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "required": [
+                  "link"
+                ],
+                "properties": {
+                  "link": {
+                    "type": "string",
+                    "example": "httpL//localhost/*"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LinkKey": {
+        "type": "object",
+        "required": [
+          "type",
+          "id"
+        ],
+        "properties": {
+          "type": {
             "type": "string",
-            "example": "1"
+            "enum": [
+              "link"
+            ]
           }
         }
       },
@@ -449,7 +487,8 @@
         "required": [
           "data",
           "url",
-          "address"
+          "address",
+          "name"
         ],
         "properties": {
           "data": {
@@ -472,6 +511,28 @@
             "type": "string",
             "format": "string",
             "example": "bc3241dhf..."
+          },
+          "name": {
+            "type": "string",
+            "format": "string",
+            "example": "DL"
+          }
+        }
+      },
+      "Settings": {
+        "type": "object",
+        "required": [
+          "name",
+          "code"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": ""
+          },
+          "code": {
+            "type": "string",
+            "example": ""
           }
         }
       },
@@ -591,19 +652,20 @@
             "enum": [
               "user"
             ]
-          },
-          "id": {
-            "type": "string",
-            "example": "1"
           }
         }
       },
       "UsersGetRequest": {
         "type": "object",
         "required": [
+          "name",
           "url"
         ],
         "properties": {
+          "name": {
+            "type": "string",
+            "example": ""
+          },
           "url": {
             "type": "string",
             "example": ""

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/internal/handlers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
@@ -21,28 +20,35 @@ const SENDQR = "qr"
 const SENDCERTIFICATE = "certificate"
 
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
-	request, err := requests.NewPrepareCertificates(r)
+	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to connect")
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	users := request.PrepareUsers()
+	users := req.PrepareUsers()
 	var files []handlers.FilesBytes
 	var filesCert []handlers.FilesBytes
 
 	client := google.NewGoogleClient(helpers.Config(r))
-	err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.Config(r).Google().Code)
+	link, err := client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to connect")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm)
+	if len(link) == 0 {
+		helpers.Log(r).WithError(err).Error("failed to authorize")
+		ape.Render(w, newLinkResponse(link))
+		w.WriteHeader(403)
+		return
+	}
+
+	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo make better
 	defer os.RemoveAll(helpers.Config(r).QRCode().QRPath)
 	for _, user := range users {
-		qr := qr.NewQR(user, helpers.Config(r))
+		qrData := qr.NewQR(user, helpers.Config(r))
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
 		if hash != "" {
@@ -52,9 +58,9 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		user.SetDataHash(hash)
 		var file []byte
 		name := ""
-		file, img, name, err := qr.GenerateQR([]byte(request.Data.Address))
+		file, img, name, err := qrData.GenerateQR([]byte(req.Data.Address))
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to generate qr")
+			helpers.Log(r).WithError(err).Error("failed to generate qrData")
 			ape.Render(w, problems.InternalError())
 			return
 		}
@@ -70,12 +76,9 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		certificate.SetCredits(req.Credits.X, req.Credits.Y, req.Credits.Size, req.Credits.Font)
 		certificate.SetExam(req.Exam.X, req.Exam.Y, req.Exam.Size, req.Exam.Font)
 		certificate.SetLevel(req.Level.X, req.Level.Y, req.Level.Size, req.Level.Font)
-		//certificate.SetNote(req.Note.X, req.Note.Y, req.Note.Size, req.Note.Font)
 		certificate.SetSerialNumber(req.SerialNumber.X, req.SerialNumber.Y, req.SerialNumber.Size, req.SerialNumber.Font)
 		certificate.SetPoints(req.Points.X, req.Points.Y, req.Points.Size, req.Points.Font)
 		certificate.SetQR(req.QR.X, req.QR.Y, req.QR.Size, req.QR.High, req.Width)
-
-		//credits, point := certificate.ParsePoints(user.Points)
 
 		pdfData := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, helpers.Config(r))
@@ -103,7 +106,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helpers.Log(r).Info("creating table")
-	errs := client.SetRes(users, request.Data.Url)
+	errs := client.SetRes(users, req.Data.Url)
 	if errs != nil {
 		helpers.Log(r).Error("failed to send date to drive: Errors: ", errs)
 		ape.Render(w, problems.InternalError())
@@ -113,7 +116,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, newUserWithImgResponse(users))
 }
 
-func newUserWithImgResponse(users []*data.User) resources.UserListResponse {
+func newUserWithImgResponse(users []*helpers.User) resources.UserListResponse {
 	usersData := make([]resources.User, 0)
 	for _, user := range users {
 		resp := resources.User{
@@ -135,4 +138,14 @@ func newUserWithImgResponse(users []*data.User) resources.UserListResponse {
 		Data: usersData,
 	}
 
+}
+
+func newLinkResponse(link string) resources.LinkResponse {
+	return resources.LinkResponse{
+		Data: resources.Link{
+			Attributes: resources.LinkAttributes{
+				Link: link,
+			},
+		},
+	}
 }

@@ -3,7 +3,7 @@ package requests
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
-	"gitlab.com/tokend/course-certificates/ccp/internal/data"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
 	"strings"
@@ -24,10 +24,10 @@ func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 	return response, err
 }
 
-func (p PrepareCertificates) PrepareUsers() []*data.User {
-	result := make([]*data.User, 0)
+func (p PrepareCertificates) PrepareUsers() []*helpers.User {
+	result := make([]*helpers.User, 0)
 	for _, user := range p.Data.Data {
-		resUser := data.User{
+		resUser := helpers.User{
 			ID:                 int(user.Attributes.ID),
 			Date:               user.Attributes.Date,
 			CourseTitle:        user.Attributes.CourseTitle,

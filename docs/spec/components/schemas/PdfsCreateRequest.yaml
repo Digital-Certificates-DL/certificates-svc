@@ -3,6 +3,7 @@ required:
   - data
   - url
   - address
+  - name
 properties:
   data:
     type: array
@@ -18,3 +19,7 @@ properties:
     type: string
     format: string
     example: "bc3241dhf..."
+  name:
+    type: string
+    format: string
+    example: "DL"

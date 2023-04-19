@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"image/color"
 
 	"github.com/boombuler/barcode/qr"
 	qrcode "github.com/skip2/go-qrcode"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
-	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"os"
 
 	"strings"
@@ -29,11 +29,11 @@ var shortTitles = map[string]string{
 }
 
 type QR struct {
-	user *data.User
+	user *helpers.User
 	cfg  config.Config
 }
 
-func NewQR(user *data.User, cfg config.Config) QR {
+func NewQR(user *helpers.User, cfg config.Config) QR {
 	return QR{
 		user: user,
 		cfg:  cfg,

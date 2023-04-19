@@ -5,6 +5,7 @@ import (
 	"gitlab.com/distributed_lab/kit/copus"
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/kit/kv"
+	"gitlab.com/distributed_lab/kit/pgdb"
 )
 
 type Config interface {
@@ -19,11 +20,13 @@ type Config interface {
 	TitlesConfiger
 	NetworksConfiger
 	ExamsConfiger
+	pgdb.Databaser
 }
 
 type config struct {
 	TableConfiger
 	Signer
+	pgdb.Databaser
 	TitlesConfiger
 	GoogleConfiger
 	TemplatesConfiger
@@ -49,6 +52,7 @@ func New(getter kv.Getter) Config {
 		Signer:            NewKeyer(getter),
 		TableConfiger:     NewTableConfiger(getter),
 		NetworksConfiger:  NewEthRPCConfiger(getter),
+		Databaser:         pgdb.NewDatabaser(getter),
 		Logger:            comfig.NewLogger(getter, comfig.LoggerOpts{}),
 	}
 }
