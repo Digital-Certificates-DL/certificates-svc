@@ -6,6 +6,7 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -27,8 +28,12 @@ func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 func (p PrepareCertificates) PrepareUsers() []*helpers.User {
 	result := make([]*helpers.User, 0)
 	for _, user := range p.Data.Data {
+		id, err := strconv.Atoi(user.ID)
+		if err != nil {
+			return nil
+		}
 		resUser := helpers.User{
-			ID:                 int(user.Attributes.ID),
+			ID:                 id,
 			Date:               user.Attributes.Date,
 			CourseTitle:        user.Attributes.CourseTitle,
 			TxHash:             user.Attributes.TxHash,

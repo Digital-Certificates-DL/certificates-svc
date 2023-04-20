@@ -30,7 +30,9 @@ func (u *User) SetDataHash(hash string) {
 	u.DataHash = hash
 	if len(u.TxHash) > 0 && len(u.TxHash) < 5 {
 		u.SerialNumber = hash[:20]
+		return
 	}
+	u.SerialNumber = u.TxHash[:20]
 
 }
 

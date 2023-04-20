@@ -13,7 +13,6 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"log"
 	"net/http"
-	"os"
 )
 
 const SENDQR = "qr"
@@ -45,8 +44,6 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	os.MkdirAll(helpers.Config(r).QRCode().QRPath, os.ModePerm) //todo make better
-	defer os.RemoveAll(helpers.Config(r).QRCode().QRPath)
 	for _, user := range users {
 		qrData := qr.NewQR(user, helpers.Config(r))
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))

@@ -1,6 +1,7 @@
 package qr
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/aaronarduino/goqrsvg"
 	svg "github.com/ajstarks/svgo"
@@ -49,35 +50,26 @@ func (q QR) GenerateQR(address []byte) ([]byte, []byte, string, error) {
 	} else {
 		path = fmt.Sprintf("certificate_%s_%s_%s_QR_codecreate.svg", parsedName[0], parsedName[1], q.cfg.TemplatesConfig()[q.user.CourseTitle])
 	}
-	pathWithSuffix := fmt.Sprintf(q.cfg.QRCode().QRPath + path)
-	fi, err := os.Create(pathWithSuffix)
 
-	if err != nil {
-		return nil, nil, "", errors.Wrap(err, "failed to create file by path")
-	}
-	s := svg.New(fi)
-	msg := q.PrepareMsgForQR(q.user.Msg, []byte("1BooKnbm48Eabw3FdPgTSudt9u4YTWKBvf"), []byte(q.user.Signature))
+	bf := new(bytes.Buffer)
+	s := svg.New(bf)
+	msg := q.PrepareMsgForQR(q.user.Msg, address, []byte(q.user.Signature))
 
 	qrCode, _ := qr.Encode(msg, qr.M, qr.Auto)
 	qs := goqrsvg.NewQrSVG(qrCode, 5)
 	qs.StartQrSVG(s)
-	qs.WriteQrSVG(s)
-
+	err := qs.WriteQrSVG(s)
+	if err != nil {
+		return nil, nil, "", errors.Wrap(err, "failed write qr in svg")
+	}
 	s.End()
 
 	img, err := q.pngQR(msg)
 	if err != nil {
 		return nil, nil, "", errors.Wrap(err, "failed to generate jpeg")
 	}
-	file, err := os.ReadFile(pathWithSuffix)
-	if err != nil {
-		return nil, nil, "", errors.Wrap(err, "failed to read file")
-	}
-	err = os.Remove(pathWithSuffix)
-	if err != nil {
-		return nil, nil, "", errors.Wrap(err, "failed to remove file")
-	}
-	return file, img, path, nil
+
+	return bf.Bytes(), img, path, nil
 }
 
 func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {

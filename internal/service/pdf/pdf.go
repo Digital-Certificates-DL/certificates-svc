@@ -302,7 +302,6 @@ func (p *PDF) SetExam(x, y float64, size int, font string) {
 
 func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, error) {
 	var err error
-
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
