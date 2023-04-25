@@ -108,10 +108,10 @@ func (h *Handler) Read(users []*helpers.User, flag string) []*helpers.User {
 func (h *Handler) setLink(user *helpers.User, path FilesBytes, flag string) *helpers.User {
 	switch strings.ToLower(flag) {
 	case "qr":
-		user.DigitalCertificate = path.Link
+		user.DigitalCertificate = strings.ReplaceAll(path.Link, "https://", "")
 		return user
 	case "certificate":
-		user.Certificate = path.Link
+		user.Certificate = strings.ReplaceAll(path.Link, "https://", "")
 		return user
 	}
 	return user

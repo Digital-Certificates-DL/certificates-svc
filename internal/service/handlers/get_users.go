@@ -27,7 +27,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(link) == 0 {
+	if len(link) != 0 {
 		helpers.Log(r).WithError(err).Error("failed to authorize")
 		ape.Render(w, newLinkResponse(link))
 		w.WriteHeader(403)

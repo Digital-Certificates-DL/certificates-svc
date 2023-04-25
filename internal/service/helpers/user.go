@@ -32,8 +32,9 @@ func (u *User) SetDataHash(hash string) {
 		u.SerialNumber = hash[:20]
 		return
 	}
-	u.SerialNumber = u.TxHash[:20]
-
+	if u.TxHash != "" {
+		u.SerialNumber = u.TxHash[:20]
+	}
 }
 
 func (u *User) Hashing(msg string) string {

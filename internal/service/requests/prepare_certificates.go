@@ -28,12 +28,12 @@ func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 func (p PrepareCertificates) PrepareUsers() []*helpers.User {
 	result := make([]*helpers.User, 0)
 	for _, user := range p.Data.Data {
-		id, err := strconv.Atoi(user.ID)
+		id, err := strconv.ParseInt(user.ID, 16, 64)
 		if err != nil {
 			return nil
 		}
 		resUser := helpers.User{
-			ID:                 id,
+			ID:                 int(id),
 			Date:               user.Attributes.Date,
 			CourseTitle:        user.Attributes.CourseTitle,
 			TxHash:             user.Attributes.TxHash,

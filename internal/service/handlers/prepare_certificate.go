@@ -122,10 +122,15 @@ func newUserWithImgResponse(users []*helpers.User) resources.UserListResponse {
 				Type: resources.USER,
 			},
 			Attributes: resources.UserAttributes{
-				Participant:    user.Participant,
-				Date:           user.Date,
-				CourseTitle:    user.CourseTitle,
-				CertificateImg: user.ImageCertificate,
+				Participant:        user.Participant,
+				Date:               user.Date,
+				CourseTitle:        user.CourseTitle,
+				CertificateImg:     user.ImageCertificate,
+				DigitalCertificate: user.DigitalCertificate,
+				Certificate:        user.Certificate,
+				Points:             user.Points,
+				Note:               user.Note,
+				Signature:          user.Signature,
 			},
 		}
 		usersData = append(usersData, resp)

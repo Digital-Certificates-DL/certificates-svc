@@ -4,6 +4,7 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"net/http"
@@ -43,6 +44,15 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		helpers.Log(r).WithError(err).Error("failed to update settings")
 		ape.Render(w, problems.InternalError())
 		return
+	}
+	if req.Data.Code != "" {
+		client := google.NewGoogleClient(helpers.Config(r))
+		_, err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to connect")
+			ape.Render(w, problems.InternalError())
+			return
+		}
 	}
 	w.WriteHeader(204)
 	return
