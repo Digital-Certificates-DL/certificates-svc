@@ -8,19 +8,13 @@ CREATE TABLE users (
 
 CREATE TABLE template (
                        id SERIAL PRIMARY KEY,
-                       user_id INTEGER REFERENCES users(id)
-
-);
-
-CREATE TABLE images (
-                      id SERIAL PRIMARY KEY,
-                      user_id INTEGER REFERENCES users(id),
-                      template_id INTEGER REFERENCES template(id),
-                      img_bytes bytea
+                       user_id INTEGER REFERENCES users(id),
+                       template TEXT,
+                       img_bytes bytea,
+                       name TEXT,
 );
 
 -- +migrate Down
-DROP TABLE users;
 DROP TABLE template;
 DROP TABLE images;
 
