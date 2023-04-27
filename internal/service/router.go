@@ -19,6 +19,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 		ape.LoganMiddleware(s.log),
 		ape.CtxMiddleware(
 			helpers.CtxClientQ(pg.NewClientQ(s.cfg.DB())),
+			helpers.CtxTemplateQ(pg.NewTemplateQ(s.cfg.DB())),
 			helpers.CtxLog(s.log),
 			helpers.CtxConfig(cfg),
 		),

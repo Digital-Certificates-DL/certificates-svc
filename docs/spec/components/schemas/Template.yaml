@@ -1,0 +1,19 @@
+allOf:
+  - $ref: '#/components/schemas/TemplateKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - template
+          - background_img
+        properties:
+          template:
+            type: object
+            format: json.RawMessage
+          background_img:
+            type: array
+            items:
+                type: byte

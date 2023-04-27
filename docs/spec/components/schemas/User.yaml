@@ -74,5 +74,6 @@ allOf:
             type: string
             format: string
           CertificateImg:
-            type: string
-            format: byte
+            type: array
+            items:
+              type: byte

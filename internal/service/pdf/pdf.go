@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
+	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"image"
 	"strings"
@@ -300,7 +301,7 @@ func (p *PDF) SetExam(x, y float64, size int, font string) {
 	p.Exam = fl
 }
 
-func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, error) {
+func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ, backgroundImg []byte) ([]byte, string, []byte, error) {
 	var err error
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
@@ -320,13 +321,36 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config) ([]byte, string, []byte, 
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
 	templateImg := cfg.TemplatesConfig()[data.Course]
-	tpl1 := pdf.ImportPage(fmt.Sprintf("staff/templates/%s.pdf", templateImg), 1, "/MediaBox") //todo use  bytes
+	//tpl1 := pdf.ImportPage(fmt.Sprintf("staff/templates/%s.pdf", templateImg), 1, "/MediaBox") //todo use  bytes
 
 	// Draw pdf onto page
-	pdf.UseImportedTemplate(tpl1, 0, 0, 0, 0)
+	//pdf.UseImportedTemplate(tpl1, 0, 0, 0, 0)
 
-	// Color the page
-	//pdf.SetLineWidth(0.1)
+	if backgroundImg == nil {
+		template, err := templateQ.GetByName(templateImg)
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to get background img")
+		}
+		backgroundImgHolder, err := gopdf.ImageHolderByBytes(template.ImgBytes)
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to prepare background")
+		}
+
+		err = pdf.ImageByHolder(backgroundImgHolder, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to set background")
+		}
+	} else {
+		backgroundImgHolder, err := gopdf.ImageHolderByBytes(backgroundImg)
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to prepare background")
+		}
+
+		err = pdf.ImageByHolder(backgroundImgHolder, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to set background")
+		}
+	}
 
 	///////// name
 	err = pdf.SetFont(p.Name.Font, "", p.Name.Size)

@@ -14,6 +14,7 @@ const (
 	logCtxKey ctxKey = iota
 	configCtxKey
 	clientCtxKey
+	templateCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -44,4 +45,14 @@ func CtxClientQ(entry data.ClientQ) func(context.Context) context.Context {
 
 func ClientQ(r *http.Request) data.ClientQ {
 	return r.Context().Value(clientCtxKey).(data.ClientQ).New()
+}
+
+func CtxTemplateQ(entry data.TemplateQ) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, templateCtxKey, entry)
+	}
+}
+
+func TemplateQ(r *http.Request) data.TemplateQ {
+	return r.Context().Value(templateCtxKey).(data.TemplateQ).New()
 }

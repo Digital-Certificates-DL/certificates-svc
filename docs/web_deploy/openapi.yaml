@@ -50,6 +50,41 @@ paths:
                       $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalError'
+  /integrations/ccp-svc/certificate/template:
+    post:
+      tags:
+        - Template
+      summary: template
+      operationId: template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  type: object
+                  $ref: '#/components/schemas/Template'
+      responses:
+        '201':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - errors
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /integrations/ccp-svc/ipfs:
     post:
       tags:
@@ -277,8 +312,9 @@ components:
           format: string
           example: Name
         img:
-          type: object
-          format: string
+          type: array
+          items:
+            type: byte
         description:
           type: string
           format: string
@@ -356,6 +392,36 @@ components:
         code:
           type: string
           example: ''
+    Template:
+      allOf:
+        - $ref: '#/components/schemas/TemplateKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - template
+                - background_img
+              properties:
+                template:
+                  type: object
+                  format: json.RawMessage
+                background_img:
+                  type: array
+                  items:
+                    type: byte
+    TemplateKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum:
+            - template
     User:
       allOf:
         - $ref: '#/components/schemas/UserKey'
@@ -433,8 +499,9 @@ components:
                   type: string
                   format: string
                 CertificateImg:
-                  type: string
-                  format: byte
+                  type: array
+                  items:
+                    type: byte
     UserKey:
       type: object
       required:

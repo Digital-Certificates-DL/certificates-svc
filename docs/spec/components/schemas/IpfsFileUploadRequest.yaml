@@ -9,8 +9,9 @@ properties:
     format: string
     example: "Name"
   img:
-    type: object
-    format: string
+    type: array
+    items:
+      type: byte
   description:
     type: string
     format: string

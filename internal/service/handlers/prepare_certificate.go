@@ -78,7 +78,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		certificate.SetQR(req.QR.X, req.QR.Y, req.QR.Size, req.QR.High, req.Width)
 
 		pdfData := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
-		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, helpers.Config(r))
+		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, helpers.Config(r), helpers.TemplateQ(r), nil)
 		if err != nil {
 			helpers.Log(r).WithError(err).Error("failed to create pdf")
 			ape.Render(w, problems.BadRequest(err))
