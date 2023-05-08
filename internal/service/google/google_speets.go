@@ -8,6 +8,7 @@ import (
 	"google.golang.org/api/sheets/v4"
 	"log"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -26,24 +27,25 @@ func (g *Google) GetTable(readRange, spreadsheetId string) error {
 	return nil
 }
 
-func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry) ([]*helpers.User, []error) {
+func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry) ([]*helpers.User, []error, bool) {
 	errs := make([]error, 0)
 	resp, err := g.sheetSrv.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
 	if err != nil {
 		log.Info("Unable to retrieve data from sheet: %v", err)
 		errs = append(errs, err)
-		return nil, errs
+		return nil, errs, strings.Contains(err.Error(), "invalid_grant")
+
 	}
 
 	if len(resp.Values) == 0 {
-		return nil, nil
+		return nil, nil, false
 	} else {
 		log.Info(resp.Values)
 	}
 
 	users := make([]*helpers.User, 0)
 	if err != nil {
-		return nil, append(errs, errors.Wrap(err, "failed to open file"))
+		return nil, append(errs, errors.Wrap(err, "failed to open file")), false
 	}
 
 	for id, row := range resp.Values {
@@ -60,9 +62,9 @@ func (g *Google) ParseFromWeb(spreadsheetId, readRange string, log *logan.Entry)
 		users = append(users, userInfo)
 	}
 	if len(errs) != 0 {
-		return nil, append(errs, errors.Wrap(err, "failed to parse xlsx"))
+		return nil, append(errs, errors.Wrap(err, "failed to parse xlsx")), false
 	}
-	return users, nil
+	return users, nil, false
 }
 
 func (g *Google) SetRes(users []*helpers.User, sheetID string) []error {
@@ -103,4 +105,9 @@ func stringToInterface(strs []string) []interface{} {
 		res[i] = v
 	}
 	return res
+}
+
+type TokenError struct {
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
 }

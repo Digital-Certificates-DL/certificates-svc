@@ -35,12 +35,20 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", helpers.Config(r).Log())
+	users, errs, isTokenExpired := client.ParseFromWeb(req.Data.Url, "A1:K", helpers.Config(r).Log()) //todo revoke token
 	if errs != nil {
 		helpers.Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
+
+	if isTokenExpired {
+		helpers.Log(r).Error("failed to connect: token expired")
+		w.WriteHeader(http.StatusForbidden)
+		ape.Render(w, newTokenExpired())
+		return
+	}
+
 	readyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id

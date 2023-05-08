@@ -284,6 +284,31 @@ components:
           enum:
             - session_token_not_found
             - session_token_invalid
+    ExpiredTokenError:
+      allOf:
+        - $ref: '#/components/schemas/ExpiredTokenKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - error
+              properties:
+                error:
+                  type: boolean
+                  example: false
+    ExpiredTokenKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum:
+            - expired_token
     IpfsFile:
       allOf:
         - $ref: '#/components/schemas/IpfsFile'

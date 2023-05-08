@@ -36,10 +36,16 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", helpers.Config(r).Log())
+	users, errs, isTokenExpired := client.ParseFromWeb(req.Data.Url, "A1:K", helpers.Config(r).Log())
 	if errs != nil {
 		helpers.Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))
+		return
+	}
+	if isTokenExpired {
+		helpers.Log(r).Error("failed to connect: token expired")
+		w.WriteHeader(http.StatusForbidden)
+		ape.Render(w, newTokenExpired())
 		return
 	}
 	emptyUsers := make([]*helpers.User, 0)
@@ -85,5 +91,13 @@ func newUserResponse(users []*helpers.User) resources.UserListResponse {
 	return resources.UserListResponse{
 		Data: usersData,
 	}
-
+}
+func newTokenExpired() resources.ExpiredTokenErrorResponse {
+	return resources.ExpiredTokenErrorResponse{
+		Data: resources.ExpiredTokenError{
+			Attributes: resources.ExpiredTokenErrorAttributes{
+				Error: true,
+			},
+		},
+	}
 }

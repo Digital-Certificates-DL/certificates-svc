@@ -1,0 +1,14 @@
+allOf:
+  - $ref: '#/components/schemas/ExpiredTokenKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - error
+        properties:
+          error:
+            type: boolean
+            example: false

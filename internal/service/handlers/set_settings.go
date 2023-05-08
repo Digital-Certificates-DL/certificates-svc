@@ -46,6 +46,13 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.Data.Code != "" {
+		settings.Token = nil
+		err = helpers.ClientQ(r).Update(settings)
+		if err != nil {
+			helpers.Log(r).WithError(err).Error("failed to update settings")
+			ape.Render(w, problems.InternalError())
+			return
+		}
 		client := google.NewGoogleClient(helpers.Config(r))
 		_, err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
 		if err != nil {

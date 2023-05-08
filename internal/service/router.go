@@ -30,11 +30,12 @@ func (s *service) router(cfg config.Config) chi.Router {
 			r.Post("/", handlers.GetUsers)
 			r.Post("/empty", handlers.GetUsersEmpty)
 			r.Post("/settings", handlers.SetSettings)
+
 		})
 		r.Route("/certificate", func(r chi.Router) {
 			r.Post("/", handlers.PrepareCertificate)
 			r.Post("/template", handlers.CreateTemplate)
-			r.Post("/bitcoin", handlers.UpdateCertificate)
+			r.Put("/", handlers.UpdateCertificate)
 			r.Post("/ipfs", handlers.UploadFileToIpfs)
 		})
 	})

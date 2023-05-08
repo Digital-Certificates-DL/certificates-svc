@@ -5,8 +5,8 @@
 package resources
 
 type PdfsCreateRequest struct {
-	Address string `json:"address"`
-	Data    []User `json:"data"`
-	Name    string `json:"name"`
-	Url     string `json:"url"`
+	Address string      `json:"address"`
+	Data    []AnyOfUser `json:"data"`
+	Name    string      `json:"name"`
+	Url     string      `json:"url"`
 }
