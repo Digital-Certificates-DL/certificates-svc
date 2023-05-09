@@ -1,4 +1,4 @@
-# qid-kyc-service
+# certificates-svc
 
 ## Install
 
