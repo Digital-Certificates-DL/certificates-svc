@@ -7,6 +7,8 @@ type TemplateQ interface {
 	GetByUserID(hash string) (*Template, error)
 	GetByName(name string) (*Template, error)
 	Update(data *Template) error
+	Select() ([]Template, error)
+	FilterByUser(ids string) TemplateQ
 }
 
 type Template struct {

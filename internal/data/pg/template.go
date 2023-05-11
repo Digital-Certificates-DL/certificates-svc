@@ -50,6 +50,17 @@ func (q *TemplateQ) Update(client *data.Template) error {
 	return err
 }
 
+func (q *TemplateQ) FilterByUser(id string) data.TemplateQ {
+	q.sql = q.sql.Where(sq.Eq{"b.user_id": id})
+	return q
+}
+
+func (q *TemplateQ) Select() ([]data.Template, error) {
+	var result []data.Template
+	err := q.db.Select(&result, q.sql)
+	return result, err
+}
+
 func (q *TemplateQ) Insert(value *data.Template) (int64, error) {
 	clauses := structs.Map(value)
 	var id int64
@@ -61,7 +72,6 @@ func (q *TemplateQ) Insert(value *data.Template) (int64, error) {
 }
 
 func (q *TemplateQ) GetByUserID(id string) (*data.Template, error) {
-
 	var result data.Template
 	err := q.db.Get(&result, sq.Select("*").From(tempalteTableName).Where(sq.Eq{"user_id": id}))
 	if err == sql.ErrNoRows {

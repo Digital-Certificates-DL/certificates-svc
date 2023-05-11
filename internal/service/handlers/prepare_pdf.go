@@ -23,9 +23,9 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	}
 	d := pdf.DefaultData
 
-	if template == nil {
-		*template = pdf.DefaultTemplateTall
-		_, _, imgBytes, err := template.Prepare(d, helpers.Config(r), helpers.TemplateQ(r), backgroundImg)
+	if template.Width == 0 || template.High == 0 {
+		tp := pdf.DefaultTemplateTall
+		_, _, imgBytes, err := tp.Prepare(d, helpers.Config(r), helpers.TemplateQ(r), backgroundImg)
 		if err != nil {
 			helpers.Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 			ape.Render(w, problems.InternalError())
@@ -53,7 +53,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	if resp.Data.Attributes.IsCompleted && template != nil {
+	if resp.Data.Attributes.IsCompleted {
 		templateBytes, err := json.Marshal(template)
 		if err != nil {
 			helpers.Log(r).Error(errors.Wrap(err, "failed to marshal"))

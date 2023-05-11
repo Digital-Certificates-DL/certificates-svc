@@ -338,6 +338,11 @@ gitlab.com/distributed_lab/lorem
 # gitlab.com/distributed_lab/running v1.6.0
 ## explicit
 gitlab.com/distributed_lab/running
+# gitlab.com/distributed_lab/urlval v3.0.0+incompatible
+## explicit
+gitlab.com/distributed_lab/urlval
+gitlab.com/distributed_lab/urlval/internal
+gitlab.com/distributed_lab/urlval/internal/betterreflect
 # go.opencensus.io v0.24.0
 ## explicit; go 1.13
 go.opencensus.io

@@ -12,6 +12,7 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/cors v1.2.1
+	github.com/google/jsonapi v0.0.0-20200226002910-c8283f632fb7
 	github.com/ipfs/go-ipfs-api v0.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/rubenv/sql-migrate v1.4.0
@@ -24,6 +25,7 @@ require (
 	gitlab.com/distributed_lab/kit v1.11.2
 	gitlab.com/distributed_lab/logan v3.8.1+incompatible
 	gitlab.com/distributed_lab/running v1.6.0
+	gitlab.com/distributed_lab/urlval v3.0.0+incompatible
 	golang.org/x/oauth2 v0.6.0
 	google.golang.org/api v0.44.0
 	gopkg.in/gographics/imagick.v2 v2.6.2
@@ -50,7 +52,6 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/jsonapi v0.0.0-20200226002910-c8283f632fb7 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

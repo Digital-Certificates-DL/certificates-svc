@@ -20,26 +20,27 @@ type GenerateTemplate struct {
 	Data resources.Template
 }
 
-func NewGenerateTemplate(r *http.Request) (*pdf.PDF, []byte, GenerateTemplate, error) {
+func NewGenerateTemplate(r *http.Request) (pdf.PDF, []byte, GenerateTemplate, error) {
 	response := GenerateTemplate{}
 	err := json.NewDecoder(r.Body).Decode(&response)
 	if err != nil {
-		return nil, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
 	}
 	pdfTemplate := pdf.PDF{}
 	err = json.Unmarshal(response.Data.Attributes.Template, &pdfTemplate)
 	if err != nil {
-		return nil, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
 	}
 
 	str := strings.ReplaceAll(response.Data.Attributes.BackgroundImg, "data:image/jpeg;base64,", "")
+	str = strings.ReplaceAll(str, "data:image/png;base64,", "")
 
 	data, err := base64toJpg(str)
 	if err != nil {
-		return nil, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
 
 	}
-	return &pdfTemplate, data, response, err
+	return pdfTemplate, data, response, err
 }
 
 // Given a base64 string of a JPEG, encodes it into an JPEG image test.jpg
