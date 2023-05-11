@@ -5,7 +5,6 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"log"
 	"net/http"
@@ -50,19 +49,19 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		if !strings.Contains(user.Certificate, "http") {
 			continue
 		}
-		file, err := client.Download(user.Certificate)
-		if err != nil {
-			helpers.Log(r).Error("failed to ", err)
-			ape.Render(w, problems.BadRequest(err))
-			return
-		}
-		img, err := pdf.Convert("png", file)
-		if err != nil {
-			helpers.Log(r).Error("failed to convert", err)
-			ape.Render(w, problems.BadRequest(err))
-			return
-		}
-		user.ImageCertificate = img
+		//file, err := client.Download(user.Certificate)
+		//if err != nil {
+		//	helpers.Log(r).Error("failed to ", err)
+		//	ape.Render(w, problems.BadRequest(err))
+		//	return
+		//}
+		//img, err := pdf.Convert("png", file)
+		//if err != nil {
+		//	helpers.Log(r).Error("failed to convert", err)
+		//	ape.Render(w, problems.BadRequest(err))
+		//	return
+		//}
+		//user.ImageCertificate = img
 		readyUsers = append(readyUsers, user)
 	}
 	ape.Render(w, newUserResponse(readyUsers))

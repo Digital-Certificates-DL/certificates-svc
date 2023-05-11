@@ -602,14 +602,28 @@
           {
             "type": "object",
             "required": [
-              "attributes"
+              "attributes",
+              "relationships"
             ],
             "properties": {
+              "relationships": {
+                "type": "object",
+                "required": [
+                  "user"
+                ],
+                "properties": {
+                  "user": {
+                    "type": "string"
+                  }
+                }
+              },
               "attributes": {
                 "type": "object",
                 "required": [
                   "template",
-                  "background_img"
+                  "background_img",
+                  "is_completed",
+                  "template_name"
                 ],
                 "properties": {
                   "template": {
@@ -617,10 +631,13 @@
                     "format": "json.RawMessage"
                   },
                   "background_img": {
-                    "type": "array",
-                    "items": {
-                      "type": "byte"
-                    }
+                    "type": "string"
+                  },
+                  "is_completed": {
+                    "type": "boolean"
+                  },
+                  "template_name": {
+                    "type": "string"
                   }
                 }
               }

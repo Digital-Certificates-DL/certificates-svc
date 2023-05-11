@@ -11,7 +11,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
-	sheets "google.golang.org/api/sheets/v4"
+	"google.golang.org/api/sheets/v4"
 	"log"
 	"net/http"
 	"os"
@@ -48,7 +48,7 @@ func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name str
 		return nil, "", errors.Wrap(err, "failed to get client")
 	}
 	if client == nil {
-		return nil, "", errors.Wrap(err, "user not found")
+		return nil, "", errors.New("user not found")
 	}
 	tok := &oauth2.Token{}
 	if len(client.Token) == 0 {
@@ -132,7 +132,10 @@ func (g *Google) Connect(path string, clientQ data.ClientQ, name string) (string
 	}
 	g.client, link, err = g.getClient(config, clientQ, name)
 	if err != nil {
-		return "", errors.Wrap(err, "unable to get client")
+		return link, errors.Wrap(err, "unable to get client")
+	}
+	if g.client == nil {
+		return link, errors.New("nil client")
 	}
 	if len(link) != 0 {
 		return link, nil

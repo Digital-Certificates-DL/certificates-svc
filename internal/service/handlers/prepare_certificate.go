@@ -143,11 +143,12 @@ func newUserWithImgResponse(users []*helpers.User) resources.UserListResponse {
 }
 
 func newLinkResponse(link string) resources.LinkResponse {
-	return resources.LinkResponse{
+	data := resources.LinkResponse{
 		Data: resources.Link{
 			Attributes: resources.LinkAttributes{
 				Link: link,
 			},
 		},
 	}
+	return data
 }

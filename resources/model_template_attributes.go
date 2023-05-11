@@ -7,6 +7,8 @@ package resources
 import "encoding/json"
 
 type TemplateAttributes struct {
-	BackgroundImg []byte          `json:"background_img"`
+	BackgroundImg string          `json:"background_img"`
+	IsCompleted   bool            `json:"is_completed"`
 	Template      json.RawMessage `json:"template"`
+	TemplateName  string          `json:"template_name"`
 }

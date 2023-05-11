@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/google/jsonapi"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
@@ -22,17 +23,24 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	client := google.NewGoogleClient(helpers.Config(r))
 
 	link, err := client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
+	if len(link) != 0 {
+		helpers.Log(r).WithError(err).Error("failed to authorize")
+		w.Header().Set("auth_link", link)
+
+		ape.RenderErr(w, []*jsonapi.ErrorObject{{
+			Title:  "Forbidden",
+			Detail: "Invalid token",
+			Status: "403",
+			Code:   "125",
+			Meta:   &map[string]interface{}{"auth_link": link}},
+		}...)
+
+		return
+	}
+
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to connect")
 		ape.Render(w, problems.InternalError())
-		return
-	}
-	if len(link) != 0 {
-		helpers.Log(r).WithError(err).Error("failed to authorize")
-		w.WriteHeader(http.StatusForbidden)
-
-		ape.Render(w, newLinkResponse(link))
-		helpers.Log(r).Info(w.Header())
 		return
 	}
 

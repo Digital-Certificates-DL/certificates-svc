@@ -6,7 +6,8 @@ package resources
 
 type Template struct {
 	Key
-	Attributes TemplateAttributes `json:"attributes"`
+	Attributes    TemplateAttributes    `json:"attributes"`
+	Relationships TemplateRelationships `json:"relationships"`
 }
 type TemplateResponse struct {
 	Data     Template `json:"data"`

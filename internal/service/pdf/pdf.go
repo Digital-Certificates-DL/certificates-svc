@@ -1,14 +1,12 @@
 package pdf
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gopkg.in/gographics/imagick.v2/imagick"
-	"image"
 	"strings"
 )
 
@@ -306,7 +304,6 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
-
 	pdf.SetTextColor(255, 255, 255)
 	err = pdf.AddTTFFont("italic", "staff/font/Inter-Italic.ttf")
 	if err != nil {
@@ -346,14 +343,14 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 			return nil, "", nil, errors.Wrap(err, "failed to prepare background")
 		}
 
-		err = pdf.ImageByHolder(backgroundImgHolder, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
+		err = pdf.ImageByHolder(backgroundImgHolder, 0, 0, &gopdf.Rect{W: p.Width, H: p.High})
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set background")
 		}
 	}
 
 	///////// name
-	err = pdf.SetFont(p.Name.Font, "", p.Name.Size)
+	err = pdf.SetFont("regular", "", 12)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -363,7 +360,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// credits
-	err = pdf.SetFont(p.Credits.Font, "", p.Credits.Size)
+	err = pdf.SetFont("italic", "", p.Credits.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -372,7 +369,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(data.Credits))
 
 	///////////// Points
-	err = pdf.SetFont(p.Points.Font, "", p.Points.Size)
+	err = pdf.SetFont("italic", "", p.Points.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 
@@ -382,7 +379,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", data.Points))
 
 	///////////// SerialNumber
-	err = pdf.SetFont(p.SerialNumber.Font, "", p.SerialNumber.Size)
+	err = pdf.SetFont("italic", "", p.SerialNumber.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -392,7 +389,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(nil, data.SerialNumber)
 
 	///////////// Date
-	err = pdf.SetFont(p.Date.Font, "", p.Date.Size)
+	err = pdf.SetFont("italic", "", p.Date.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -402,7 +399,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Issued on: %s", data.Date))
 
 	///////////// Course
-	err = pdf.SetFont(p.Course.Font, "", p.Course.Size)
+	err = pdf.SetFont("italic", "", p.Course.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -413,17 +410,19 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	isLevel, title, level := p.checkLevel(titles[templateImg])
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
 
+	pdf.WritePdf("test2.pdf")
+
 	///////////// QR
-	img, _, err := image.Decode(bytes.NewReader(data.QR))
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
-	}
-	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set image")
-	}
+	//img, _, err := image.Decode(bytes.NewReader(data.QR))
+	//if err != nil {
+	//	return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
+	//}
+	//err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
+	//if err != nil {
+	//	return nil, "", nil, errors.Wrap(err, "failed to set image")
+	//}
 	/////////////// Exam
-	err = pdf.SetFont(p.Exam.Font, "", p.Exam.Size)
+	err = pdf.SetFont("italic", "", p.Exam.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -433,7 +432,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, ex[data.Exam], gopdf.CellOption{Align: gopdf.Center})
 	///////////// Level
 	if isLevel {
-		err = pdf.SetFont(p.Level.Font, "", p.Level.Size)
+		err = pdf.SetFont("italic", "", p.Level.Size)
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set font")
 		}
@@ -443,6 +442,8 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 
 	}
 
+	pdf.WritePdf("test.pdf")
+
 	parsedName := strings.Split(data.Name, " ")
 	name := ""
 	if len(parsedName) < 2 {
@@ -450,7 +451,11 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	} else {
 		name = fmt.Sprintf("certificate_%s_%s_%s.pdf", parsedName[0], parsedName[1], cfg.TemplatesConfig()[data.Course])
 	}
+
 	pdfBlob := pdf.GetBytesPdf()
+	if err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to  save")
+	}
 	imgBlob, err := Convert("png", pdfBlob)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to  convert pdf to png")
