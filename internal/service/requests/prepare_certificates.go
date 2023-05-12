@@ -4,14 +4,36 @@ import (
 	"encoding/json"
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
-	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
 type PrepareCertificates struct {
-	Data resources.PdfsCreateRequest //todo update model
+	Data PdfsCreateRequest //todo update model
+}
+
+type PdfsCreateRequest struct {
+	Address string `json:"address"`
+	Data    []User `json:"users"`
+	Name    string `json:"name"`
+	Url     string `json:"url"`
+}
+
+type User struct {
+	Certificate        string `json:"Certificate"`
+	CertificateImg     []byte `json:"CertificateImg"`
+	CourseTitle        string `json:"CourseTitle"`
+	DataHash           string `json:"DataHash"`
+	Date               string `json:"Date"`
+	DigitalCertificate string `json:"DigitalCertificate"`
+	ID                 int64  `json:"UserID"`
+	Msg                string `json:"Msg"`
+	Note               string `json:"Note"`
+	Participant        string `json:"Participant"`
+	Points             string `json:"Points"`
+	SerialNumber       string `json:"SerialNumber"`
+	Signature          string `json:"Signature"`
+	TxHash             string `json:"TxHash"`
 }
 
 func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
@@ -28,24 +50,24 @@ func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 func (p PrepareCertificates) PrepareUsers() []*helpers.User {
 	result := make([]*helpers.User, 0)
 	for _, user := range p.Data.Data {
-		id, err := strconv.ParseInt(user.ID, 16, 64)
-		if err != nil {
-			return nil
-		}
+		//id, err := strconv.ParseInt(user.ID, 16, 64)
+		//if err != nil {
+		//	return nil
+		//}
 		resUser := helpers.User{
-			ID:                 int(id),
-			Date:               user.Attributes.Date,
-			CourseTitle:        user.Attributes.CourseTitle,
-			TxHash:             user.Attributes.TxHash,
-			Signature:          user.Attributes.Signature,
-			DataHash:           user.Attributes.DataHash,
-			SerialNumber:       user.Attributes.SerialNumber,
-			Note:               user.Attributes.Note,
-			Msg:                user.Attributes.Msg,
-			Participant:        user.Attributes.Participant,
-			Points:             user.Attributes.Points,
-			Certificate:        user.Attributes.Certificate,
-			DigitalCertificate: user.Attributes.DigitalCertificate,
+			ID:                 int(user.ID),
+			Date:               user.Date,
+			CourseTitle:        user.CourseTitle,
+			TxHash:             user.TxHash,
+			Signature:          user.Signature,
+			DataHash:           user.DataHash,
+			SerialNumber:       user.SerialNumber,
+			Note:               user.Note,
+			Msg:                user.Msg,
+			Participant:        user.Participant,
+			Points:             user.Points,
+			Certificate:        user.Certificate,
+			DigitalCertificate: user.DigitalCertificate,
 		}
 		result = append(result, &resUser)
 	}

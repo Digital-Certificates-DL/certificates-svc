@@ -10,11 +10,11 @@ CREATE TABLE template (
                        id SERIAL PRIMARY KEY,
                        user_id INTEGER REFERENCES users(id),
                        template TEXT,
-                       img_bytes bytea,
-                       name TEXT,
+                       img_bytes text,
+                       name TEXT
 );
 
 -- +migrate Down
 DROP TABLE template;
-DROP TABLE images;
+
 

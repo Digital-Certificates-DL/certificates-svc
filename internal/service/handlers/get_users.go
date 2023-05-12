@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
@@ -8,7 +9,6 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +21,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	client := google.NewGoogleClient(helpers.Config(r))
 	link, err := client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
-	if err != nil { //todo
+	if err != nil {
 		log.Println(err)
 		return
 	}
@@ -43,12 +43,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	readyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id
-		if user.Certificate == "" {
-			continue
-		}
-		if !strings.Contains(user.Certificate, "http") {
-			continue
-		}
+
 		//file, err := client.Download(user.Certificate)
 		//if err != nil {
 		//	helpers.Log(r).Error("failed to ", err)
@@ -62,6 +57,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		//	return
 		//}
 		//user.ImageCertificate = img
+		user.Msg = fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 		readyUsers = append(readyUsers, user)
 	}
 	ape.Render(w, newUserResponse(readyUsers))

@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-const tempalteTableName = "tempate"
+const tempalteTableName = "template"
 
 func NewTemplateQ(db *pgdb.DB) data.TemplateQ {
 	return &TemplateQ{
@@ -50,14 +50,17 @@ func (q *TemplateQ) Update(client *data.Template) error {
 	return err
 }
 
-func (q *TemplateQ) FilterByUser(id string) data.TemplateQ {
-	q.sql = q.sql.Where(sq.Eq{"b.user_id": id})
+func (q *TemplateQ) FilterByUser(id int64) data.TemplateQ {
+	q.sql = q.sql.Where(sq.Eq{"user_id": id})
 	return q
 }
 
-func (q *TemplateQ) Select() ([]data.Template, error) {
+func (q *TemplateQ) Select(id int64) ([]data.Template, error) {
 	var result []data.Template
-	err := q.db.Select(&result, q.sql)
+
+	stmt := sq.Select("*").From(tempalteTableName).Where(sq.Eq{"user_id": id})
+	err := q.db.Select(&result, stmt)
+
 	return result, err
 }
 

@@ -11,7 +11,7 @@ type UserAttributes struct {
 	DataHash           string `json:"DataHash"`
 	Date               string `json:"Date"`
 	DigitalCertificate string `json:"DigitalCertificate"`
-	ID                 int64  `json:"ID"`
+	ID                 int64  `json:"UserID"`
 	Msg                string `json:"Msg"`
 	Note               string `json:"Note"`
 	Participant        string `json:"Participant"`

@@ -74,7 +74,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		}
 		helpers.TemplateQ(r).Insert(&data.Template{
 			Template: templateBytes,
-			ImgBytes: imgBytes,
+			ImgBytes: string(imgBytes), //todo make better
 			Name:     resp.Data.Attributes.TemplateName,
 			UserID:   user.ID,
 		})

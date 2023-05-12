@@ -1,12 +1,16 @@
 package pdf
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gopkg.in/gographics/imagick.v2/imagick"
+	"image"
+	"image/jpeg"
 	"strings"
 )
 
@@ -328,12 +332,27 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to get background img")
 		}
-		backgroundImgHolder, err := gopdf.ImageHolderByBytes(template.ImgBytes)
+		if template == nil {
+			template, err = templateQ.GetByName("default")
+			if err != nil {
+				return nil, "", nil, errors.Wrap(err, "failed to get default background img")
+			}
+		}
+		if template == nil {
+			return nil, "", nil, errors.Wrap(err, "default template isn't found")
+		}
+
+		back, err := base64toJpg(template.ImgBytes)
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to decode base64 to jpeg")
+		}
+
+		backgroundImgHolder, err := gopdf.ImageHolderByBytes(back)
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to prepare background")
 		}
 
-		err = pdf.ImageByHolder(backgroundImgHolder, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
+		err = pdf.ImageByHolder(backgroundImgHolder, 0, 0, &gopdf.Rect{W: p.Width, H: p.High})
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set background")
 		}
@@ -350,7 +369,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 
 	///////// name
-	err = pdf.SetFont("regular", "", 12)
+	err = pdf.SetFont("regular", "", p.Name.Size)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -410,17 +429,18 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	isLevel, title, level := p.checkLevel(titles[templateImg])
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
 
-	pdf.WritePdf("test2.pdf")
+	/////////// QR
+	if data.QR != nil {
+		img, _, err := image.Decode(bytes.NewReader(data.QR))
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
+		}
+		err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 114, H: 114})
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to set image")
+		}
+	}
 
-	///////////// QR
-	//img, _, err := image.Decode(bytes.NewReader(data.QR))
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
-	//}
-	//err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to set image")
-	//}
 	/////////////// Exam
 	err = pdf.SetFont("italic", "", p.Exam.Size)
 	if err != nil {
@@ -442,8 +462,6 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 
 	}
 
-	pdf.WritePdf("test.pdf")
-
 	parsedName := strings.Split(data.Name, " ")
 	name := ""
 	if len(parsedName) < 2 {
@@ -453,9 +471,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 
 	pdfBlob := pdf.GetBytesPdf()
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to  save")
-	}
+
 	imgBlob, err := Convert("png", pdfBlob)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to  convert pdf to png")
@@ -506,4 +522,22 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 		return nil, errors.Wrap(err, "failed to set  format")
 	}
 	return mw.GetImageBlob(), nil
+}
+
+func base64toJpg(data string) ([]byte, error) {
+
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
+	m, _, err := image.Decode(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	//Encode from image format to writer
+	buf := new(bytes.Buffer)
+
+	err = jpeg.Encode(buf, m, &jpeg.Options{Quality: 75})
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

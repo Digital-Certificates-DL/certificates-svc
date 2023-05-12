@@ -22,7 +22,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
 		helpers.Log(r).WithError(err).Error("failed to parse data")
-		ape.Render(w, problems.InternalError())
+		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 	users := req.PrepareUsers()
@@ -64,7 +64,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 
 		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
-		req := pdf.DefaultTemplateTall
+		req := pdf.DefaultTemplateNormal
 		log.Println("user", user)
 		certificate := pdf.NewPDF(req.High, req.Width)
 		certificate.SetName(req.Name.X, req.Name.Y, req.Name.Size, req.Name.Font)
