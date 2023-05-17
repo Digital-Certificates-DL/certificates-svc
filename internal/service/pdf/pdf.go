@@ -11,6 +11,7 @@ import (
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"image"
 	"image/jpeg"
+	"os"
 	"strings"
 )
 
@@ -476,6 +477,13 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to  convert pdf to png")
 	}
+	file, err := os.Create("test.png")
+	if err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to create png file")
+	}
+
+	file.Write(imgBlob)
+	file.Close()
 	return pdfBlob, name, imgBlob, nil
 
 }

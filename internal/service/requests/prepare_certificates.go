@@ -20,20 +20,20 @@ type PdfsCreateRequest struct {
 }
 
 type User struct {
-	Certificate        string `json:"Certificate"`
-	CertificateImg     []byte `json:"CertificateImg"`
-	CourseTitle        string `json:"CourseTitle"`
-	DataHash           string `json:"DataHash"`
-	Date               string `json:"Date"`
-	DigitalCertificate string `json:"DigitalCertificate"`
-	ID                 int64  `json:"UserID"`
-	Msg                string `json:"Msg"`
-	Note               string `json:"Note"`
-	Participant        string `json:"Participant"`
-	Points             string `json:"Points"`
-	SerialNumber       string `json:"SerialNumber"`
-	Signature          string `json:"Signature"`
-	TxHash             string `json:"TxHash"`
+	Certificate        string `json:"certificate"`
+	CertificateImg     string `json:"certificateImg"`
+	CourseTitle        string `json:"courseTitle"`
+	DataHash           string `json:"dataHash"`
+	Date               string `json:"date"`
+	DigitalCertificate string `json:"digitalCertificate"`
+	ID                 int64  `json:"id"`
+	Msg                string `json:"msg"`
+	Note               string `json:"note"`
+	Participant        string `json:"participant"`
+	Points             string `json:"points"`
+	SerialNumber       string `json:"serialNumber"`
+	Signature          string `json:"signature"`
+	TxHash             string `json:"txHash"`
 }
 
 func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
@@ -54,6 +54,10 @@ func (p PrepareCertificates) PrepareUsers() []*helpers.User {
 		//if err != nil {
 		//	return nil
 		//}
+		img, err := base64toJpg(user.CertificateImg)
+		if err != nil {
+			img = nil
+		}
 		resUser := helpers.User{
 			ID:                 int(user.ID),
 			Date:               user.Date,
@@ -68,6 +72,7 @@ func (p PrepareCertificates) PrepareUsers() []*helpers.User {
 			Points:             user.Points,
 			Certificate:        user.Certificate,
 			DigitalCertificate: user.DigitalCertificate,
+			ImageCertificate:   img,
 		}
 		result = append(result, &resUser)
 	}

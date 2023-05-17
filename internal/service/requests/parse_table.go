@@ -20,6 +20,7 @@ func NewGetUsers(r *http.Request) (GetUsers, error) {
 		return GetUsers{}, errors.Wrap(err, "failed to decode data")
 	}
 	response.Data.Url = response.parse()
+
 	return response, err
 }
 

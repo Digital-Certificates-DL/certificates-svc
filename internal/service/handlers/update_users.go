@@ -52,9 +52,11 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		//}
 		//
 		//user.SetDataHash(hash)
-
+		helpers.Log(r).Info(user.TxHash, " tx")
 		if user.TxHash != "" {
 			user.SetDataHash(user.TxHash)
+			helpers.Log(r).Info(user.DataHash)
+			helpers.Log(r).Info(user.TxHash)
 		}
 
 		req := pdf.DefaultTemplateTall

@@ -5,18 +5,18 @@
 package resources
 
 type UserAttributes struct {
-	Certificate        string `json:"Certificate"`
-	CertificateImg     []byte `json:"CertificateImg"`
-	CourseTitle        string `json:"CourseTitle"`
-	DataHash           string `json:"DataHash"`
-	Date               string `json:"Date"`
-	DigitalCertificate string `json:"DigitalCertificate"`
-	ID                 int64  `json:"UserID"`
-	Msg                string `json:"Msg"`
-	Note               string `json:"Note"`
-	Participant        string `json:"Participant"`
-	Points             string `json:"Points"`
-	SerialNumber       string `json:"SerialNumber"`
-	Signature          string `json:"Signature"`
-	TxHash             string `json:"TxHash"`
+	Certificate        string `json:"certificate"`
+	CertificateImg     []byte `json:"certificateImg"`
+	CourseTitle        string `json:"courseTitle"`
+	DataHash           string `json:"dataHash"`
+	Date               string `json:"date"`
+	DigitalCertificate string `json:"digitalCertificate"`
+	Id                 int64  `json:"id"`
+	Msg                string `json:"msg"`
+	Note               string `json:"note"`
+	Participant        string `json:"participant"`
+	Points             string `json:"points"`
+	SerialNumber       string `json:"serialNumber"`
+	Signature          string `json:"signature"`
+	TxHash             string `json:"txHash"`
 }

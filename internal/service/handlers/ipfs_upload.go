@@ -37,14 +37,15 @@ func UploadFileToIpfs(w http.ResponseWriter, r *http.Request) {
 	helpers.Log(r).Debug(newIpfsUploadResponse(preparedURI))
 }
 
-func newIpfsUploadResponse(uri string) resources.IpfsFile {
-	return resources.IpfsFile{
-		Key: resources.Key{
-			Type: resources.IPFS,
-		},
-		Attributes: resources.IpfsFileAttributes{
-			Url: uri,
+func newIpfsUploadResponse(uri string) resources.IpfsFileResponse {
+	return resources.IpfsFileResponse{
+		Data: resources.IpfsFile{
+			Key: resources.Key{
+				Type: resources.IPFS,
+			},
+			Attributes: resources.IpfsFileAttributes{
+				Url: uri,
+			},
 		},
 	}
-
 }

@@ -74,7 +74,7 @@ func newUserResponse(users []*helpers.User) resources.UserListResponse {
 			},
 			Attributes: resources.UserAttributes{
 				Certificate:  user.Certificate,
-				ID:           int64(user.ID),
+				Id:           int64(user.ID),
 				Points:       user.Points,
 				Participant:  user.Participant,
 				Msg:          user.Msg,
