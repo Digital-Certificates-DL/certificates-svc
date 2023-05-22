@@ -28,7 +28,7 @@ func GetTemplates(w http.ResponseWriter, r *http.Request) {
 
 	if client == nil {
 		helpers.Log(r).Error(errors.Wrap(err, "client is not found"))
-		ape.Render(w, problems.NotFound())
+		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 

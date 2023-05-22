@@ -30,6 +30,9 @@ func (s *service) router(cfg config.Config) chi.Router {
 			r.Post("/", handlers.GetUsers)
 			r.Post("/empty", handlers.GetUsersEmpty)
 			r.Post("/settings", handlers.SetSettings)
+
+			r.Post("/token", handlers.UpdateToken)
+
 		})
 		r.Route("/certificate", func(r chi.Router) {
 			r.Post("/", handlers.PrepareCertificate)

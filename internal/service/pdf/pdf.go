@@ -11,6 +11,7 @@ import (
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"image"
 	"image/jpeg"
+	"io"
 	"os"
 	"strings"
 )
@@ -323,10 +324,6 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
 	templateImg := cfg.TemplatesConfig()[data.Course]
-	//tpl1 := pdf.ImportPage(fmt.Sprintf("staff/templates/%s.pdf", templateImg), 1, "/MediaBox") //todo use  bytes
-
-	// Draw pdf onto page
-	//pdf.UseImportedTemplate(tpl1, 0, 0, 0, 0)
 
 	if backgroundImg == nil {
 		template, err := templateQ.GetByName(templateImg)
@@ -339,13 +336,28 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 				return nil, "", nil, errors.Wrap(err, "failed to get default background img")
 			}
 		}
-		if template == nil {
-			return nil, "", nil, errors.Wrap(err, "default template isn't found")
-		}
+		//if template == nil {
+		//	return nil, "", nil, errors.Wrap(err, "default template isn't found")
+		//}
+		var back []byte
+		if template != nil {
+			back, err = base64toJpg(template.ImgBytes)
+			if err != nil {
+				return nil, "", nil, errors.Wrap(err, "cant to decode img")
 
-		back, err := base64toJpg(template.ImgBytes)
-		if err != nil {
-			return nil, "", nil, errors.Wrap(err, "failed to decode base64 to jpeg")
+			}
+		} else {
+			file, err := os.Open("./staff/templates/template.jpg")
+			defer file.Close()
+			if err != nil {
+				return nil, "", nil, errors.Wrap(err, "default template isn't found")
+			}
+
+			back, err = io.ReadAll(file)
+			if err != nil {
+				return nil, "", nil, errors.Wrap(err, "cant to decode img")
+
+			}
 		}
 
 		backgroundImgHolder, err := gopdf.ImageHolderByBytes(back)
