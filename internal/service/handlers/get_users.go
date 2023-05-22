@@ -31,7 +31,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 			Title:  "Forbidden",
 			Detail: "Invalid token",
 			Status: "403",
-			Code:   "125",
 			Meta:   &map[string]interface{}{"auth_link": link}},
 		}...)
 
