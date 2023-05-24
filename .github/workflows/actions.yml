@@ -14,6 +14,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install libmagickwand-dev
+        run: sudo apt-get install libmagickwand-dev -y
+
       - name: Install werf
         uses: werf/actions/install@v1.2
 

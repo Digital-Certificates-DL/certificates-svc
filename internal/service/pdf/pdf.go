@@ -68,7 +68,7 @@ var DefaultTemplateNormal = PDF{
 		Size: 14,
 		Font: "semibold",
 	},
-	Credits: Field{ //todo get from front and save to db
+	Credits: Field{
 		X:    70,
 		Y:    56,
 		Size: 12,
@@ -143,7 +143,7 @@ var DefaultTemplateTall = PDF{
 		Font: "regular",
 	},
 	SerialNumber: Field{
-		X:    1282,
+		X:    1144,
 		Y:    112,
 		Size: 24,
 		Font: "regular",
@@ -331,10 +331,13 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 			return nil, "", nil, errors.Wrap(err, "failed to get background img")
 		}
 		if template == nil {
-			template, err = templateQ.GetByName("default")
+			titles := cfg.TitlesConfig()
+			_ = titles
+			template, err = templateQ.GetByName(templateImg)
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "failed to get default background img")
 			}
+
 		}
 		//if template == nil {
 		//	return nil, "", nil, errors.Wrap(err, "default template isn't found")
@@ -347,7 +350,13 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 
 			}
 		} else {
-			file, err := os.Open("./staff/templates/template.jpg")
+
+			file, err := os.Open(fmt.Sprintf("./staff/templates/%s.png", templateImg))
+			fmt.Println()
+			fmt.Println()
+			fmt.Println(fmt.Sprintf("./staff/templates/%s.png", templateImg))
+			fmt.Println()
+			fmt.Println()
 			defer file.Close()
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "default template isn't found")
@@ -440,7 +449,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.SetY(p.Course.Y)
 	titles := cfg.TitlesConfig()
 	isLevel, title, level := p.checkLevel(titles[templateImg])
-	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
+	pdf.CellWithOption(&gopdf.Rect{W: p.Width - 50, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
 
 	/////////// QR
 	if data.QR != nil {
