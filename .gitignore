@@ -1,7 +1,7 @@
 result
 ./qr
 .idea
-config.yaml
+config.local.yaml
 test.png
 testqr.png
 client.json
