@@ -3,34 +3,45 @@ log:
   level: info
 
 db:
-  url:
+  url: postgres://postgres:password@localhost:5432/ccp?sslmode=disable
 
 listener:
-  addr:
+  addr: :8000
 
 signature:
-  key:
+  key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
+
 networks:
-  rpc_eth:
-  ipfs:
-  ipfs_pr_id:
-  ipfs_pr_key:
+  rpc_eth: "https://goerli.infura.io/v3/45efc27205e746adb3a1d6c3da69a7ba"
+  ipfs: "https://ipfs.infura.io:5001"
+  ipfs_pr_id: "2LgGs3QZ5Ndz065ZVu4xoSTWzcU"
+  ipfs_pr_key: "4afcd5182cb6e849fa72726d44f77186"
 
 google:
-  secret_path: ""
-  qr_path: ""
-  pdf_path: ""
+  secret_path: "./client.json"
+  qr_path: "qr"
+  pdf_path: "pdf"
   api_key: ""
+#  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
   code: ""
   enable: true
+#
+#google:
+#  secret_path: "./client.json"
+#  qr_path: "qr"
+#  pdf_path: "pdf"
+#  api_key: ""
+##  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
+#  code: "4/0AVHEtk6nkskIwm0pcZEhcrOpoXZG14GYeuoeQ4akl5HOHJLcuwpDRryMZydgBekmjzgElg"
+#  enable: true
 
 tables:
-  result: ""
-  input: ""
+  result: "test.xlsx"
+  input: "certificates.xlsx"
 
 qr_code:
-  qr_path: ""
-  template: ""
+  qr_path: "./qr/"
+  template: "message:\n%s\n\naddress:\n%s\n\nsignature:\n%s\n\ncertificate page:\nhttps://dlt-academy.com/certificates"
 
 templates:
   list:
