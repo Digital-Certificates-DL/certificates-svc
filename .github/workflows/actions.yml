@@ -35,5 +35,5 @@ jobs:
           . $(werf ci-env github --as-file) 
           werf build --save-build-report=true --build-report-path=images-report.json
           docker pull $(cat images-report.json | jq -r .Images.service.DockerImageName)
-          docker tag $(cat images-report.json | jq -r .Images.service.DockerImageName) ghcr.io/$GITHUB_REPOSITORY:$GITHUB_SHA
-          docker push ghcr.io/$GITHUB_REPOSITORY:$GITHUB_SHA
+          docker tag $(cat images-report.json | jq -r .Images.service.DockerImageName) ghcr.io/digital-certificates-dl/ccp-script/certificates-svc:$GITHUB_SHA
+          docker push ghcr.io/digital-certificates-dl/ccp-script/certificates-svc:$GITHUB_SHA

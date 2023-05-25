@@ -53,10 +53,10 @@ func NewHandler(input chan FilesBytes, output chan FilesBytes, log *logan.Entry,
 
 func (h *Handler) StartDriveRunner() {
 	for i := 0; i < h.running; i++ {
-		h.log.Debug("start ", i)
+		h.log.Debug("start worker ", i)
 		go func(name string) {
 			defer h.decrement()
-			defer h.log.Debug("quit ", i)
+			defer h.log.Debug("quit from worker: ", i)
 			for path := range h.chInput {
 				running.UntilSuccess(context.Background(), h.log, h.name, func(ctx context.Context) (bool, error) {
 					link, err := h.googleClient.Update(path.Name, path.File, path.Type)
@@ -66,7 +66,7 @@ func (h *Handler) StartDriveRunner() {
 					}
 					path.Link = link
 					h.chOutput <- path
-					h.log.Debug("send ", name)
+					h.log.Debug("send file to cloud and contain link on chan  ", name)
 					h.count++
 					return true, err
 				}, time.Millisecond*150, time.Millisecond*180)
@@ -82,7 +82,7 @@ func (h *Handler) decrement() {
 	if h.running == 0 {
 		close(h.chOutput)
 		h.cancel()
-		h.log.Debug("ctx done")
+		h.log.Debug("worker context  is done")
 	}
 }
 
@@ -90,16 +90,16 @@ func (h *Handler) Read(users []*helpers.User, flag string) []*helpers.User {
 	for {
 		select {
 		case path := <-h.chOutput:
-			h.log.Debug("read")
+			h.log.Debug("read from  worker chan")
 			for id, u := range users {
 				if u.ID == path.ID {
 					users[id] = h.setLink(users[id], path, flag)
-					log.Println("break: ", flag)
+					log.Println("set external link: ", flag)
 					break
 				}
 			}
 		case <-h.ctx.Done():
-			h.log.Debug("out")
+			h.log.Debug("exit from read func")
 			return users
 		}
 	}

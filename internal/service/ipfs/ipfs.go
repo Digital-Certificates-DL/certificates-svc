@@ -24,12 +24,6 @@ type ERC721json struct {
 	ExternalUrl string `json:"external_url"`
 }
 
-//
-//type ERC721DescriptionInfo struct {
-//	types       string `json:"type"`
-//	description string `json:"description"`
-//}
-
 func NewConnector(cfg config.Config) *Connector {
 	return &Connector{cfg: cfg}
 }

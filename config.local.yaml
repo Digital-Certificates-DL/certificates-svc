@@ -1,0 +1,74 @@
+log:
+  disable_sentry: true
+  level: info
+
+db:
+  url:
+
+listener:
+  addr:
+
+signature:
+  key:
+networks:
+  rpc_eth:
+  ipfs:
+  ipfs_pr_id:
+  ipfs_pr_key:
+
+google:
+  secret_path: ""
+  qr_path: ""
+  pdf_path: ""
+  api_key: ""
+  code: ""
+  enable: true
+
+tables:
+  result: ""
+  input: ""
+
+qr_code:
+  qr_path: ""
+  template: ""
+
+templates:
+  list:
+    golang: "Golang programming on fundamental aspects"
+    distributed_system: "Blockchain and Distributed Systems"
+    cryptocurrencies: "Cryptocurrencies and Distributed Systems"
+    decentralize_technologies: "Basic Level in Decentralized Technologies"
+    bitcoin: "Біткоїн та криптовалюти"
+    security: "Cryptography and information security theory"
+    database: "Theory of database organization and basic SQL"
+    blockchain: "Beginner at theoretical aspects blockchain technology"
+    solidity: "Basic aspects of programing with Solidity"
+    defi: "Basic theory about decentralized finance"
+
+titles:
+  list:
+    golang: "has successfully completed GoLang programming Course on fundamental aspects"
+    distributed_system: "Blockchain and Distributed Systems"
+    cryptocurrencies: "Cryptocurrencies and Distributed Systems"
+    decentralize_technologies: "Basic Level in Decentralized Technologies"
+    bitcoin: "Біткоїн та криптовалюти"
+    security: "has successfully completed Course \"Cryptography\" on theoretical aspects"
+    database:  "has successfully completed Course \"Database Organization\" on theoretical aspects of database design and basic SQL"
+    blockchain: "has successfully completed Course \"Blockchain and Decentralized Technologies\" Level: \"beginner at theoretical aspects\""
+    solidity: "has successfully completed Course \"Basic aspects of programing with Solidity\""
+    defi: "has successfully completed Course \"Basic theory about decentralized finance\""
+
+exams:
+  list:
+    "": "Exam passed"
+    "Basic level": "Basic level"
+    "graduated with honors": "Exam passed with honors"
+    "Listener only": "Listener only. Exam not passed"
+
+cop:
+  disabled: true
+  endpoint: "http://..."
+  upstream: "http://..."
+  service_name: css
+  service_port: 80
+

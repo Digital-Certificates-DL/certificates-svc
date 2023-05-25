@@ -1,18 +1,15 @@
 package requests
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"image"
 	"image/jpeg"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -60,31 +57,4 @@ func base64toJpg(data string) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
-}
-
-// Gets base64 string of an existing JPEG file
-func getJPEGbase64(fileName string) string {
-
-	imgFile, err := os.Open(fileName)
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	defer imgFile.Close()
-
-	// create a new buffer base on file size
-	fInfo, _ := imgFile.Stat()
-	var size = fInfo.Size()
-	buf := make([]byte, size)
-
-	// read file content into buffer
-	fReader := bufio.NewReader(imgFile)
-	fReader.Read(buf)
-
-	imgBase64Str := base64.StdEncoding.EncodeToString(buf)
-	//fmt.Println("Base64 string is:", imgBase64Str)
-	return imgBase64Str
-
 }

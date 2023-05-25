@@ -2,308 +2,16 @@ package pdf
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
-	"github.com/pkg/errors"
 	"github.com/signintech/gopdf"
+	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
-	"gopkg.in/gographics/imagick.v2/imagick"
 	"image"
-	"image/jpeg"
 	"io"
 	"os"
 	"strings"
 )
-
-type PDF struct {
-	High         float64 `json:"high"`
-	Width        float64 `json:"width"`
-	Name         Field   `json:"name"`
-	Course       Field   `json:"course"`
-	Credits      Field   `json:"credits"`
-	Points       Field   `json:"points"`
-	SerialNumber Field   `json:"serial_number"`
-	Date         Field   `json:"date"`
-	QR           Field   `json:"qr"`
-	Exam         Field   `json:"exam"`
-	Level        Field   `json:"level"`
-	Note         Field   `json:"note"`
-}
-
-type Field struct {
-	X     float64 `json:"x"`
-	Y     float64 `json:"y"`
-	Size  int     `json:"size"`
-	Font  string  `json:"font"`
-	High  float64 `json:"high"`
-	Width float64 `json:"width"`
-}
-
-type PDFData struct {
-	Name         string
-	Course       string
-	Credits      string
-	Points       string
-	SerialNumber string
-	Date         string
-	QR           []byte
-	Exam         string
-	Level        string
-	Note         string
-}
-
-var DefaultTemplateNormal = PDF{
-	High:  595,
-	Width: 842,
-	Name: Field{
-		X:    200,
-		Y:    217,
-		Size: 28,
-		Font: "semibold",
-	},
-	Course: Field{
-		X:    61,
-		Y:    259,
-		Size: 14,
-		Font: "semibold",
-	},
-	Credits: Field{
-		X:    70,
-		Y:    56,
-		Size: 12,
-		Font: "regular",
-	},
-	Points: Field{
-		X:    70,
-		Y:    79,
-		Size: 12,
-		Font: "regular",
-	},
-	SerialNumber: Field{
-		X:    641,
-		Y:    56,
-		Size: 12,
-		Font: "regular",
-	},
-	Date: Field{
-		X:    641,
-		Y:    79,
-		Size: 12,
-		Font: "regular",
-	},
-	QR: Field{
-		X:     658,
-		Y:     106,
-		High:  114,
-		Width: 114,
-	},
-	Exam: Field{
-		X:    300,
-		Y:    300,
-		Size: 15,
-		Font: "italic",
-	},
-	Level: Field{
-		X:    300,
-		Y:    277,
-		Size: 14,
-		Font: "semibold",
-	},
-	//Note: Field{
-	//	X:    12,
-	//	Y:    466,
-	//	Size: 12,
-	//	Font: "arial",
-	//},
-}
-var DefaultTemplateTall = PDF{
-	High:  1190,
-	Width: 1684,
-	Name: Field{
-		Y:    434,
-		Size: 56,
-		Font: "semibold",
-	},
-	Course: Field{
-		Y:    518,
-		Size: 28,
-		Font: "semibold",
-	},
-	Credits: Field{ //todo get from front and save to db
-		X:    140,
-		Y:    112,
-		Size: 24,
-		Font: "regular",
-	},
-	Points: Field{
-		X:    140,
-		Y:    158,
-		Size: 24,
-		Font: "regular",
-	},
-	SerialNumber: Field{
-		X:    1144,
-		Y:    112,
-		Size: 24,
-		Font: "regular",
-	},
-	Date: Field{
-		X:    1282,
-		Y:    158,
-		Size: 24,
-		Font: "regular",
-	},
-	QR: Field{
-		X:     1316,
-		Y:     212,
-		High:  228,
-		Width: 228,
-	},
-	Exam: Field{
-		Y:    600,
-		Size: 30,
-		Font: "italic",
-	},
-	Level: Field{
-		Y:    554,
-		Size: 28,
-		Font: "semibold",
-	},
-}
-
-var DefaultData = PDFData{
-	Name:         "Test Name",
-	Course:       "Blockchain and Distributed Systems",
-	Credits:      " 99",
-	Points:       "100",
-	SerialNumber: "694d0f5a7afe6fbc99cb",
-	Date:         "30.05.2018",
-	QR:           nil,
-	Exam:         "passed",
-	Level:        "graduated with honors",
-	Note:         "************************************************",
-}
-
-func NewPDF(high, width float64) *PDF {
-	return &PDF{
-		High:  high,
-		Width: width,
-	}
-}
-
-func NewData(name, course, credits, points, serialNumber, date string, qr []byte, exam, level, note string) PDFData {
-	return PDFData{
-		Name:         name,
-		Course:       course,
-		Credits:      credits,
-		Points:       points,
-		SerialNumber: serialNumber,
-		Date:         date,
-		QR:           qr,
-		Exam:         exam,
-		Level:        level,
-		Note:         note,
-	}
-}
-
-func (p *PDF) SetName(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Name = fl
-}
-
-func (p *PDF) SetCourse(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Course = fl
-}
-func (p *PDF) SetCredits(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Credits = fl
-}
-
-func (p *PDF) SetLevel(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Level = fl
-}
-
-func (p *PDF) SetPoints(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Points = fl
-}
-
-func (p *PDF) SetSerialNumber(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.SerialNumber = fl
-}
-
-func (p *PDF) SetDate(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Date = fl
-}
-func (p *PDF) SetQR(x, y float64, size int, high, width float64) {
-	fl := Field{
-		X:     x,
-		Y:     y,
-		Size:  size,
-		High:  high,
-		Width: width,
-	}
-
-	p.QR = fl
-}
-
-func (p *PDF) SetExam(x, y float64, size int, font string) {
-	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
-	}
-
-	p.Exam = fl
-}
 
 func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ, backgroundImg []byte) ([]byte, string, []byte, error) {
 	var err error
@@ -339,9 +47,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 			}
 
 		}
-		//if template == nil {
-		//	return nil, "", nil, errors.Wrap(err, "default template isn't found")
-		//}
+
 		var back []byte
 		if template != nil {
 			back, err = base64toJpg(template.ImgBytes)
@@ -352,11 +58,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 		} else {
 
 			file, err := os.Open(fmt.Sprintf("./staff/templates/%s.png", templateImg))
-			fmt.Println()
-			fmt.Println()
 			fmt.Println(fmt.Sprintf("./staff/templates/%s.png", templateImg))
-			fmt.Println()
-			fmt.Println()
 			defer file.Close()
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "default template isn't found")
@@ -496,7 +198,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 
 	imgBlob, err := Convert("png", pdfBlob)
 	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to  convert pdf to png")
+		return nil, "", nil, errors.Wrap(err, "failed to convert pdf to png")
 	}
 	file, err := os.Create("test.png")
 	if err != nil {
@@ -509,64 +211,10 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 
 }
 
-func (p *PDF) ParsePoints(point string) (string, string) {
-	splitedStr := strings.Split(point, "/")
-	return splitedStr[0], splitedStr[1]
-}
-
-func (p *PDF) prepareLevel(level, title string) float64 {
-	titleW := len(title) * p.Course.Size
-	return float64(titleW - len(level)*p.Level.Size/2)
-}
-
-func (p *PDF) centralizeName(str string, width float64, size int) float64 {
-	return (width/2 - (float64(size*len(str))*0.54)/2)
-}
-
-func (p *PDF) centralizeTitle(str string, width float64, size int) float64 {
-
-	return (width/2 - (float64(size*len(str))*0.5)/2)
-
-}
 func (p *PDF) checkLevel(title string) (bool, string, string) {
 	strs := strings.Split(title, "Level:")
 	if len(strs) > 1 {
 		return true, strs[0], fmt.Sprint("Level:", strs[1])
 	}
 	return false, strs[0], ""
-}
-
-func Convert(imgType string, blob []byte) ([]byte, error) {
-	imagick.Initialize()
-	defer imagick.Terminate()
-	mw := imagick.NewMagickWand()
-	defer mw.Destroy()
-	err := mw.ReadImageBlob(blob)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to  read  img blob")
-	}
-	mw.SetIteratorIndex(0)
-	err = mw.SetImageFormat(imgType)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to set  format")
-	}
-	return mw.GetImageBlob(), nil
-}
-
-func base64toJpg(data string) ([]byte, error) {
-
-	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
-	m, _, err := image.Decode(reader)
-	if err != nil {
-		return nil, err
-	}
-
-	//Encode from image format to writer
-	buf := new(bytes.Buffer)
-
-	err = jpeg.Encode(buf, m, &jpeg.Options{Quality: 75})
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
 }

@@ -1,8 +1,9 @@
 configVersion: 1
 project: "backend"
+
 ---
 image: builder
-from: golang:1.19.8-buster
+from: golang:1.20.4-buster
 docker:
   WORKDIR: /go/src/gitlab.com/tokend/course-certificates/ccp
 git:
@@ -13,15 +14,14 @@ git:
         - "**/*"
 shell:
   install:
-#    - apt-get update && apt-get upgrade -y && apt-get autoremove && apt-get autoclean
-    - apt-get install gcc g++ make git
-    - apt-get install libmagickwand-dev
+    - apt-get update && apt-get install -y gcc g++ make git
+    - apt-get install -y imagemagick libmagickwand-dev
 
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
     - export GOOS=linux
-    - go build  -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
+    - go build -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
 
 ---
 image: service

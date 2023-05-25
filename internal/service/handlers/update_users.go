@@ -62,15 +62,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		req := pdf.DefaultTemplateTall
 		helpers.Log(r).Info("user", user)
 		certificate := pdf.NewPDF(req.High, req.Width)
-		//certificate.SetName(req.Name.X, req.Name.Y, req.Name.Size, req.Name.Font)
-		//certificate.SetDate(req.Date.X, req.Date.Y, req.Date.Size, req.Date.Font)
-		//certificate.SetCourse(req.Course.X, req.Course.Y, req.Course.Size, req.Course.Font)
-		//certificate.SetCredits(req.Credits.X, req.Credits.Y, req.Credits.Size, req.Credits.Font)
-		//certificate.SetExam(req.Exam.X, req.Exam.Y, req.Exam.Size, req.Exam.Font)
-		//certificate.SetLevel(req.Level.X, req.Level.Y, req.Level.Size, req.Level.Font)
 		certificate.SetSerialNumber(req.SerialNumber.X, req.SerialNumber.Y, req.SerialNumber.Size, req.SerialNumber.Font)
-		//certificate.SetPoints(req.Points.X, req.Points.Y, req.Points.Size, req.Points.Font)
-		//certificate.SetQR(req.QR.X, req.QR.Y, req.QR.Size, req.QR.High, req.Width)
 
 		pdfData := pdf.NewData("", "", "", "", user.SerialNumber, "", nil, "", "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, helpers.Config(r), helpers.TemplateQ(r), user.ImageCertificate)

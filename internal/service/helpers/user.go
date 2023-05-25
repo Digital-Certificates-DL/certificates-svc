@@ -41,9 +41,3 @@ func (u *User) Hashing(msg string) string {
 	sum := sha256.Sum256([]byte(msg))
 	return fmt.Sprintf("%x", sum[:])
 }
-
-//func PrepareUsersForSend(allUsers, newUsers []*User) []*User{
-//	for id, user := range newUsers{
-//
-//	}
-//}
