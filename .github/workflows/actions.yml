@@ -17,6 +17,9 @@ jobs:
       - name: Install libmagickwand-dev
         run: sudo apt-get install libmagickwand-dev -y
 
+      - name: Install  linux-libc-dev
+        run: sudo apt-get install  linux-libc-dev -y
+
       - name: Install werf
         uses: werf/actions/install@v1.2
 

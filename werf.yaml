@@ -15,7 +15,7 @@ git:
 shell:
   install:
     - apt-get update && apt-get install -y gcc g++ make git
-    - apt-get install -y imagemagick libmagickwand-dev linux-libc-dev
+    - apt-get install -y linux-libc-dev imagemagick libmagickwand-dev
 
   setup:
     - export CGO_ENABLED=1
