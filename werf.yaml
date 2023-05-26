@@ -14,8 +14,8 @@ git:
         - "**/*"
 shell:
   install:
-    - apt-get update && apt-get install -y gcc g++ make git
-    - apt-get install -y libc-dev imagemagick libmagickwand-dev
+    - apt-get update && apt-get install -y gcc g++ make git libc-dev librdkafka-dev pkgconf
+    - apt-get install -y linux-libc-dev imagemagick libmagickwand-dev
 
   setup:
     - export CGO_ENABLED=1
