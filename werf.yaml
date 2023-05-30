@@ -16,12 +16,12 @@ shell:
   install:
     - apt-get update && apt-get install -y gcc g++ make git libc-dev librdkafka-dev pkgconf
     - apt-get install -y linux-libc-dev imagemagick libmagickwand-dev
-    - apt-get install -y libc6
 
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
     - export GOOS=linux
+    - apt-get install -y linux-libc-dev libc-dev libc6-compat
     - go build -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
 
 ---
