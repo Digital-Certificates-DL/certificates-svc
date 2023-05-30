@@ -14,15 +14,13 @@ git:
         - "**/*"
 shell:
   install:
-    - apk update  && apk --no-cache add imagemagick && apk add pkgconfig imagemagick-dev && apk add --no-cache wget build-base pkgconfig libjpeg-turbo-dev libpng-dev
+    - apk update  && apk add --no-cache wget build-base pkgconfig libjpeg-turbo-dev libpng-dev gcc libc-dev
 
 
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
     - export GOOS=linux
-    - apk add apk-tools
-    - apk add --no-cache gcc libc-dev
     - wget https://github.com/ImageMagick/ImageMagick6/archive/6.9.10-11.tar.gz && \
       tar xvzf 6.9.10-11.tar.gz && \
       cd ImageMagick* && \
