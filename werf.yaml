@@ -14,7 +14,8 @@ git:
         - "**/*"
 shell:
   install:
-    - apk update  && apk --no-cache add imagemagick
+    - apk update  && apk --no-cache add imagemagick && apk add pkgconfig imagemagick-dev
+
 
   setup:
     - export CGO_ENABLED=1
