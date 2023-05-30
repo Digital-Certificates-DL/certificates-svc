@@ -14,7 +14,7 @@ git:
         - "**/*"
 shell:
   install:
-    - apk update  && apk add --no-cache wget build-base pkgconfig libjpeg-turbo-dev libpng-dev gcc libc-dev
+    - apk update  && apk add --no-cache wget build-base pkgconfig libjpeg-turbo-dev libpng-dev gcc libc-dev tar
 
 
   setup:
