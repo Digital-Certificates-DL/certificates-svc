@@ -1,6 +1,7 @@
 configVersion: 1
 project: "backend"
 
+
 ---
 image: builder
 from: golang:1.19-alpine
@@ -16,22 +17,24 @@ shell:
   install:
     - apk update  && apk add --no-cache wget build-base pkgconfig libjpeg-turbo-dev libpng-dev gcc libc-dev tar
 
-
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
     - export GOOS=linux
-    - wget https://github.com/ImageMagick/ImageMagick6/archive/6.9.10-11.tar.gz && \
-      tar xvzf 6.9.10-11.tar.gz && \
-      cd ImageMagick* && \
-      ./configure \
+    - apk add --no-cache sudo
+    - echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
+    - adduser -D -u 1000 myuser
+    - addgroup myuser wheel
+    - sudo -u myuser wget https://github.com/ImageMagick/ImageMagick6/archive/6.9.10-11.tar.gz && \
+      sudo -u myuser tar xvzf 6.9.10-11.tar.gz && \
+      cd ImageMagick6-6.9.10-11 && \
+      sudo -u myuser ./configure \
       --without-magick-plus-plus \
-      --without-perl \
       --disable-openmp \
       --with-gvc=no \
       --disable-docs && \
-      make -j$(nproc) && make install && \
-      ldconfig /usr/local/lib
+      sudo -u myuser make -j$(nproc) && sudo -u myuser make install && \
+      sudo ldconfig /usr/local/lib
     - go build -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
 
 ---
