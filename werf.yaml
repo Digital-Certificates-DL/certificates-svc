@@ -15,6 +15,7 @@ git:
 shell:
   install:
     - apt-get update && apt-get install -y gcc linux-libc-dev imagemagick libmagickwand-dev libc6 libc-dev
+    - apt-get install -y musl-dev
 
   setup:
     - export CGO_ENABLED=1
