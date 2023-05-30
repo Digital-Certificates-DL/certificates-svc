@@ -3,7 +3,7 @@ project: "backend"
 
 ---
 image: builder
-from: golang:1.18-alpine
+from: golang:1.19-alpine
 docker:
   WORKDIR: /go/src/gitlab.com/tokend/course-certificates/ccp
 git:
