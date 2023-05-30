@@ -3,7 +3,7 @@ project: "backend"
 
 ---
 image: builder
-from: golang:1.20.4-buster
+from: golang:1.18-alpine
 docker:
   WORKDIR: /go/src/gitlab.com/tokend/course-certificates/ccp
 git:
@@ -14,13 +14,13 @@ git:
         - "**/*"
 shell:
   install:
-    - apt-get update && apt-get install -y gcc linux-libc-dev imagemagick libmagickwand-dev libc6 libc-dev
-    - apt-get install -y musl-dev
+    - apk update  && apk --no-cache add php8-pecl-imagic imagemagick
 
   setup:
     - export CGO_ENABLED=1
     - export GO111MODULE=off
     - export GOOS=linux
+    - apk add --no-cache gcc libc-dev
     - go build -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
 
 ---
