@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ, backgroundImg []byte) ([]byte, string, []byte, error) {
+func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ, backgroundImg []byte, userID int64) ([]byte, string, []byte, error) {
 	var err error
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
@@ -34,14 +34,14 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	templateImg := cfg.TemplatesConfig()[data.Course]
 
 	if backgroundImg == nil {
-		template, err := templateQ.GetByName(templateImg)
+		template, err := templateQ.GetByName(templateImg, userID)
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to get background img")
 		}
 		if template == nil {
 			titles := cfg.TitlesConfig()
 			_ = titles
-			template, err = templateQ.GetByName(templateImg)
+			template, err = templateQ.GetByName(templateImg, userID)
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "failed to get default background img")
 			}
@@ -93,17 +93,17 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 
 	///////// name
-	err = pdf.SetFont("regular", "", p.Name.Size)
+	err = pdf.SetFont("regular", "", p.Name.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
-	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.Size))
+	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.FontSize))
 	pdf.SetY(p.Name.Y)
 	//pdf.Cell(nil, data.Name)
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// credits
-	err = pdf.SetFont("italic", "", p.Credits.Size)
+	err = pdf.SetFont("italic", "", p.Credits.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -112,7 +112,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(data.Credits))
 
 	///////////// Points
-	err = pdf.SetFont("italic", "", p.Points.Size)
+	err = pdf.SetFont("italic", "", p.Points.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 
@@ -122,7 +122,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", data.Points))
 
 	///////////// SerialNumber
-	err = pdf.SetFont("italic", "", p.SerialNumber.Size)
+	err = pdf.SetFont("italic", "", p.SerialNumber.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -132,7 +132,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(nil, data.SerialNumber)
 
 	///////////// Date
-	err = pdf.SetFont("italic", "", p.Date.Size)
+	err = pdf.SetFont("italic", "", p.Date.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -142,7 +142,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Issued on: %s", data.Date))
 
 	///////////// Course
-	err = pdf.SetFont("italic", "", p.Course.Size)
+	err = pdf.SetFont("italic", "", p.Course.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -166,7 +166,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 
 	/////////////// Exam
-	err = pdf.SetFont("italic", "", p.Exam.Size)
+	err = pdf.SetFont("italic", "", p.Exam.FontSize)
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to set font")
 	}
@@ -176,7 +176,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, ex[data.Exam], gopdf.CellOption{Align: gopdf.Center})
 	///////////// Level
 	if isLevel {
-		err = pdf.SetFont("italic", "", p.Level.Size)
+		err = pdf.SetFont("italic", "", p.Level.FontSize)
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set font")
 		}

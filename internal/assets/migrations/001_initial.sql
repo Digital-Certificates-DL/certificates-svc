@@ -16,5 +16,4 @@ CREATE TABLE template (
 
 -- +migrate Down
 DROP TABLE template;
-
-
+DROP TABLE users;

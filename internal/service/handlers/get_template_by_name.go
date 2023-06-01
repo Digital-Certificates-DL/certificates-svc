@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -11,15 +12,15 @@ import (
 	"net/http"
 )
 
-func GetTemplates(w http.ResponseWriter, r *http.Request) {
-	userName, err := requests.NewGetTemplateRequest(r)
+func GetTemplateByName(w http.ResponseWriter, r *http.Request) {
+	request, err := requests.NewGetTemplateByNameRequest(r)
 	if err != nil {
 		helpers.Log(r).Error(errors.Wrap(err, "failed to parse request "))
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 
-	client, err := helpers.ClientQ(r).GetByName(userName.User)
+	client, err := helpers.ClientQ(r).GetByName(request.User)
 	if err != nil {
 		helpers.Log(r).Error(errors.Wrap(err, "failed to get client"))
 		ape.Render(w, problems.InternalError())
@@ -32,27 +33,30 @@ func GetTemplates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmps, err := helpers.TemplateQ(r).Select(client.ID)
+	tmp, err := helpers.TemplateQ(r).GetByName(request.TemplateName, client.ID)
 	if err != nil {
 		helpers.Log(r).Error(errors.Wrap(err, "failed to select templates "))
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	ape.Render(w, newTemlateListResp(tmps))
 
+	if tmp != nil {
+		helpers.Log(r).Error(errors.Wrap(err, "template is not found"))
+		ape.Render(w, problems.NotFound())
+		return
+	}
+
+	ape.Render(w, newTemplateResp(tmp))
 }
 
-func newTemlateListResp(tmps []data.Template) resources.TemplateListResponse {
-	var reponseTmpList []resources.Template
-	for _, tmp := range tmps {
-		reponseTmpList = append(reponseTmpList, resources.Template{
+func newTemplateResp(tmp *data.Template) resources.TemplateResponse {
+	return resources.TemplateResponse{
+		Data: resources.Template{
 			Attributes: resources.TemplateAttributes{
-				BackgroundImg: string(tmp.ImgBytes),
+				BackgroundImg: base64.StdEncoding.EncodeToString(tmp.ImgBytes),
 				TemplateName:  tmp.Name,
+				Template:      tmp.Template,
 			},
-		})
-	}
-	return resources.TemplateListResponse{
-		Data: reponseTmpList,
+		},
 	}
 }

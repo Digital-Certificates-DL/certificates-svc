@@ -8,7 +8,6 @@ import (
 
 	"image"
 	"image/jpeg"
-	"strings"
 )
 
 func Convert(imgType string, blob []byte) ([]byte, error) {
@@ -28,9 +27,9 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 	return mw.GetImageBlob(), nil
 }
 
-func base64toJpg(data string) ([]byte, error) {
+func base64toJpg(data []byte) ([]byte, error) {
 
-	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
+	reader := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(data))
 	m, _, err := image.Decode(reader)
 	if err != nil {
 		return nil, err

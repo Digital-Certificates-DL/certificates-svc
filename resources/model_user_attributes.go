@@ -17,6 +17,7 @@ type UserAttributes struct {
 	Participant        string `json:"participant"`
 	Points             string `json:"points"`
 	SerialNumber       string `json:"serialNumber"`
+	ShortCourse        string `json:"shortCourse"`
 	Signature          string `json:"signature"`
 	TxHash             string `json:"txHash"`
 }

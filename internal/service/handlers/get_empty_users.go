@@ -25,7 +25,6 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	link, err := client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
 	if len(link) != 0 {
 		helpers.Log(r).WithError(err).Error("failed to authorize")
-		w.Header().Set("auth_link", link)
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -53,6 +52,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	emptyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id
+		user.ShortCourseName = helpers.Config(r).TemplatesConfig()[user.CourseTitle]
 		if user.Certificate != "" {
 			helpers.Log(r).Debug("has already")
 			continue
@@ -61,7 +61,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		emptyUsers = append(emptyUsers, user)
 	}
 
-	ape.Render(w, newUserResponse(emptyUsers)) //todo make better
+	ape.Render(w, newUserResponse(emptyUsers))
 }
 
 func newUserResponse(users []*helpers.User) resources.UserListResponse {
@@ -85,6 +85,7 @@ func newUserResponse(users []*helpers.User) resources.UserListResponse {
 				TxHash:       user.TxHash,
 				Date:         user.Date,
 				CourseTitle:  user.CourseTitle,
+				ShortCourse:  user.ShortCourseName,
 			},
 		}
 		usersData = append(usersData, resp)

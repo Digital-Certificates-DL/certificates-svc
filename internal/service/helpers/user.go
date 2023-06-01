@@ -20,6 +20,7 @@ type User struct {
 	ID                 int
 	Msg                string
 	ImageCertificate   []byte
+	ShortCourseName    string
 }
 
 func (u *User) SetSignature(signature string) {

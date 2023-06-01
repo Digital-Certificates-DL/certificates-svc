@@ -41,6 +41,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			r.Route("/template", func(r chi.Router) {
 				r.Post("/", handlers.CreateTemplate)
 				r.Get("/{user}", handlers.GetTemplates)
+				r.Get("/{user}/{name}", handlers.GetTemplateByName)
 			})
 		})
 	})

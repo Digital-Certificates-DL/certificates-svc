@@ -25,7 +25,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	if len(link) != 0 {
 		helpers.Log(r).WithError(err).Error("failed to authorize")
-		w.Header().Set("auth_link", link)
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -41,6 +40,10 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		helpers.Log(r).WithError(err).Error("failed to authorize")
 		if strings.Contains(err.Error(), "unable to get client") {
 			ape.RenderErr(w, problems.NotFound())
+			return
+		}
+		if strings.Contains(err.Error(), "Token has been expired or revoked") {
+			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}
 		helpers.Log(r).WithError(err).Error("failed to authorize")
@@ -64,6 +67,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	readyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id
+		user.ShortCourseName = helpers.Config(r).TemplatesConfig()[user.CourseTitle]
 
 		//file, err := client.Download(user.Certificate)
 		//if err != nil {

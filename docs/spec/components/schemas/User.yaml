@@ -21,6 +21,7 @@ allOf:
          - id
          - msg
          - certificateImg
+         - shortCourse
         properties:
           date:
             type: string
@@ -71,6 +72,9 @@ allOf:
             format: int64
             example: 1
           msg:
+            type: string
+            format: string
+          shortCourse:
             type: string
             format: string
           certificateImg:

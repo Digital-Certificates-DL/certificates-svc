@@ -16,12 +16,15 @@ type PDF struct {
 }
 
 type Field struct {
-	X     float64 `json:"x"`
-	Y     float64 `json:"y"`
-	Size  int     `json:"size"`
-	Font  string  `json:"font"`
-	High  float64 `json:"high"`
-	Width float64 `json:"width"`
+	X        float64 `json:"x"`
+	Y        float64 `json:"y"`
+	XCenter  bool    `json:"x_center"`
+	YCenter  bool    `json:"y_center"`
+	FontSize int     `json:"font_size"`
+	Color    string  `json:"color"`
+	Font     string  `json:"font"`
+	High     float64 `json:"high"`
+	Width    float64 `json:"width"`
 }
 
 type PDFData struct {
@@ -41,40 +44,40 @@ var DefaultTemplateNormal = PDF{
 	High:  595,
 	Width: 842,
 	Name: Field{
-		X:    200,
-		Y:    217,
-		Size: 28,
-		Font: "semibold",
+		X:        200,
+		Y:        217,
+		FontSize: 28,
+		Font:     "semibold",
 	},
 	Course: Field{
-		X:    61,
-		Y:    259,
-		Size: 14,
-		Font: "semibold",
+		X:        61,
+		Y:        259,
+		FontSize: 14,
+		Font:     "semibold",
 	},
 	Credits: Field{
-		X:    70,
-		Y:    56,
-		Size: 12,
-		Font: "regular",
+		X:        70,
+		Y:        56,
+		FontSize: 12,
+		Font:     "regular",
 	},
 	Points: Field{
-		X:    70,
-		Y:    79,
-		Size: 12,
-		Font: "regular",
+		X:        70,
+		Y:        79,
+		FontSize: 12,
+		Font:     "regular",
 	},
 	SerialNumber: Field{
-		X:    641,
-		Y:    56,
-		Size: 12,
-		Font: "regular",
+		X:        641,
+		Y:        56,
+		FontSize: 12,
+		Font:     "regular",
 	},
 	Date: Field{
-		X:    641,
-		Y:    79,
-		Size: 12,
-		Font: "regular",
+		X:        641,
+		Y:        79,
+		FontSize: 12,
+		Font:     "regular",
 	},
 	QR: Field{
 		X:     658,
@@ -83,16 +86,16 @@ var DefaultTemplateNormal = PDF{
 		Width: 114,
 	},
 	Exam: Field{
-		X:    300,
-		Y:    300,
-		Size: 15,
-		Font: "italic",
+		X:        300,
+		Y:        300,
+		FontSize: 15,
+		Font:     "italic",
 	},
 	Level: Field{
-		X:    300,
-		Y:    277,
-		Size: 14,
-		Font: "semibold",
+		X:        300,
+		Y:        277,
+		FontSize: 14,
+		Font:     "semibold",
 	},
 }
 
@@ -100,38 +103,38 @@ var DefaultTemplateTall = PDF{
 	High:  1190,
 	Width: 1684,
 	Name: Field{
-		Y:    434,
-		Size: 56,
-		Font: "semibold",
+		Y:        434,
+		FontSize: 56,
+		Font:     "semibold",
 	},
 	Course: Field{
-		Y:    518,
-		Size: 28,
-		Font: "semibold",
+		Y:        518,
+		FontSize: 28,
+		Font:     "semibold",
 	},
 	Credits: Field{ //todo get from front and save to db
-		X:    140,
-		Y:    112,
-		Size: 24,
-		Font: "regular",
+		X:        140,
+		Y:        112,
+		FontSize: 24,
+		Font:     "regular",
 	},
 	Points: Field{
-		X:    140,
-		Y:    158,
-		Size: 24,
-		Font: "regular",
+		X:        140,
+		Y:        158,
+		FontSize: 24,
+		Font:     "regular",
 	},
 	SerialNumber: Field{
-		X:    1144,
-		Y:    112,
-		Size: 24,
-		Font: "regular",
+		X:        1144,
+		Y:        112,
+		FontSize: 24,
+		Font:     "regular",
 	},
 	Date: Field{
-		X:    1282,
-		Y:    158,
-		Size: 24,
-		Font: "regular",
+		X:        1282,
+		Y:        158,
+		FontSize: 24,
+		Font:     "regular",
 	},
 	QR: Field{
 		X:     1316,
@@ -140,14 +143,14 @@ var DefaultTemplateTall = PDF{
 		Width: 228,
 	},
 	Exam: Field{
-		Y:    600,
-		Size: 30,
-		Font: "italic",
+		Y:        600,
+		FontSize: 30,
+		Font:     "italic",
 	},
 	Level: Field{
-		Y:    554,
-		Size: 28,
-		Font: "semibold",
+		Y:        554,
+		FontSize: 28,
+		Font:     "semibold",
 	},
 }
 
@@ -188,10 +191,10 @@ func NewData(name, course, credits, points, serialNumber, date string, qr []byte
 
 func (p *PDF) SetName(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Name = fl
@@ -199,20 +202,20 @@ func (p *PDF) SetName(x, y float64, size int, font string) {
 
 func (p *PDF) SetCourse(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Course = fl
 }
 func (p *PDF) SetCredits(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Credits = fl
@@ -220,10 +223,10 @@ func (p *PDF) SetCredits(x, y float64, size int, font string) {
 
 func (p *PDF) SetLevel(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Level = fl
@@ -231,10 +234,10 @@ func (p *PDF) SetLevel(x, y float64, size int, font string) {
 
 func (p *PDF) SetPoints(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Points = fl
@@ -242,10 +245,10 @@ func (p *PDF) SetPoints(x, y float64, size int, font string) {
 
 func (p *PDF) SetSerialNumber(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.SerialNumber = fl
@@ -253,21 +256,21 @@ func (p *PDF) SetSerialNumber(x, y float64, size int, font string) {
 
 func (p *PDF) SetDate(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Date = fl
 }
 func (p *PDF) SetQR(x, y float64, size int, high, width float64) {
 	fl := Field{
-		X:     x,
-		Y:     y,
-		Size:  size,
-		High:  high,
-		Width: width,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		High:     high,
+		Width:    width,
 	}
 
 	p.QR = fl
@@ -275,10 +278,10 @@ func (p *PDF) SetQR(x, y float64, size int, high, width float64) {
 
 func (p *PDF) SetExam(x, y float64, size int, font string) {
 	fl := Field{
-		X:    x,
-		Y:    y,
-		Size: size,
-		Font: font,
+		X:        x,
+		Y:        y,
+		FontSize: size,
+		Font:     font,
 	}
 
 	p.Exam = fl

@@ -83,9 +83,9 @@ func (q *TemplateQ) GetByUserID(id string) (*data.Template, error) {
 	return &result, err
 }
 
-func (q *TemplateQ) GetByName(name string) (*data.Template, error) {
+func (q *TemplateQ) GetByName(name string, clientID int64) (*data.Template, error) {
 	var result data.Template
-	err := q.db.Get(&result, sq.Select("*").From(tempalteTableName).Where(sq.Eq{"name": name}))
+	err := q.db.Get(&result, sq.Select("*").From(tempalteTableName).Where(sq.Eq{"name": name, "user_id": clientID}))
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
