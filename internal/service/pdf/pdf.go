@@ -159,7 +159,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
 		}
-		err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 114, H: 114})
+		err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set image")
 		}

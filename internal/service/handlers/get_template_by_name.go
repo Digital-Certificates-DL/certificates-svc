@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/base64"
+	"fmt"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -45,6 +46,8 @@ func GetTemplateByName(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.NotFound())
 		return
 	}
+	helpers.Log(r).Debug("template: ", tmp.Template)
+	fmt.Println("template: ", tmp.Template)
 
 	ape.Render(w, newTemplateResp(tmp))
 }
