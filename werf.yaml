@@ -22,8 +22,8 @@ shell:
     - export GO111MODULE=off
     - export GOOS=linux
     - apk add --no-cache sudo
-    - adduser myuser; \
-    - echo 'myuser:123' | chpasswd; \
+    - adduser myuser;
+#    - echo 'myuser:123' | chpasswd;
     - echo 'permit myuser as root' > /etc/doas.d/doas.conf
     - sudo -u myuser wget https://github.com/ImageMagick/ImageMagick6/archive/6.9.10-11.tar.gz && \
       sudo -u myuser tar xvzf 6.9.10-11.tar.gz && \
