@@ -30,4 +30,4 @@ WORKDIR /go/projects/ccp
 COPY . .
 
 RUN go install
-CMD /go/bin/ccp
+CMD /usr/local/bin/ccp
