@@ -26,8 +26,8 @@ RUN cd && \
 	make -j$(nproc) && make install && \
 	ldconfig /usr/local/lib
 
-WORKDIR /go/projects/ccp
+WORKDIR /usr/local/bin/ccp
 COPY . .
 
 RUN go install
-CMD /usr/local/bin/ccp
+CMD /go/bin/ccp
