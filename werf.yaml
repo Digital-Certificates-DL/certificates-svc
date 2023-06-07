@@ -4,38 +4,7 @@ project: "backend"
 
 ---
 image: builder
-from: golang:1.19-alpine
-docker:
-  WORKDIR: /go/src/gitlab.com/tokend/course-certificates/ccp
-git:
-  - add: /
-    to: /go/src/gitlab.com/tokend/course-certificates/ccp
-    stageDependencies:
-      setup:
-        - "**/*"
-shell:
-  install:
-    - apk update  && apk add --no-cache wget build-base pkgconfig libjpeg-turbo-dev libpng-dev gcc libc-dev tar
-
-  setup:
-    - export CGO_ENABLED=1
-    - export GO111MODULE=off
-    - export GOOS=linux
-    - apk add --no-cache sudo
-    - adduser myuser;
-#    - echo 'myuser:123' | chpasswd;
-    - echo 'permit myuser as root' > /etc/doas.d/doas.conf
-    - sudo -u myuser wget https://github.com/ImageMagick/ImageMagick6/archive/6.9.10-11.tar.gz && \
-      sudo -u myuser tar xvzf 6.9.10-11.tar.gz && \
-      cd ImageMagick6-6.9.10-11 && \
-      sudo -u myuser ./configure \
-      --without-magick-plus-plus \
-      --disable-openmp \
-      --with-gvc=no \
-      --disable-docs && \
-      sudo -u myuser make -j$(nproc) && sudo -u myuser make install && \
-      sudo ldconfig /usr/local/lib
-    - go build -o /usr/local/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
+dockerfile: Dockerfile
 
 ---
 image: service
