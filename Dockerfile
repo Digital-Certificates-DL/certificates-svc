@@ -30,4 +30,4 @@ WORKDIR /usr/local/bin/ccp
 COPY . .
 
 RUN go install
-CMD /go/bin/ccp
+CMD chmod a+x /go/bin/ccp
