@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # install build essentials
 RUN apt-get update && \
-    apt-get install -y wget build-essential pkg-config --no-install-recommends
+    apt-get install -y wget build-essential  libc-dev  pkg-config --no-install-recommends
 
 # Install ImageMagick deps
 RUN apt-get -q -y install libjpeg-dev libpng-dev libtiff-dev \
@@ -29,5 +29,12 @@ RUN cd && \
 WORKDIR /usr/local/bin/ccp
 COPY . .
 
-RUN go install
-CMD chmod +x /go/bin/ccp
+
+#
+#RUN export CGO_ENABLED=1
+#RUN   export GO111MODULE=off
+#RUN    export GOOS=linux
+#RUN  go install
+RUN    go build
+
+CMD ["/go/bin/ccp"]
