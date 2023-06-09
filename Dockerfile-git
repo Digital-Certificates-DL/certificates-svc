@@ -7,15 +7,15 @@ ENV DEBIAN_FRONTEND noninteractive
 WORKDIR /go/src/github.com/Digital-Certificates-DL/certificates-svc
 RUN ls
 RUN echo "go"
-RUN /go/
+RUN ls /go/
 RUN echo "go src"
 
-RUN /go/src/
+RUN ls /go/src/
 RUN echo "go src github"
 
-RUN /go/src/github.com/
+RUN ls /go/src/github.com/
 
-RUN /go/src/github.com/Digital-Certificates-DL/
+RUN ls /go/src/github.com/Digital-Certificates-DL/
 
 
 # Copy source code
