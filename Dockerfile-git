@@ -3,6 +3,12 @@ FROM golang:1.19
 # Ignore APT warnings about not having a TTY
 ENV DEBIAN_FRONTEND noninteractive
 
+
+WORKDIR /go/src/gitlab.com/tokend/course-certificates/ccp
+RUN ls
+
+# Copy source code
+COPY . /go/src/gitlab.com/tokend/course-certificates/ccp
 # install build essentials
 RUN apt-get update && \
     apt-get install -y wget build-essential  libc-dev  pkg-config --no-install-recommends
@@ -25,18 +31,16 @@ RUN cd && \
 	    --disable-docs && \
 	make -j$(nproc) && make install && \
 	ldconfig /usr/local/lib
-RUN ls /usr/local/bin/ccp
-RUN ls /go
-RUN ls /go/src
-RUN ls /go/src/gitlab.com/tokend/course-certificates/
-WORKDIR /go/src/gitlab.com/tokend/course-certificates/ccp
-COPY . .
 
-#
-#RUN export CGO_ENABLED=1
-#RUN   export GO111MODULE=off
-#RUN    export GOOS=linux
-RUN  go install
-RUN    go build
 
+
+# Set environment variables
+ENV CGO_ENABLED=1
+ENV GO111MODULE=off
+ENV GOOS=linux
+
+# Build the Go application
+RUN ls /go/src/gitlab.com/tokend/course-certificates/ccp
+RUN  go build -o /go/bin/ccp /go/src/gitlab.com/tokend/course-certificates/ccp
+WORKDIR /go/bin
 ENTRYPOINT  ["ccp"]
