@@ -45,11 +45,6 @@ RUN cd && \
 
 
 
-# Set environment variables
-ENV CGO_ENABLED=1
-ENV GO111MODULE=off
-ENV GOOS=linux
-
 # Build the Go application
 RUN ls /go/src/github.com/Digital-Certificates-DL/certificates-svc
 RUN  go build -o /go/bin/ccp /go/src/github.com/Digital-Certificates-DL/certificates-svc
