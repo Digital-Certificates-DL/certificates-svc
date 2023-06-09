@@ -14,9 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Enable debugging
-        run: echo "::set-env name=DEBUG::true"
-
       - name: Install werf
         uses: werf/actions/install@v1.2
 

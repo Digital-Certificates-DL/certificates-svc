@@ -26,7 +26,7 @@ RUN cd && \
 	make -j$(nproc) && make install && \
 	ldconfig /usr/local/lib
 
-WORKDIR /usr/local/bin/ccp
+WORKDIR /go/src/gitlab.com/tokend/course-certificates/ccp
 COPY . .
 
 #
