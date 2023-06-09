@@ -48,5 +48,7 @@ RUN cd && \
 # Build the Go application
 RUN ls /go/src/github.com/Digital-Certificates-DL/certificates-svc
 RUN  go build -o /go/bin/ccp /go/src/github.com/Digital-Certificates-DL/certificates-svc
+RUN  ls /go/bin
+RUN  ls /go/bin/ccp
 WORKDIR /go/bin
 ENTRYPOINT  ["ccp"]
