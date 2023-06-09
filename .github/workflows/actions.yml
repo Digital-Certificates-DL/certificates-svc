@@ -14,11 +14,8 @@ jobs:
         with:
           fetch-depth: 0
 
-#      - name: Install libmagickwand-dev
-#        run: sudo apt-get install libmagickwand-dev -y
-#
-#      - name: Install  linux-libc-dev
-#        run: sudo apt-get install  linux-libc-dev -y
+      - name: Enable debugging
+        run: echo "::set-env name=DEBUG::true"
 
       - name: Install werf
         uses: werf/actions/install@v1.2
