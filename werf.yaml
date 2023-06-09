@@ -9,12 +9,9 @@ dockerfile: Dockerfile
 ---
 image: service
 from: alpine:3.14.6
-#docker:
-#  ENTRYPOINT: chmod +x /usr/local/bin/ccp && ls /usr/local/bin/ccp && /usr/local/bin/ccp/ccp
 shell:
   setup:
     - apk add --no-cache ca-certificates
-#  raw: chmod +x /usr/local/bin/ccp
 
 import:
   - image: builder
