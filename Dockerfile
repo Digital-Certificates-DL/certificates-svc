@@ -29,12 +29,11 @@ RUN cd && \
 WORKDIR /usr/local/bin/ccp
 COPY . .
 
-
 #
 #RUN export CGO_ENABLED=1
 #RUN   export GO111MODULE=off
 #RUN    export GOOS=linux
-#RUN  go install
+RUN  go install
 RUN    go build
 
-CMD ["/go/bin/ccp"]
+ENTRYPOINT  ["ccp"]
