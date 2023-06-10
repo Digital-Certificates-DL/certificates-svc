@@ -6,7 +6,6 @@ ENV DEBIAN_FRONTEND noninteractive
 
 
 # Copy source code
-COPY . /go/src/github.com/Digital-Certificates-DL/certificates-svc
 # install build essentials
 RUN apt-get update && \
     apt-get install -y wget build-essential  libc-dev  pkg-config --no-install-recommends
@@ -32,17 +31,13 @@ RUN cd && \
 
 
 
+# Build the Go application
 WORKDIR /go/src/github.com/Digital-Certificates-DL/certificates-svc
-RUN ls
-RUN echo "go"
-RUN ls /go/
-RUN echo "go src"
 
-RUN ls /go/src/
-RUN echo "go src github"
-
-RUN ls /go/src/github.com/
-
+COPY . .
 RUN ls /go/src/github.com/Digital-Certificates-DL/
-
+RUN ls /go/src/github.com/Digital-Certificates-DL/certificates-svc
+RUN  go install
+RUN  go build
+RUN  ls
 ENTRYPOINT  ["ccp"]
