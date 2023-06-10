@@ -4,19 +4,6 @@ FROM golang:1.19
 ENV DEBIAN_FRONTEND noninteractive
 
 
-WORKDIR /go/src/github.com/Digital-Certificates-DL/certificates-svc
-RUN ls
-RUN echo "go"
-RUN ls /go/
-RUN echo "go src"
-
-RUN ls /go/src/
-RUN echo "go src github"
-
-RUN ls /go/src/github.com/
-
-RUN ls /go/src/github.com/Digital-Certificates-DL/
-
 
 # Copy source code
 COPY . /go/src/github.com/Digital-Certificates-DL/certificates-svc
@@ -45,8 +32,17 @@ RUN cd && \
 
 
 
-# Build the Go application
-RUN ls /go/src/github.com/Digital-Certificates-DL/certificates-svc
-RUN  go build
-RUN  ls
+WORKDIR /go/src/github.com/Digital-Certificates-DL/certificates-svc
+RUN ls
+RUN echo "go"
+RUN ls /go/
+RUN echo "go src"
+
+RUN ls /go/src/
+RUN echo "go src github"
+
+RUN ls /go/src/github.com/
+
+RUN ls /go/src/github.com/Digital-Certificates-DL/
+
 ENTRYPOINT  ["ccp"]
