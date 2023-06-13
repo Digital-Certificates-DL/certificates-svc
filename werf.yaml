@@ -14,6 +14,6 @@ shell:
     - apk add --no-cache ca-certificates
 import:
   - image: builder
-    add: /go/bin/ccp
-    to: /go/bin/ccp
+    add: /go/src/github.com/Digital-Certificates-DL/certificates-svc/ccp
+    to: /go/src/github.com/Digital-Certificates-DL/certificates-svc/ccp
     after: setup
