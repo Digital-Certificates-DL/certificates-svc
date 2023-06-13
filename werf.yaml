@@ -3,17 +3,35 @@ project: "backend"
 
 ---
 image: builder
-dockerfile: Dockerfile-git
+dockerfile: Dockerfile-git-apline
 
 ---
 image: service
 from: alpine:3.14.6
+docker:
+  ENTRYPOINT: ccp
 
 shell:
   setup:
     - apk add --no-cache ca-certificates
+    - apk update
+    - apk add --no-cache wget build-base libjpeg-turbo-dev libpng-dev tiff-dev giflib-dev libx11-dev linux-headers
+    - |
+      export IMAGEMAGICK_VERSION=6.9.10-11
+      cd && \
+      wget https://github.com/ImageMagick/ImageMagick6/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
+      tar xvzf ${IMAGEMAGICK_VERSION}.tar.gz && \
+      cd ImageMagick* && \
+      ./configure \
+      --without-magick-plus-plus \
+      --without-perl \
+      --disable-openmp \
+      --with-gvc=no \
+      --disable-docs && \
+      make -j$(nproc) && make install
+
 import:
   - image: builder
-    add: /go/src/github.com/Digital-Certificates-DL/certificates-svc/ccp
-    to: /go/src/github.com/Digital-Certificates-DL/certificates-svc/ccp
+    add: /usr/local/bin/ccp
+    to: /usr/local/bin/ccp
     after: setup

@@ -1,5 +1,4 @@
-FROM golang:1.19
-
+FROM golang:1.19 as buildbase
 # Ignore APT warnings about not having a TTY
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -38,6 +37,11 @@ COPY . .
 RUN ls /go/src/github.com/Digital-Certificates-DL/
 RUN ls /go/src/github.com/Digital-Certificates-DL/certificates-svc
 RUN  go install
-RUN  go build
+RUN go build -o /usr/local/bin /go/src/github.com/Digital-Certificates-DL/certificates-svc
 RUN  ls
-ENTRYPOINT  ["ccp"]
+
+FROM debian:latest
+
+COPY
+
+ENTRYPOINT  ["/usr/local/bin/ccp"]
