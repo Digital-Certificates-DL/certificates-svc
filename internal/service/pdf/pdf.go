@@ -77,8 +77,8 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 			}
 		} else {
 
-			file, err := os.Open(fmt.Sprintf("./staff/templates/%s.png", templateImg))
-			fmt.Println(fmt.Sprintf("./staff/templates/%s.png", templateImg))
+			file, err := os.Open(fmt.Sprintf("/usr/local/bin/staff/templates/%s.png", templateImg))
+			fmt.Println(fmt.Sprintf("/usr/local/bin/stafftemplates/%s.png", templateImg))
 			defer file.Close()
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "default template isn't found")
