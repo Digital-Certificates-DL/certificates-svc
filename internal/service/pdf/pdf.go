@@ -20,37 +20,19 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
-	//err = pdf.AddTTFFont("italic", "./staff/font/Inter-Italic.ttf")
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to add font")
-	//}
-	//err = pdf.AddTTFFont("regular", "./staff/font/Inter-Regular.ttf")
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
-	//}
-	//err = pdf.AddTTFFont("semibold", "./staff/font/Inter-SemiBold.ttf")
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
-	//}
-
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-	log.Println(path)
-
-	err = pdf.AddTTFFont("italic", "/usr/local/bin/staff/font/arial.ttf")
+	err = pdf.AddTTFFont("italic", "/usr/local/bin/staff/font/Inter-Italic.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	err = pdf.AddTTFFont("regular", "/usr/local/bin/staff/font/arial.ttf")
+	err = pdf.AddTTFFont("regular", "/usr/local/bin/staff/font/Inter-Regular.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	err = pdf.AddTTFFont("semibold", "/usr/local/bin/staff/font/arial.ttf")
+	err = pdf.AddTTFFont("semibold", "/usr/local/bin/staff/font/Inter-SemiBold.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
+
 	templateImg := cfg.TemplatesConfig()[data.Course]
 
 	if backgroundImg == nil {
@@ -78,7 +60,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 		} else {
 
 			file, err := os.Open(fmt.Sprintf("/usr/local/bin/staff/templates/%s.png", templateImg))
-			fmt.Println(fmt.Sprintf("/usr/local/bin/stafftemplates/%s.png", templateImg))
+			fmt.Println(fmt.Sprintf("/usr/local/bin/staff/templates/%s.png", templateImg))
 			defer file.Close()
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "default template isn't found")
@@ -119,6 +101,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.FontSize))
 	pdf.SetY(p.Name.Y)
+	pdf.SetX(0)
 	//pdf.Cell(nil, data.Name)
 	fmt.Println(p.Width, p.High)
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center})
@@ -172,7 +155,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.SetY(p.Course.Y)
 	titles := cfg.TitlesConfig()
 	isLevel, title, level := p.checkLevel(titles[templateImg])
-	pdf.CellWithOption(&gopdf.Rect{W: p.Width - 50, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
+	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
 
 	/////////// QR
 	if data.QR != nil {
@@ -180,7 +163,10 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
 		}
-		err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: 228, H: 228})
+
+		log.Println("p.QR.High: ", p.QR.High)
+		log.Println("p.QR.Width: ", p.QR.High)
+		err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.High, H: p.QR.High})
 		if err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to set image")
 		}
@@ -216,9 +202,6 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 
 	pdfBlob := pdf.GetBytesPdf()
-	log.Println("***********************************")
-	log.Println(pdfBlob)
-	log.Println("***********************************")
 
 	imgBlob, err := Convert("png", pdfBlob)
 	if err != nil {

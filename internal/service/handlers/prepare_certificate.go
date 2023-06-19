@@ -84,7 +84,8 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 
 		files = append(files, handlers.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
-		req := pdf.DefaultTemplateNormal
+		req := pdf.DefaultTemplateTall
+		log.Println(req)
 		log.Println("user", user)
 		certificate := pdf.NewPDF(req.High, req.Width)
 		certificate.SetName(req.Name.X, req.Name.Y, req.Name.FontSize, req.Name.Font)

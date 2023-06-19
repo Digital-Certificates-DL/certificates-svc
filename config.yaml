@@ -80,5 +80,5 @@ cop:
   disabled: true
   endpoint: "http://..."
   upstream: "http://..."
-  service_name: css
+  service_name: ccp
   service_port: 80
