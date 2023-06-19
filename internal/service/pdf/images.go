@@ -73,8 +73,19 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	log.Println(exec.Command("pwd").Output())
-	log.Println(exec.Command("ls").Output())
+	log.Println()
+	res, err := exec.Command("pwd").Output()
+	if err != nil {
+		return nil, err
+	}
+	log.Println(res)
+
+	res, err = exec.Command("ls").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println(res)
 
 	log.Println(fileInputPath + " " + fileOutputPath)
 	cmd := exec.Command("gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile=" + fileOutputPath + " " + fileInputPath)
