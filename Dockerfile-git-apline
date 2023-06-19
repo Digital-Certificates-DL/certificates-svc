@@ -11,22 +11,24 @@ RUN apk update && apk add --no-cache \
     tiff-dev \
     giflib-dev \
     libx11-dev \
-    linux-headers
+    linux-headers \
+    ghostscript
 
-ENV IMAGEMAGICK_VERSION=7.1.1-11
-
-# Install ImageMagick
-RUN cd && \
-    wget https://github.com/ImageMagick/ImageMagick/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
-    tar xvzf ${IMAGEMAGICK_VERSION}.tar.gz && \
-    cd ImageMagick* && \
-    ./configure \
-        --without-magick-plus-plus \
-        --without-perl \
-        --disable-openmp \
-        --with-gvc=no \
-        --disable-docs && \
-    make -j$(nproc) && make install
+#ENV IMAGEMAGICK_VERSION=7.1.1-11
+#
+## Install ImageMagick
+#RUN cd && \
+#    wget https://github.com/ImageMagick/ImageMagick/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
+#    tar xvzf ${IMAGEMAGICK_VERSION}.tar.gz && \
+#    cd ImageMagick* && \
+#    ./configure \
+#        --without-magick-plus-plus \
+#        --without-perl \
+#        --disable-openmp \
+#        --with-gvc=no \
+#        --disable-docs && \
+#    make -j$(nproc) && make install \
+#
 
 # Build the Go application
 WORKDIR /go/src/github.com/Digital-Certificates-DL/certificates-svc
