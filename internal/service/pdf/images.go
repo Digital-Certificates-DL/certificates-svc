@@ -7,6 +7,7 @@ import (
 	"image/jpeg"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 //func Convert(imgType string, blob []byte) ([]byte, error) {
@@ -42,7 +43,7 @@ import (
 //}
 
 func Convert(imgType string, blob []byte) ([]byte, error) {
-	fileInput, err := os.Create("/input.pdf")
+	fileInput, err := os.Create("input.pdf")
 	if err != nil {
 		return nil, err
 	}
@@ -51,13 +52,33 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	cmd := exec.Command("gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile=/output.png /input.pdf")
+	fileInputPath, err := filepath.Abs(fileInput.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	fileOutput, err := os.Create("output.png")
+	if err != nil {
+		return nil, err
+	}
+
+	err = fileOutput.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	fileOutputPath, err := filepath.Abs(fileOutput.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	cmd := exec.Command("gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile=", fileInputPath, fileOutputPath)
 	_, err = cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	fileBlob, err := os.ReadFile("/output.png")
+	fileBlob, err := os.ReadFile(fileOutputPath)
 	if err != nil {
 		return nil, err
 	}
