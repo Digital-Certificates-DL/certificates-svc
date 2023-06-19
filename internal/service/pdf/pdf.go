@@ -9,6 +9,7 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"image"
 	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -32,15 +33,21 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	//	return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	//}
 
-	err = pdf.AddTTFFont("italic", "./staff/font/arial.ttf")
+	path, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(path)
+
+	err = pdf.AddTTFFont("italic", "/usr/local/bin/staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	err = pdf.AddTTFFont("regular", "./staff/font/arial.ttf")
+	err = pdf.AddTTFFont("regular", "/usr/local/bin/staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	err = pdf.AddTTFFont("semibold", "./staff/font/arial.ttf")
+	err = pdf.AddTTFFont("semibold", "/usr/local/bin/staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
