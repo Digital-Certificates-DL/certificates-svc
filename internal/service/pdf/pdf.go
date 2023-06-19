@@ -19,15 +19,28 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
-	err = pdf.AddTTFFont("italic", "./staff/font/Inter-Italic.ttf")
+	//err = pdf.AddTTFFont("italic", "./staff/font/Inter-Italic.ttf")
+	//if err != nil {
+	//	return nil, "", nil, errors.Wrap(err, "failed to add font")
+	//}
+	//err = pdf.AddTTFFont("regular", "./staff/font/Inter-Regular.ttf")
+	//if err != nil {
+	//	return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
+	//}
+	//err = pdf.AddTTFFont("semibold", "./staff/font/Inter-SemiBold.ttf")
+	//if err != nil {
+	//	return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
+	//}
+
+	err = pdf.AddTTFFont("italic", "./staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	err = pdf.AddTTFFont("regular", "./staff/font/Inter-Regular.ttf")
+	err = pdf.AddTTFFont("regular", "./staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	err = pdf.AddTTFFont("semibold", "./staff/font/Inter-SemiBold.ttf")
+	err = pdf.AddTTFFont("semibold", "./staff/font/arial.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
@@ -100,6 +113,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.FontSize))
 	pdf.SetY(p.Name.Y)
 	//pdf.Cell(nil, data.Name)
+	fmt.Println(p.Width, p.High)
 	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center})
 
 	///////////// credits
