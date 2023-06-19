@@ -44,7 +44,7 @@ import (
 //}
 
 func Convert(imgType string, blob []byte) ([]byte, error) {
-	fileInput, err := os.Create("input.pdf")
+	fileInput, err := os.Create("test/input.pdf")
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	fileOutput, err := os.Create("output.png")
+	fileOutput, err := os.Create("test/output.png")
 	if err != nil {
 		return nil, err
 	}
@@ -78,14 +78,14 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println(res)
+	log.Println(string(res))
 
 	res, err = exec.Command("ls").Output()
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println(res)
+	log.Println(string(res))
 
 	log.Println(fileInputPath + " " + fileOutputPath)
 	cmd := exec.Command("gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile=" + fileOutputPath + " " + fileInputPath)
