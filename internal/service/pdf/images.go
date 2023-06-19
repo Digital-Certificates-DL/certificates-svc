@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"image"
 	"image/jpeg"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -72,11 +73,17 @@ func Convert(imgType string, blob []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	cmd := exec.Command("gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile=", fileInputPath, fileOutputPath)
-	_, err = cmd.Output()
+	exec.Command("pwd")
+	exec.Command("ls")
+
+	log.Println(fileInputPath + " " + fileOutputPath)
+	cmd := exec.Command("gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile=" + fileInputPath + " " + fileOutputPath)
+	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
+
+	log.Println(out)
 
 	fileBlob, err := os.ReadFile(fileOutputPath)
 	if err != nil {
