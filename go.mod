@@ -28,7 +28,7 @@ require (
 	gitlab.com/distributed_lab/urlval v3.0.0+incompatible
 	golang.org/x/oauth2 v0.6.0
 	google.golang.org/api v0.44.0
-	gopkg.in/gographics/imagick.v2 v2.6.2
+	gopkg.in/gographics/imagick.v3 v3.4.2
 )
 
 require (
