@@ -19,15 +19,15 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
-	err = pdf.AddTTFFont("italic", "staff/font/Inter-Italic.ttf")
+	err = pdf.AddTTFFont("italic", "./staff/font/Inter-Italic.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	err = pdf.AddTTFFont("regular", "staff/font/Inter-Regular.ttf")
+	err = pdf.AddTTFFont("regular", "./staff/font/Inter-Regular.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	err = pdf.AddTTFFont("semibold", "staff/font/Inter-SemiBold.ttf")
+	err = pdf.AddTTFFont("semibold", "./staff/font/Inter-SemiBold.ttf")
 	if err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
