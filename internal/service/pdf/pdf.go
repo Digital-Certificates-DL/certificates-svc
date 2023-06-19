@@ -216,6 +216,9 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, templateQ data.TemplateQ,
 	}
 
 	pdfBlob := pdf.GetBytesPdf()
+	log.Println("***********************************")
+	log.Println(pdfBlob)
+	log.Println("***********************************")
 
 	imgBlob, err := Convert("png", pdfBlob)
 	if err != nil {
