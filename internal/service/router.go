@@ -25,7 +25,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 		),
 	)
 
-	r.Route("/integrations/ccp/", func(r chi.Router) {
+	r.Route("/integrations/ccp", func(r chi.Router) {
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/", handlers.GetUsers)
 			r.Post("/empty", handlers.GetUsersEmpty)
