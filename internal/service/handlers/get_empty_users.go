@@ -15,16 +15,16 @@ import (
 func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewGetUsers(r)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to parse request")
+		Log(r).WithError(err).Error("failed to parse request")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 
-	client := google.NewGoogleClient(helpers.Config(r))
+	client := google.NewGoogleClient(Config(r))
 
-	link, err := client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
+	link, err := client.Connect(Config(r).Google().SecretPath, ClientQ(r), req.Data.Name)
 	if len(link) != 0 {
-		helpers.Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -38,23 +38,23 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to connect")
+		Log(r).WithError(err).Error("failed to connect")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", helpers.Config(r).Log())
+	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", Config(r).Log())
 	if errs != nil {
-		helpers.Log(r).Error("failed to parse table: Errors:", errs)
+		Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 	emptyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id
-		user.ShortCourseName = helpers.Config(r).TemplatesConfig()[user.CourseTitle]
+		user.ShortCourseName = Config(r).TemplatesConfig()[user.CourseTitle]
 		if user.Certificate != "" {
-			helpers.Log(r).Debug("has already")
+			Log(r).Debug("has already")
 			continue
 		}
 		user.Msg = fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)

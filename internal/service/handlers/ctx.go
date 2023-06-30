@@ -1,10 +1,11 @@
-package helpers
+package handlers
 
 import (
 	"context"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"net/http"
 )
 
@@ -13,8 +14,8 @@ type ctxKey int
 const (
 	logCtxKey ctxKey = iota
 	configCtxKey
-	clientCtxKey
-	templateCtxKey
+	masterqCtxKey
+	pdfCreatorCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -37,22 +38,22 @@ func Config(r *http.Request) config.Config {
 	return r.Context().Value(configCtxKey).(config.Config)
 }
 
-func CtxClientQ(entry data.ClientQ) func(context.Context) context.Context {
+func CtxMasterQ(entry data.MasterQ) func(context.Context) context.Context {
 	return func(ctx context.Context) context.Context {
-		return context.WithValue(ctx, clientCtxKey, entry)
+		return context.WithValue(ctx, masterqCtxKey, entry)
 	}
 }
 
-func ClientQ(r *http.Request) data.ClientQ {
-	return r.Context().Value(clientCtxKey).(data.ClientQ).New()
+func MasterQ(r *http.Request) data.MasterQ {
+	return r.Context().Value(masterqCtxKey).(data.MasterQ).New()
 }
 
-func CtxTemplateQ(entry data.TemplateQ) func(context.Context) context.Context {
+func CtxPdfCreator(entry pdf.PDFCreator) func(context.Context) context.Context {
 	return func(ctx context.Context) context.Context {
-		return context.WithValue(ctx, templateCtxKey, entry)
+		return context.WithValue(ctx, pdfCreatorCtxKey, entry)
 	}
 }
 
-func TemplateQ(r *http.Request) data.TemplateQ {
-	return r.Context().Value(templateCtxKey).(data.TemplateQ).New()
+func PdfCreator(r *http.Request) pdf.PDFCreator {
+	return r.Context().Value(pdfCreatorCtxKey).(pdf.PDFCreator)
 }

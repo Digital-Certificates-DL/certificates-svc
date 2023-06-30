@@ -5,7 +5,6 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/google"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"net/http"
 )
@@ -13,14 +12,14 @@ import (
 func SetSettings(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewSetSettings(r)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to parse request")
+		Log(r).WithError(err).Error("failed to parse request")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 
-	settings, err := helpers.ClientQ(r).GetByName(req.Data.Name)
+	settings, err := ClientQ(r).GetByName(req.Data.Name)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to get settings")
+		Log(r).WithError(err).Error("failed to get settings")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
@@ -29,9 +28,9 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 			Name: req.Data.Name,
 			Code: req.Data.Code,
 		}
-		_, err := helpers.ClientQ(r).Insert(&user)
+		_, err := ClientQ(r).Insert(&user)
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to get settings")
+			Log(r).WithError(err).Error("failed to get settings")
 			ape.Render(w, problems.InternalError())
 			return
 		}
@@ -39,17 +38,17 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	settings.Code = req.Data.Code
-	err = helpers.ClientQ(r).Update(settings)
+	err = ClientQ(r).Update(settings)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to update settings")
+		Log(r).WithError(err).Error("failed to update settings")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 	if req.Data.Code != "" {
-		client := google.NewGoogleClient(helpers.Config(r))
-		_, err = client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
+		client := google.NewGoogleClient(Config(r))
+		_, err = client.Connect(Config(r).Google().SecretPath, ClientQ(r), req.Data.Name)
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to connect")
+			Log(r).WithError(err).Error("failed to connect")
 			ape.Render(w, problems.InternalError())
 			return
 		}

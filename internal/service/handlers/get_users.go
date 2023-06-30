@@ -15,16 +15,16 @@ import (
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewGetUsers(r)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to parse request")
+		Log(r).WithError(err).Error("failed to parse request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	client := google.NewGoogleClient(helpers.Config(r))
-	link, err := client.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
+	client := google.NewGoogleClient(Config(r))
+	link, err := client.Connect(Config(r).Google().SecretPath, ClientQ(r), req.Data.Name)
 
 	if len(link) != 0 {
-		helpers.Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -37,7 +37,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 		if strings.Contains(err.Error(), "unable to get client") {
 			ape.RenderErr(w, problems.NotFound())
 			return
@@ -46,28 +46,28 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}
-		helpers.Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", helpers.Config(r).Log())
+	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", Config(r).Log())
 	if errs != nil {
 		fmt.Println(errs[0].Error())
 
 		if strings.Contains(errs[0].Error(), "400") {
-			helpers.Log(r).Error("token expired")
+			Log(r).Error("token expired")
 			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}
-		helpers.Log(r).Error("failed to parse table: Errors:", errs)
+		Log(r).Error("failed to parse table: Errors:", errs)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	readyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id
-		user.ShortCourseName = helpers.Config(r).TemplatesConfig()[user.CourseTitle]
+		user.ShortCourseName = Config(r).TemplatesConfig()[user.CourseTitle]
 
 		//file, err := client.Download(user.Certificate)
 		//if err != nil {

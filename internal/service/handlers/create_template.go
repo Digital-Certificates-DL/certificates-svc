@@ -9,7 +9,6 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
@@ -21,20 +20,20 @@ import (
 func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	template, backgroundImg, resp, err := requests.NewGenerateTemplate(r)
 	if err != nil {
-		helpers.Log(r).Error(errors.Wrap(err, "failed to generate template"))
+		Log(r).Error(errors.Wrap(err, "failed to generate template"))
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 	d := pdf.DefaultData
-	client, err := helpers.ClientQ(r).GetByName(resp.Data.Relationships.User)
-	helpers.Log(r).Debug("client ", client)
+	client, err := ClientQ(r).GetByName(resp.Data.Relationships.User)
+	Log(r).Debug("client ", client)
 	if err != nil {
-		helpers.Log(r).Error(errors.Wrap(err, "failed to get client"))
+		Log(r).Error(errors.Wrap(err, "failed to get client"))
 		ape.Render(w, problems.InternalError())
 		return
 	}
 	if client == nil {
-		helpers.Log(r).Error(errors.Wrap(err, "client is not found"))
+		Log(r).Error(errors.Wrap(err, "client is not found"))
 		ape.Render(w, problems.NotFound())
 		return
 	}
@@ -42,9 +41,9 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("********")
 	if template.Width == 0 || template.High == 0 {
 		tp := pdf.DefaultTemplateTall
-		_, _, imgBytes, err := tp.Prepare(d, helpers.Config(r), helpers.TemplateQ(r), backgroundImg, client.ID)
+		_, _, imgBytes, err := tp.Prepare(d, Config(r), TemplateQ(r), backgroundImg, client.ID)
 		if err != nil {
-			helpers.Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
+			Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 			ape.Render(w, problems.InternalError())
 			return
 		}
@@ -64,9 +63,9 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
 	file.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
 	file.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
-	_, _, imgBytes, err := template.Prepare(d, helpers.Config(r), helpers.TemplateQ(r), backgroundImg, client.ID)
+	_, _, imgBytes, err := template.Prepare(d, Config(r), TemplateQ(r), backgroundImg, client.ID)
 	if err != nil {
-		helpers.Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
+		Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 		ape.Render(w, problems.InternalError())
 		return
 	}
@@ -74,23 +73,23 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	if resp.Data.Attributes.IsCompleted {
 		templateBytes, err := json.Marshal(template)
 		if err != nil {
-			helpers.Log(r).Error(errors.Wrap(err, "failed to marshal"))
+			Log(r).Error(errors.Wrap(err, "failed to marshal"))
 			ape.Render(w, problems.InternalError())
 			return
 		}
-		helpers.Log(r).Debug("template: ", templateBytes)
+		Log(r).Debug("template: ", templateBytes)
 		fmt.Println("template ", templateBytes)
 
-		helpers.Log(r).Debug("client ", client)
+		Log(r).Debug("client ", client)
 
-		_, err = helpers.TemplateQ(r).Insert(&data.Template{
+		_, err = TemplateQ(r).Insert(&data.Template{
 			Template: templateBytes,
 			//ImgBytes: backgroundImg,
 			Name:   resp.Data.Attributes.TemplateName,
 			UserID: client.ID,
 		})
 		if err != nil {
-			helpers.Log(r).Error(errors.Wrap(err, "failed to insert template"))
+			Log(r).Error(errors.Wrap(err, "failed to insert template"))
 			ape.Render(w, problems.InternalError())
 			return
 		}
@@ -110,7 +109,6 @@ func newTemplateImageResp(img []byte) resources.TemplateResponse {
 }
 
 func base64BytestoPng(data []byte) (string, error) {
-
 	reader := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(data))
 	m, _, err := image.Decode(reader)
 	if err != nil {

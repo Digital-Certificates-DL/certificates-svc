@@ -7,7 +7,6 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data/pg"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/handlers"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 )
 
 func (s *service) router(cfg config.Config) chi.Router {
@@ -18,10 +17,10 @@ func (s *service) router(cfg config.Config) chi.Router {
 		ape.RecoverMiddleware(s.log),
 		ape.LoganMiddleware(s.log),
 		ape.CtxMiddleware(
-			helpers.CtxClientQ(pg.NewClientQ(s.cfg.DB())),
-			helpers.CtxTemplateQ(pg.NewTemplateQ(s.cfg.DB())),
-			helpers.CtxLog(s.log),
-			helpers.CtxConfig(cfg),
+			handlers.CtxMasterQ(pg.NewMasterQ(s.cfg.DB())),
+			handlers.CtxLog(s.log),
+			handlers.CtxPdfCreator(s.pdfCreator),
+			handlers.CtxConfig(cfg),
 		),
 	)
 

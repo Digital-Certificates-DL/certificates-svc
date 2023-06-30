@@ -1,19 +1,22 @@
 package service
 
 import (
+	"context"
 	"gitlab.com/distributed_lab/kit/copus/types"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/pdf"
 	"net"
 	"net/http"
 )
 
 type service struct {
-	cfg      config.Config
-	log      *logan.Entry
-	listener net.Listener
-	copus    types.Copus
+	cfg        config.Config
+	log        *logan.Entry
+	listener   net.Listener
+	copus      types.Copus
+	pdfCreator *pdf.PDFCreatorType
 }
 
 func (s *service) run(cfg config.Config) error {
@@ -26,11 +29,15 @@ func (s *service) run(cfg config.Config) error {
 }
 
 func newService(cfg config.Config) *service {
+
+	pdfCreator := pdf.NewPdfCreator(cfg.Log())
+	go pdfCreator.Run(context.Background())
 	return &service{
-		cfg:      cfg,
-		log:      cfg.Log(),
-		copus:    cfg.Copus(),
-		listener: cfg.Listener(),
+		cfg:        cfg,
+		log:        cfg.Log(),
+		copus:      cfg.Copus(),
+		listener:   cfg.Listener(),
+		pdfCreator: pdfCreator,
 	}
 }
 

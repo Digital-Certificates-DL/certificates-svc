@@ -23,7 +23,7 @@ const SENDCERTIFICATE = "certificate"
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to parse data")
+		Log(r).WithError(err).Error("failed to parse data")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
@@ -31,16 +31,16 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	var files []handlers.FilesBytes
 	var filesCert []handlers.FilesBytes
 
-	googleClient := google.NewGoogleClient(helpers.Config(r))
-	link, err := googleClient.Connect(helpers.Config(r).Google().SecretPath, helpers.ClientQ(r), req.Data.Name)
+	googleClient := google.NewGoogleClient(Config(r))
+	link, err := googleClient.Connect(Config(r).Google().SecretPath, ClientQ(r), req.Data.Name)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to connect")
+		Log(r).WithError(err).Error("failed to connect")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
 	if len(link) != 0 {
-		helpers.Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -52,24 +52,24 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := helpers.ClientQ(r).GetByName(req.Data.Name)
+	client, err := ClientQ(r).GetByName(req.Data.Name)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to get client")
+		Log(r).WithError(err).Error("failed to get client")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 	if client == nil {
-		helpers.Log(r).Error(errors.Wrap(err, "client is not found"))
+		Log(r).Error(errors.Wrap(err, "client is not found"))
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
 	for _, user := range users {
-		qrData := qr.NewQR(user, helpers.Config(r))
+		qrData := qr.NewQR(user, Config(r))
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
 		if hash != "" {
-			helpers.Log(r).Info(user.Participant, " hash = ", hash)
+			Log(r).Info(user.Participant, " hash = ", hash)
 		}
 
 		user.SetDataHash(hash)
@@ -77,7 +77,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		name := ""
 		file, img, name, err := qrData.GenerateQR([]byte(req.Data.Address))
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to generate qrData")
+			Log(r).WithError(err).Error("failed to generate qrData")
 			ape.Render(w, problems.InternalError())
 			return
 		}
@@ -99,9 +99,9 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		certificate.SetQR(req.QR.X, req.QR.Y, req.QR.FontSize, req.QR.High, req.Width)
 
 		pdfData := pdf.NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
-		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, helpers.Config(r), helpers.TemplateQ(r), nil, client.ID)
+		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, Config(r), TemplateQ(r), nil, client.ID)
 		if err != nil {
-			helpers.Log(r).WithError(err).Error("failed to create pdf")
+			Log(r).WithError(err).Error("failed to create pdf")
 			ape.Render(w, problems.BadRequest(err))
 			return
 		}
@@ -109,24 +109,24 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		filesCert = append(filesCert, handlers.FilesBytes{File: fileBytes, Name: name, ID: user.ID, Type: "application/pdf"})
 	}
 
-	users, err = handlers.Drive(googleClient, helpers.Log(r), files, users, SENDQR, helpers.Config(r).Google().QRPath)
+	users, err = handlers.Drive(googleClient, Log(r), files, users, SENDQR, Config(r).Google().QRPath)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to send date to drive")
+		Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	users, err = handlers.Drive(googleClient, helpers.Log(r), filesCert, users, SENDCERTIFICATE, helpers.Config(r).Google().PdfPath)
+	users, err = handlers.Drive(googleClient, Log(r), filesCert, users, SENDCERTIFICATE, Config(r).Google().PdfPath)
 	if err != nil {
-		helpers.Log(r).WithError(err).Error("failed to send date to drive")
+		Log(r).WithError(err).Error("failed to send date to drive")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
-	helpers.Log(r).Info("creating table")
+	Log(r).Info("creating table")
 	errs := googleClient.SetRes(users, req.Data.Url)
 	if errs != nil {
-		helpers.Log(r).Error("failed to send date to drive: Errors: ", errs)
+		Log(r).Error("failed to send date to drive: Errors: ", errs)
 		ape.Render(w, problems.InternalError())
 		return
 	}

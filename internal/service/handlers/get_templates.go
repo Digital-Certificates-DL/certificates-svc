@@ -5,7 +5,6 @@ import (
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service/helpers"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/requests"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
@@ -14,27 +13,27 @@ import (
 func GetTemplates(w http.ResponseWriter, r *http.Request) {
 	userName, err := requests.NewGetTemplateRequest(r)
 	if err != nil {
-		helpers.Log(r).Error(errors.Wrap(err, "failed to parse request "))
+		Log(r).Error(errors.Wrap(err, "failed to parse request "))
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 
-	client, err := helpers.ClientQ(r).GetByName(userName.User)
+	client, err := ClientQ(r).GetByName(userName.User)
 	if err != nil {
-		helpers.Log(r).Error(errors.Wrap(err, "failed to get client"))
+		Log(r).Error(errors.Wrap(err, "failed to get client"))
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
 	if client == nil {
-		helpers.Log(r).Error(errors.Wrap(err, "client is not found"))
+		Log(r).Error(errors.Wrap(err, "client is not found"))
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
-	tmps, err := helpers.TemplateQ(r).Select(client.ID)
+	tmps, err := TemplateQ(r).Select(client.ID)
 	if err != nil {
-		helpers.Log(r).Error(errors.Wrap(err, "failed to select templates "))
+		Log(r).Error(errors.Wrap(err, "failed to select templates "))
 		ape.Render(w, problems.InternalError())
 		return
 	}
