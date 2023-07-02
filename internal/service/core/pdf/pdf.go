@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func (p *PDF) Prepare(data PDFData, config PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64) ([]byte, string, []byte, error) {
+func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64) ([]byte, string, []byte, error) {
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
@@ -219,4 +219,18 @@ func (p *PDF) checkLevel(title string) (bool, string, string) {
 		return true, titles[0], fmt.Sprint("Level:", titles[1])
 	}
 	return false, titles[0], ""
+}
+
+func (p *PDF) SetTemplateData(template PDF) *PDF {
+	certificate := NewPDF(template.High, template.Width)
+	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font)
+	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font)
+	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font)
+	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font)
+	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font)
+	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font)
+	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
+	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
+	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
+	return certificate
 }

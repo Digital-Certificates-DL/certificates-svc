@@ -57,10 +57,12 @@ func (c *Container) Generate() error {
 		req := DefaultTemplateTall
 		log.Println(req)
 		log.Println("user", user)
-		certificate := c.setTemplateData(req)
+
+		pdf := PDF{}
+		certificate := pdf.SetTemplateData(req)
 
 		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
-		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, c.config, c.masterQ, nil, c.owner.ID)
+		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, NewPDFConfig(c.config), c.masterQ, nil, c.owner.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to create pdf")
 		}
@@ -111,10 +113,11 @@ func (c *Container) Update() error {
 		log.Println(req)
 		log.Println("user", user)
 
-		certificate := c.setTemplateData(req)
+		pdf := PDF{}
+		certificate := pdf.SetTemplateData(req)
 
 		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
-		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, c.config, c.masterQ, nil, c.owner.ID)
+		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, NewPDFConfig(c.config), c.masterQ, nil, c.owner.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to create pdf")
 		}
@@ -141,18 +144,4 @@ func (c *Container) Update() error {
 	c.Status = true
 
 	return nil
-}
-
-func (c *Container) setTemplateData(template PDF) *PDF {
-	certificate := NewPDF(template.High, template.Width)
-	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font)
-	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font)
-	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font)
-	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font)
-	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font)
-	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font)
-	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
-	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
-	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
-	return certificate
 }

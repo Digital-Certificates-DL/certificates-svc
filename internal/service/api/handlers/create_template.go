@@ -10,7 +10,7 @@ import (
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/api/requests"
-	pdf2 "gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"image"
 	"image/png"
@@ -24,7 +24,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
-	d := pdf2.DefaultData
+	d := pdf.DefaultData
 	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Relationships.User)
 	Log(r).Debug("client ", client)
 	if err != nil {
@@ -40,8 +40,8 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("********")
 	if template.Width == 0 || template.High == 0 {
-		tp := pdf2.DefaultTemplateTall
-		_, _, imgBytes, err := tp.Prepare(d, Config(r), MasterQ(r), backgroundImg, client.ID)
+		tp := pdf.DefaultTemplateTall
+		_, _, imgBytes, err := tp.Prepare(d, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
 		if err != nil {
 			Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 			ape.Render(w, problems.InternalError())
@@ -52,7 +52,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file := pdf2.NewPDF(template.High, template.Width)
+	file := pdf.NewPDF(template.High, template.Width)
 
 	file.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font)
 	file.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font)
@@ -63,7 +63,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
 	file.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
 	file.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
-	_, _, imgBytes, err := template.Prepare(d, Config(r), MasterQ(r), backgroundImg, client.ID)
+	_, _, imgBytes, err := template.Prepare(d, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
 	if err != nil {
 		Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 		ape.Render(w, problems.InternalError())
