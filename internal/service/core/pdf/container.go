@@ -12,6 +12,11 @@ import (
 	"log"
 )
 
+type ContainerHandler interface {
+	Generate() error
+	Update() error
+}
+
 type Container struct {
 	Users        []*helpers.User
 	ID           int
@@ -42,8 +47,6 @@ func (c *Container) Generate() error {
 		}
 
 		user.SetDataHash(hash)
-		var file []byte
-		name := ""
 		file, img, name, err := qrData.GenerateQR([]byte(c.address))
 		if err != nil {
 			return errors.Wrap(err, "failed to Generate qrData")
@@ -54,16 +57,7 @@ func (c *Container) Generate() error {
 		req := DefaultTemplateTall
 		log.Println(req)
 		log.Println("user", user)
-		certificate := NewPDF(req.High, req.Width)
-		certificate.SetName(req.Name.X, req.Name.Y, req.Name.FontSize, req.Name.Font)
-		certificate.SetDate(req.Date.X, req.Date.Y, req.Date.FontSize, req.Date.Font)
-		certificate.SetCourse(req.Course.X, req.Course.Y, req.Course.FontSize, req.Course.Font)
-		certificate.SetCredits(req.Credits.X, req.Credits.Y, req.Credits.FontSize, req.Credits.Font)
-		certificate.SetExam(req.Exam.X, req.Exam.Y, req.Exam.FontSize, req.Exam.Font)
-		certificate.SetLevel(req.Level.X, req.Level.Y, req.Level.FontSize, req.Level.Font)
-		certificate.SetSerialNumber(req.SerialNumber.X, req.SerialNumber.Y, req.SerialNumber.FontSize, req.SerialNumber.Font)
-		certificate.SetPoints(req.Points.X, req.Points.Y, req.Points.FontSize, req.Points.Font)
-		certificate.SetQR(req.QR.X, req.QR.Y, req.QR.FontSize, req.QR.High, req.Width)
+		certificate := c.setTemplateData(req)
 
 		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, c.config, c.masterQ, nil, c.owner.ID)
@@ -106,8 +100,6 @@ func (c *Container) Update() error {
 		}
 
 		user.SetDataHash(hash)
-		var file []byte
-		name := ""
 		file, img, name, err := qrData.GenerateQR([]byte(c.address))
 		if err != nil {
 			return errors.Wrap(err, "failed to Generate qrData")
@@ -118,22 +110,15 @@ func (c *Container) Update() error {
 		req := DefaultTemplateTall
 		log.Println(req)
 		log.Println("user", user)
-		certificate := NewPDF(req.High, req.Width)
-		certificate.SetName(req.Name.X, req.Name.Y, req.Name.FontSize, req.Name.Font)
-		certificate.SetDate(req.Date.X, req.Date.Y, req.Date.FontSize, req.Date.Font)
-		certificate.SetCourse(req.Course.X, req.Course.Y, req.Course.FontSize, req.Course.Font)
-		certificate.SetCredits(req.Credits.X, req.Credits.Y, req.Credits.FontSize, req.Credits.Font)
-		certificate.SetExam(req.Exam.X, req.Exam.Y, req.Exam.FontSize, req.Exam.Font)
-		certificate.SetLevel(req.Level.X, req.Level.Y, req.Level.FontSize, req.Level.Font)
-		certificate.SetSerialNumber(req.SerialNumber.X, req.SerialNumber.Y, req.SerialNumber.FontSize, req.SerialNumber.Font)
-		certificate.SetPoints(req.Points.X, req.Points.Y, req.Points.FontSize, req.Points.Font)
-		certificate.SetQR(req.QR.X, req.QR.Y, req.QR.FontSize, req.QR.High, req.Width)
+
+		certificate := c.setTemplateData(req)
 
 		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, c.config, c.masterQ, nil, c.owner.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to create pdf")
 		}
+
 		user.ImageCertificate = certificateImg
 		filesCert = append(filesCert, google.FilesBytes{File: fileBytes, Name: name, ID: user.ID, Type: "application/pdf"})
 	}
@@ -156,4 +141,18 @@ func (c *Container) Update() error {
 	c.Status = true
 
 	return nil
+}
+
+func (c *Container) setTemplateData(template PDF) *PDF {
+	certificate := NewPDF(template.High, template.Width)
+	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font)
+	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font)
+	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font)
+	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font)
+	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font)
+	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font)
+	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
+	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
+	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
+	return certificate
 }

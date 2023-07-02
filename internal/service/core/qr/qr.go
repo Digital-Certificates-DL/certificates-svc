@@ -12,6 +12,7 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/helpers"
 	"image/color"
 	"os"
+	"time"
 
 	"strings"
 )
@@ -28,13 +29,19 @@ var shortTitles = map[string]string{
 	"Blockchain and Distributed Systems":                    "distributed_system",
 }
 
+type QRCreator interface {
+	GenerateQR(address []byte) ([]byte, []byte, string, error)
+	PrepareMsgForQR(name string, address, signature []byte) string
+	pngQR(msg string) ([]byte, error)
+}
+
 type QR struct {
 	user      *helpers.User
 	templates map[string]string
 	log       *logan.Entry
 }
 
-func NewQR(user *helpers.User, log *logan.Entry, templates map[string]string) QR {
+func NewQR(user *helpers.User, log *logan.Entry, templates map[string]string) QRCreator {
 	return QR{
 		user:      user,
 		log:       log,
@@ -74,11 +81,13 @@ func (q QR) GenerateQR(address []byte) ([]byte, []byte, string, error) {
 }
 
 func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {
-	msg := fmt.Sprintf(sample, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
-	return msg
+	return fmt.Sprintf(sample, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
+
 }
 
 func (q QR) pngQR(msg string) ([]byte, error) {
+	unixTime := time.Now().Unix()
+
 	back := color.RGBA{
 		R: 0,
 		G: 18,
@@ -91,13 +100,13 @@ func (q QR) pngQR(msg string) ([]byte, error) {
 		B: 255,
 		A: 255,
 	}
-	err := qrcode.WriteColorFile(msg, qrcode.Highest, 400, back, front, "testqr.png")
-	if err != nil {
-		return nil, err
+	if err := qrcode.WriteColorFile(msg, qrcode.Highest, 400, back, front, fmt.Sprintf("testqr%d.png", unixTime)); err != nil {
+		return nil, errors.Wrap(err, "failed to write color file")
 	}
-	file, err := os.ReadFile("testqr.png")
+
+	file, err := os.ReadFile(fmt.Sprintf("testqr%d.png", unixTime))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to read file")
 	}
 	return file, nil
 }

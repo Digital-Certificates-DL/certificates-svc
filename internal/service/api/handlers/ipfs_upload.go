@@ -16,7 +16,7 @@ func UploadFileToIpfs(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	connector := ipfs.NewConnector(Config(r))
+	connector := ipfs.NewConnector(Config(r).NetworksConfig())
 	imgHash, err := connector.Upload(req.Data.Img)
 	jsonHash, err := connector.PrepareJSON(req.Data.Name, req.Data.Description, imgHash)
 	if err != nil {

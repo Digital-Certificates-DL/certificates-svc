@@ -5,35 +5,29 @@ import (
 	"fmt"
 	"github.com/signintech/gopdf"
 	"gitlab.com/distributed_lab/logan/v3/errors"
-	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
 	"image"
 	"io"
-	"log"
 	"os"
 	"strings"
 )
 
-func (p *PDF) Prepare(data PDFData, cfg config.Config, masterQ data.MasterQ, backgroundImg []byte, userID int64) ([]byte, string, []byte, error) {
-	var err error
+func (p *PDF) Prepare(data PDFData, config PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64) ([]byte, string, []byte, error) {
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
-	err = pdf.AddTTFFont("italic", "/usr/local/bin/staff/font/Inter-Italic.ttf")
-	if err != nil {
+	if err := pdf.AddTTFFont("italic", "/usr/local/bin/staff/font/Inter-Italic.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	err = pdf.AddTTFFont("regular", "/usr/local/bin/staff/font/Inter-Regular.ttf")
-	if err != nil {
+	if err := pdf.AddTTFFont("regular", "/usr/local/bin/staff/font/Inter-Regular.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	err = pdf.AddTTFFont("semibold", "/usr/local/bin/staff/font/Inter-SemiBold.ttf")
-	if err != nil {
+	if err := pdf.AddTTFFont("semibold", "/usr/local/bin/staff/font/Inter-SemiBold.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
 
-	templateImg := cfg.TemplatesConfig()[data.Course]
+	templateImg := config.templates[data.Course]
 
 	if backgroundImg == nil {
 		template, err := masterQ.TemplateQ().GetByName(templateImg, userID)
@@ -41,8 +35,6 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, masterQ data.MasterQ, bac
 			return nil, "", nil, errors.Wrap(err, "failed to get background img")
 		}
 		if template == nil {
-			titles := cfg.TitlesConfig()
-			_ = titles
 			template, err = masterQ.TemplateQ().GetByName(templateImg, userID)
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "failed to get default background img")
@@ -52,7 +44,7 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, masterQ data.MasterQ, bac
 
 		var back []byte
 		if template != nil {
-			back, err = base64toJpg(template.ImgBytes)
+			back, err = NewImageConverter().base64toJpg(template.ImgBytes)
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "cant to decode img")
 
@@ -95,133 +87,136 @@ func (p *PDF) Prepare(data PDFData, cfg config.Config, masterQ data.MasterQ, bac
 	}
 
 	///////// name
-	err = pdf.SetFont("regular", "", p.Name.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.SetFont("regular", "", p.Name.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font name")
 	}
-	//pdf.SetX(p.centralizeName(data.Name, p.Width, p.Name.FontSize))
 	pdf.SetY(p.Name.Y)
 	pdf.SetX(0)
-	//pdf.Cell(nil, data.Name)
 	fmt.Println(p.Width, p.High)
-	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center})
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, data.Name, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell name")
+	}
 
 	///////////// credits
-	err = pdf.SetFont("italic", "", p.Credits.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.SetFont("italic", "", p.Credits.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font credits")
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
-	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(data.Credits))
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(data.Credits)); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell credits")
+	}
 
 	///////////// Points
-	err = pdf.SetFont("italic", "", p.Points.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.SetFont("italic", "", p.Points.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font points")
 
 	}
 	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
-	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", data.Points))
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", data.Points)); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell points")
+	}
 
 	///////////// SerialNumber
-	err = pdf.SetFont("italic", "", p.SerialNumber.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.SetFont("italic", "", p.SerialNumber.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font SerialNumber")
 	}
 
 	pdf.SetX(p.SerialNumber.X)
 	pdf.SetY(p.SerialNumber.Y)
-	pdf.Cell(nil, data.SerialNumber)
+	if err := pdf.Cell(nil, data.SerialNumber); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell SerialNumber ")
+	}
 
 	///////////// Date
-	err = pdf.SetFont("italic", "", p.Date.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.SetFont("italic", "", p.Date.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font Date")
 	}
 
 	pdf.SetX(p.Date.X)
 	pdf.SetY(p.Date.Y)
-	pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Issued on: %s", data.Date))
-
-	///////////// Course
-	err = pdf.SetFont("italic", "", p.Course.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Issued on: %s", data.Date)); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell Date")
 	}
-	//pdf.SetTextColor()
+	///////////// Course
+	if err := pdf.SetFont("italic", "", p.Course.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font Course")
+	}
 	pdf.SetX(0)
 	pdf.SetY(p.Course.Y)
-	titles := cfg.TitlesConfig()
-	isLevel, title, level := p.checkLevel(titles[templateImg])
-	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center})
 
+	isLevel, title, level := p.checkLevel(config.titles[templateImg])
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, title, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell Course")
+
+	}
 	/////////// QR
 	if data.QR != nil {
 		img, _, err := image.Decode(bytes.NewReader(data.QR))
 		if err != nil {
-			return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image")
+			return nil, "", nil, errors.Wrap(err, "failed to convert bytes to image QR")
 		}
 
-		log.Println("p.QR.High: ", p.QR.High)
-		log.Println("p.QR.Width: ", p.QR.High)
 		err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.High, H: p.QR.High})
 		if err != nil {
-			return nil, "", nil, errors.Wrap(err, "failed to set image")
+			return nil, "", nil, errors.Wrap(err, "failed to set image QR")
 		}
 	}
 
 	/////////////// Exam
-	err = pdf.SetFont("italic", "", p.Exam.FontSize)
-	if err != nil {
-		return nil, "", nil, errors.Wrap(err, "failed to set font")
+	if err := pdf.SetFont("italic", "", p.Exam.FontSize); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to set font Exam")
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Exam.Y)
-	ex := cfg.ExamsConfig()
-	pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, ex[data.Exam], gopdf.CellOption{Align: gopdf.Center})
+
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, config.exams[data.Exam], gopdf.CellOption{Align: gopdf.Center}); err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to cell Exam")
+	}
 	///////////// Level
 	if isLevel {
-		err = pdf.SetFont("italic", "", p.Level.FontSize)
-		if err != nil {
-			return nil, "", nil, errors.Wrap(err, "failed to set font")
+		if err := pdf.SetFont("italic", "", p.Level.FontSize); err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to set font Level")
 		}
 		pdf.SetX(0)
 		pdf.SetY(p.Level.Y)
-		pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, level, gopdf.CellOption{Align: gopdf.Center})
+		if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, level, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to cell Level")
+		}
 
 	}
 
 	parsedName := strings.Split(data.Name, " ")
-	name := ""
 	if len(parsedName) < 2 {
-		name = fmt.Sprintf("certificate_%s_%s.pdf", parsedName[0], cfg.TemplatesConfig()[data.Course])
-	} else {
-		name = fmt.Sprintf("certificate_%s_%s_%s.pdf", parsedName[0], parsedName[1], cfg.TemplatesConfig()[data.Course])
+		name := fmt.Sprintf("certificate_%s_%s.pdf", parsedName[0], config.templates[data.Course])
+
+		pdfBlob := pdf.GetBytesPdf()
+
+		imgBlob, err := NewImageConverter().Convert(pdfBlob)
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "failed to convert pdf to png")
+		}
+
+		return pdfBlob, name, imgBlob, nil
 	}
 
+	name := fmt.Sprintf("certificate_%s_%s_%s.pdf", parsedName[0], parsedName[1], config.templates[data.Course])
 	pdfBlob := pdf.GetBytesPdf()
 
-	imgBlob, err := Convert(pdfBlob)
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to convert pdf to png")
-	//}
-	//file, err := os.Create("test.png")
-	//if err != nil {
-	//	return nil, "", nil, errors.Wrap(err, "failed to create png file")
-	//}
-	//
-	//file.Write(imgBlob)
-	//file.Close()
+	imgBlob, err := NewImageConverter().Convert(pdfBlob)
+	if err != nil {
+		return nil, "", nil, errors.Wrap(err, "failed to convert pdf to png")
+	}
+
 	return pdfBlob, name, imgBlob, nil
 
 }
 
 func (p *PDF) checkLevel(title string) (bool, string, string) {
-	strs := strings.Split(title, "Level:")
-	if len(strs) > 1 {
-		return true, strs[0], fmt.Sprint("Level:", strs[1])
+	titles := strings.Split(title, "Level:")
+	if len(titles) > 1 {
+		return true, titles[0], fmt.Sprint("Level:", titles[1])
 	}
-	return false, strs[0], ""
+	return false, titles[0], ""
 }

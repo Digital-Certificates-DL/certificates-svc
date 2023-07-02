@@ -7,29 +7,27 @@ import (
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"image/png"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+type ConnectorHandler interface {
+	Upload(data []byte) (string, error)
+	PrepareJSON(tokenName, tokenDescription, imagePath string) ([]byte, error)
+	PrepareImagePath(imagePath string) ([]byte, error)
+}
+
 type Connector struct {
-	cfg config.Config
+	cfg *config.NetworksConfig
 }
 
-type ERC721json struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
-	ExternalUrl string `json:"external_url"`
-}
-
-func NewConnector(cfg config.Config) *Connector {
+func NewConnector(cfg *config.NetworksConfig) *Connector {
 	return &Connector{cfg: cfg}
 }
 
 func (i Connector) Upload(data []byte) (string, error) {
-	ipfs := shell.NewShellWithClient(i.cfg.NetworksConfig().IPFSEndpoint, NewClient(i.cfg.NetworksConfig().IpfsPrId, i.cfg.NetworksConfig().IpfsPrKey))
+	ipfs := shell.NewShellWithClient(i.cfg.IPFSEndpoint, NewClient(i.cfg.IpfsPrId, i.cfg.IpfsPrKey))
 
 	fileHash, err := ipfs.Add(bytes.NewReader(data))
 	if err != nil {
@@ -55,8 +53,8 @@ func (i Connector) PrepareJSON(tokenName, tokenDescription, imagePath string) ([
 	return erc721JSON, nil
 }
 
-func (i Connector) PrepareImageyPath(imagePath string) ([]byte, error) {
-	path, err := filepath.Abs("main.go")
+func (i Connector) PrepareImagePath(imagePath string) ([]byte, error) {
+	path, err := filepath.Abs("main.go") //todo  make better
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get absolute path")
 	}
@@ -66,37 +64,16 @@ func (i Connector) PrepareImageyPath(imagePath string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open image")
 	}
+
 	img, err := png.Decode(infile)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode image")
 	}
 
 	buf := new(bytes.Buffer)
-	err = png.Encode(buf, img)
-	if err != nil {
+
+	if err = png.Encode(buf, img); err != nil {
 		return nil, errors.Wrap(err, "failed to decode image to []byte")
 	}
 	return buf.Bytes(), nil
-}
-
-func NewClient(projectId, projectSecret string) *http.Client {
-	return &http.Client{
-		Transport: authTransport{
-			RoundTripper:  http.DefaultTransport,
-			ProjectId:     projectId,
-			ProjectSecret: projectSecret,
-		},
-	}
-}
-
-// authTransport decorates each request with a basic auth header.
-type authTransport struct {
-	http.RoundTripper
-	ProjectId     string
-	ProjectSecret string
-}
-
-func (t authTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.SetBasicAuth(t.ProjectId, t.ProjectSecret)
-	return t.RoundTripper.RoundTrip(r)
 }
