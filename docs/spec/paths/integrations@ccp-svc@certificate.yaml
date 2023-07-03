@@ -1,0 +1,58 @@
+post:
+  tags:
+    - Pdf
+  summary: pdf
+  operationId: pdf
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/PdfsCreateRequest'
+  responses:
+    '201':
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/responses/User"
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/responses/BadRequest"
+    '404':
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/responses/NotFound"
+    '500':
+      $ref: "#/components/responses/InternalError"

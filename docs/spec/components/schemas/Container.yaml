@@ -1,5 +1,5 @@
 allOf:
-  - $ref: '#/components/schemas/IpfsFile'
+  - $ref: '#/components/schemas/Container'
   - type: object
     required:
       - attributes
@@ -7,8 +7,9 @@ allOf:
       attributes:
         type: object
         required:
-          - url
+          - container_id
         properties:
-          url:
+          container_id:
             type: string
-            example: "ipfs://..."
+            format: string
+            example: "1"
