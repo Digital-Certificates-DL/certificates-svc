@@ -20,6 +20,11 @@ func CheckContainerState(w http.ResponseWriter, r *http.Request) {
 	}
 
 	container := PdfCreator(r).CheckContainerState(containerID)
+	if container == nil {
+		Log(r).WithError(err).Debug("user not found")
+		ape.RenderErr(w, problems.NotFound())
+		return
+	}
 	ape.Render(w, newUserWithImgResponse(container.Users))
 	return
 }

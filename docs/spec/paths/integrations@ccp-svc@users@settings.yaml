@@ -13,7 +13,7 @@ post:
           properties:
             data:
               type: object
-              $ref: '#/components/schemas/Setting'
+              $ref: '#/components/schemas/Settings'
   responses:
     '204':
       description: Success

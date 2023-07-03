@@ -103,10 +103,12 @@ func (q QR) pngQR(msg string) ([]byte, error) {
 	if err := qrcode.WriteColorFile(msg, qrcode.Highest, 400, back, front, fmt.Sprintf("testqr%d.png", unixTime)); err != nil {
 		return nil, errors.Wrap(err, "failed to write color file")
 	}
+	defer os.Remove(fmt.Sprintf("testqr%d.png", unixTime))
 
 	file, err := os.ReadFile(fmt.Sprintf("testqr%d.png", unixTime))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read file")
 	}
+
 	return file, nil
 }

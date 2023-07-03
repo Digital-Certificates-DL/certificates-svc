@@ -30,7 +30,7 @@ func (s *service) run(cfg config.Config) error {
 
 func newService(cfg config.Config) *service {
 
-	pdfCreator := pdf.NewPdfCreator(cfg.Log())
+	pdfCreator := pdf.NewPdfCreator(cfg.Log(), cfg)
 	go pdfCreator.Run(context.Background())
 	return &service{
 		cfg:        cfg,

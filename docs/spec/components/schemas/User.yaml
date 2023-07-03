@@ -46,27 +46,27 @@ allOf:
           note:
             type: string
             format: string
-            example: string
+            example: ""
           certificate:
             type: string
             format: string
-            example: string
+            example: ""
           dataHash:
             type: string
             format: string
-            example: string
+            example: ""
           txHash:
             type: string
             format: string
-            example: string
+            example: ""
           signature:
             type: string
             format: string
-            example: string
+            example: ""
           digitalCertificate:
             type: string
             format: string
-            example: string
+            example: ""
           id:
             type: number
             format: int64

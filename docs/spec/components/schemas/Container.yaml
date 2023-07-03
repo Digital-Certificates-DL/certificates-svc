@@ -8,8 +8,18 @@ allOf:
         type: object
         required:
           - container_id
+          - certificates
+          - status
         properties:
           container_id:
             type: string
             format: string
             example: "1"
+          certificates:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+          status:
+            type: boolean
+            example: false
+

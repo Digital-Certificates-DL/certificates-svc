@@ -22,7 +22,6 @@ type Container struct {
 	ID           int
 	Status       bool
 	log          *logan.Entry
-	client       *data.Client
 	config       config.Config
 	masterQ      data.MasterQ
 	googleClient *google.Google

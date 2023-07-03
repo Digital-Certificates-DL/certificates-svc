@@ -27,10 +27,12 @@ type CreatorPDFType struct {
 	readyContainers []*Container
 }
 
-func NewPdfCreator(log *logan.Entry) *CreatorPDFType {
+func NewPdfCreator(log *logan.Entry, config config.Config) *CreatorPDFType {
 	return &CreatorPDFType{
-		handlerChan: make(chan *Container),
-		log:         log,
+		handlerChan:     make(chan *Container),
+		log:             log,
+		config:          config,
+		readyContainers: make([]*Container, 0),
 	}
 }
 
@@ -80,10 +82,10 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 }
 
 func (p *CreatorPDFType) CheckContainerState(containerID int) *Container {
-	for i, container := range p.readyContainers {
+	for _, container := range p.readyContainers {
 		if container.ID == containerID {
 			if container.Status {
-				defer p.removeIndex(i)
+				//defer p.removeIndex(i)
 			}
 			return container
 		}
