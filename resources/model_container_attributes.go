@@ -5,5 +5,7 @@
 package resources
 
 type ContainerAttributes struct {
-	ContainerId string `json:"container_id"`
+	Certificates []User `json:"certificates"`
+	ContainerId  string `json:"container_id"`
+	Status       bool   `json:"status"`
 }

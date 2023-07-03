@@ -33,6 +33,8 @@ func (i ImageConvert) Convert(blob []byte) ([]byte, error) {
 		return nil, errors.Wrap(err, "failed to create file")
 	}
 
+	defer os.Remove(fileInput.Name())
+
 	if _, err = fileInput.Write(blob); err != nil {
 		return nil, errors.Wrap(err, "failed to write data")
 	}
@@ -46,6 +48,8 @@ func (i ImageConvert) Convert(blob []byte) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed ot create file")
 	}
+
+	defer os.Remove(fileOutput.Name())
 
 	err = fileOutput.Close()
 	if err != nil {

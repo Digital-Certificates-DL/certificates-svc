@@ -66,6 +66,9 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 				if err != nil {
 					p.log.Error(err, "failed to run container")
 				}
+				container.Status = true
+				p.log.Debug("Success: ", container)
+
 				p.readyContainers = append(p.readyContainers, container)
 				break
 			case Update:
@@ -74,6 +77,7 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 				if err != nil {
 					p.log.Error(err, "failed to run container")
 				}
+				container.Status = true
 				p.readyContainers = append(p.readyContainers, container)
 			}
 			break
@@ -82,11 +86,15 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 }
 
 func (p *CreatorPDFType) CheckContainerState(containerID int) *Container {
+	p.log.Debug("readyContainers: ", p.readyContainers)
+
 	for _, container := range p.readyContainers {
 		if container.ID == containerID {
-			if container.Status {
-				//defer p.removeIndex(i)
-			}
+			//if container.Status {
+			//
+			//	//defer p.removeIndex(i)
+			//}
+			p.log.Debug("container: ", container)
 			return container
 		}
 	}

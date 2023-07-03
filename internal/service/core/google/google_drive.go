@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/api/drive/v3"
 	"io"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -39,7 +38,6 @@ func (g *Google) CreateFolder(folderPath string) error {
 }
 
 func (g *Google) GetFiles() ([]*drive.File, error) {
-
 	r, err := g.driveSrv.Files.List().PageSize(10).
 		Fields("nextPageToken, files(id, name)").Do()
 	if err != nil {
@@ -71,19 +69,13 @@ func (g *Google) Download(url string) ([]byte, error) {
 	//f, err := g.driveSrv.Files.Export(g.googleParseURl(url), "application/pdf").Download()
 
 	// Get the file metadata to retrieve the file name and download URL
-	file, err := g.driveSrv.Files.Get(g.googleParseURl(url)).Fields("name, webContentLink").Do()
+	file, err := g.driveSrv.Files.Get(g.googleParseURl(url)).Download()
 	if err != nil {
 		fmt.Println("Unable to retrieve file metadata: ", err)
 		return nil, err
 	}
 
-	// Download the file content
-	resp, err := http.Get(file.WebContentLink)
-	if err != nil {
-		fmt.Println("Unable to download file: ", err)
-		return nil, err
-	}
-	defer resp.Body.Close()
+	defer file.Body.Close()
 
 	out := new(bytes.Buffer)
 	if err != nil {
@@ -91,7 +83,7 @@ func (g *Google) Download(url string) ([]byte, error) {
 		return nil, err
 	}
 
-	_, err = io.Copy(out, resp.Body)
+	_, err = io.Copy(out, file.Body)
 	if err != nil {
 		fmt.Println("Unable to save file: ", err)
 		return nil, err
@@ -101,7 +93,7 @@ func (g *Google) Download(url string) ([]byte, error) {
 }
 
 func (g *Google) googleParseURl(url string) string {
-	id := strings.Replace(url, "https://drive.google.com/file/d/", "", 1)
+	id := strings.Replace(url, "drive.google.com/file/d/", "", 1)
 	id = strings.Replace(id, "/view", "", 1)
 	return id
 }

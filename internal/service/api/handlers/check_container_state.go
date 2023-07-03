@@ -22,14 +22,15 @@ func CheckContainerState(w http.ResponseWriter, r *http.Request) {
 	container := PdfCreator(r).CheckContainerState(containerID)
 	if container == nil {
 		Log(r).WithError(err).Debug("user not found")
-		ape.RenderErr(w, problems.NotFound())
+		w.WriteHeader(http.StatusProcessing)
 		return
 	}
-	ape.Render(w, newUserWithImgResponse(container.Users))
+	Log(r).Debug("container on  handler: ", container)
+	ape.Render(w, newUserWithImgResponse(container.Users, container.ID, container.Status))
 	return
 }
 
-func newUserWithImgResponse(users []*helpers.User) resources.UserListResponse {
+func newUserWithImgResponse(users []*helpers.User, id int, status bool) resources.ContainerResponse {
 	usersData := make([]resources.User, 0)
 	for _, user := range users {
 		resp := resources.User{
@@ -37,7 +38,7 @@ func newUserWithImgResponse(users []*helpers.User) resources.UserListResponse {
 				ID:   fmt.Sprintf("%x", user.ID),
 				Type: resources.USER,
 			},
-			Attributes: resources.UserAttributes{
+			Attributes: resources.UserAttributes{ //todo make better
 				Participant:        user.Participant,
 				Date:               user.Date,
 				CourseTitle:        user.CourseTitle,
@@ -52,8 +53,14 @@ func newUserWithImgResponse(users []*helpers.User) resources.UserListResponse {
 		usersData = append(usersData, resp)
 	}
 
-	return resources.UserListResponse{
-		Data: usersData,
+	return resources.ContainerResponse{
+		Data: resources.Container{
+			Attributes: resources.ContainerAttributes{
+				ContainerId:  fmt.Sprintf("%d", id),
+				Certificates: usersData,
+				Status:       status,
+			},
+		},
 	}
 
 }

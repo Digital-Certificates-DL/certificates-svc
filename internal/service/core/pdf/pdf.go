@@ -17,13 +17,13 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
-	if err := pdf.AddTTFFont("italic", "/usr/local/bin/staff/font/Inter-Italic.ttf"); err != nil {
+	if err := pdf.AddTTFFont("italic", "./staff/font/Inter-Italic.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	if err := pdf.AddTTFFont("regular", "/usr/local/bin/staff/font/Inter-Regular.ttf"); err != nil {
+	if err := pdf.AddTTFFont("regular", "./staff/font/Inter-Regular.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	if err := pdf.AddTTFFont("semibold", "/usr/local/bin/staff/font/Inter-SemiBold.ttf"); err != nil {
+	if err := pdf.AddTTFFont("semibold", "./staff/font/Inter-SemiBold.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
 
@@ -51,7 +51,7 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 			}
 		} else {
 
-			file, err := os.Open(fmt.Sprintf("/usr/local/bin/staff/templates/%s.png", templateImg))
+			file, err := os.Open(fmt.Sprintf("./staff/templates/%s.png", templateImg))
 			fmt.Println(fmt.Sprintf("/usr/local/bin/staff/templates/%s.png", templateImg))
 			defer file.Close()
 			if err != nil {

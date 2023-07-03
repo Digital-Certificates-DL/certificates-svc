@@ -8,6 +8,7 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/api/requests"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/helpers"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
 	"net/http"
 	"strings"
 )
@@ -60,28 +61,34 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}
+
 		Log(r).Error("failed to parse table: Errors:", errs)
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
+
 	readyUsers := make([]*helpers.User, 0)
 	for id, user := range users {
 		user.ID = id
 		user.ShortCourseName = Config(r).TemplatesConfig()[user.CourseTitle]
 
-		//file, err := client.Download(user.Certificate)
-		//if err != nil {
-		//	helpers.Log(r).Error("failed to ", err)
-		//	ape.Render(w, problems.BadRequest(err))
-		//	return
-		//}
-		//img, err := pdf.Convert("png", file)
-		//if err != nil {
-		//	helpers.Log(r).Error("failed to convert", err)
-		//	ape.Render(w, problems.BadRequest(err))
-		//	return
-		//}
-		//user.ImageCertificate = img
+		if user.Certificate != "" {
+			file, err := client.Download(user.Certificate)
+			if err != nil {
+				Log(r).Error("failed to ", err)
+				ape.Render(w, problems.BadRequest(err))
+				return
+			}
+			img, err := pdf.NewImageConverter().Convert(file)
+			if err != nil {
+				Log(r).Error("failed to convert", err)
+				ape.Render(w, problems.BadRequest(err))
+				return
+			}
+
+			user.ImageCertificate = img
+		}
+
 		user.Msg = fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 		readyUsers = append(readyUsers, user)
 	}

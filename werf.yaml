@@ -39,5 +39,5 @@ import:
 
   - image: builder
     add: /go/src/github.com/Digital-Certificates-DL/certificates-svc/staff
-    to: /usr/local/bin/staff
+    to: /staff
     after: setup
