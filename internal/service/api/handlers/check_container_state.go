@@ -38,7 +38,7 @@ func newUserWithImgResponse(users []*helpers.User, id int, status bool) resource
 				ID:   fmt.Sprintf("%x", user.ID),
 				Type: resources.USER,
 			},
-			Attributes: resources.UserAttributes{ //todo make better
+			Attributes: resources.UserBlob{ //todo make better
 				Participant:        user.Participant,
 				Date:               user.Date,
 				CourseTitle:        user.CourseTitle,

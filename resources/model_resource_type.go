@@ -8,9 +8,10 @@ type ResourceType string
 
 // List of ResourceType
 const (
-	CONTAINER ResourceType = "container"
-	IPFS      ResourceType = "ipfs"
-	LINK      ResourceType = "link"
-	TEMPLATE  ResourceType = "template"
-	USER      ResourceType = "user"
+	CONTAINER           ResourceType = "container"
+	IPFS                ResourceType = "ipfs"
+	LINK                ResourceType = "link"
+	PREPARE_CERTIFICATE ResourceType = "prepare_certificate"
+	TEMPLATE            ResourceType = "template"
+	USER                ResourceType = "user"
 )

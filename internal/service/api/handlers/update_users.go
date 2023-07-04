@@ -23,7 +23,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 	users := req.PrepareUsers()
 
 	googleClient := google.NewGoogleClient(Config(r))
-	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Name)
+	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to connect")
 		ape.Render(w, problems.InternalError())
@@ -42,7 +42,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Name)
+	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
 	Log(r).Debug("user ", client)
 	if err != nil {
 		Log(r).Error(errors.Wrap(err, "failed to get user"))
@@ -55,7 +55,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := PdfCreator(r).NewContainer(users, googleClient, req.Data.Address, req.Data.Url, client, MasterQ(r), pdf.Update)
+	id := PdfCreator(r).NewContainer(users, googleClient, req.Data.Attributes.Address, req.Data.Attributes.Url, client, MasterQ(r), pdf.Update)
 
 	ape.Render(w, NewContainerResponse(id))
 }

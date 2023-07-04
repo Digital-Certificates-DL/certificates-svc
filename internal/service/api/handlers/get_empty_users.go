@@ -71,7 +71,7 @@ func newUserResponse(users []*helpers.User) resources.UserListResponse {
 				ID:   fmt.Sprintf("%x", user.ID),
 				Type: resources.USER,
 			},
-			Attributes: resources.UserAttributes{
+			Attributes: resources.UserBlob{
 				Certificate:    user.Certificate,
 				Id:             int64(user.ID),
 				Points:         user.Points,

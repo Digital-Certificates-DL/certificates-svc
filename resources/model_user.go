@@ -6,7 +6,7 @@ package resources
 
 type User struct {
 	Key
-	Attributes UserAttributes `json:"attributes"`
+	Attributes UserBlob `json:"attributes"`
 }
 type UserResponse struct {
 	Data     User     `json:"data"`

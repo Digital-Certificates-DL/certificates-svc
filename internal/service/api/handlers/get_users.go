@@ -8,7 +8,6 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/api/requests"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/helpers"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
 	"net/http"
 	"strings"
 )
@@ -36,7 +35,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 	if err != nil {
 		Log(r).WithError(err).Error("failed to authorize")
 		if strings.Contains(err.Error(), "unable to get client") {
@@ -71,24 +69,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	for id, user := range users {
 		user.ID = id
 		user.ShortCourseName = Config(r).TemplatesConfig()[user.CourseTitle]
-
-		if user.Certificate != "" {
-			file, err := client.Download(user.Certificate)
-			if err != nil {
-				Log(r).Error("failed to ", err)
-				ape.Render(w, problems.BadRequest(err))
-				return
-			}
-			img, err := pdf.NewImageConverter().Convert(file)
-			if err != nil {
-				Log(r).Error("failed to convert", err)
-				ape.Render(w, problems.BadRequest(err))
-				return
-			}
-
-			user.ImageCertificate = img
-		}
-
 		user.Msg = fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle)
 		readyUsers = append(readyUsers, user)
 	}

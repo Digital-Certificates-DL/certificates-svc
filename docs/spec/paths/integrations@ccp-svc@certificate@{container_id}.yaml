@@ -16,7 +16,7 @@ get:
               errors:
                 type: array
                 items:
-                  $ref: "#/components/responses/User"
+                  $ref: "#/components/schema/User"
     '400':
       description: Bad Request
       content:
