@@ -18,7 +18,7 @@ type ContainerHandler interface {
 }
 
 type Container struct {
-	Users        []*helpers.User
+	Certificates []*helpers.Certificate
 	ID           int
 	Status       bool
 	log          *logan.Entry
@@ -37,7 +37,7 @@ const sendCertificate = "certificate"
 func (c *Container) Generate() error {
 	var files []google.FilesBytes
 	var filesCert []google.FilesBytes
-	for _, user := range c.Users {
+	for _, user := range c.Certificates {
 		qrData := qr.NewQR(user, c.log, c.config.TemplatesConfig())
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
@@ -69,12 +69,12 @@ func (c *Container) Generate() error {
 		filesCert = append(filesCert, google.FilesBytes{File: fileBytes, Name: name, ID: user.ID, Type: "application/pdf"})
 	}
 
-	users, err := google.Drive(c.googleClient, c.log, files, c.Users, SendQR, c.config.Google().QRPath)
+	users, err := google.Drive(c.googleClient, c.log, files, c.Certificates, SendQR, c.config.Google().QRPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to send date to drive")
 	}
 
-	users, err = google.Drive(c.googleClient, c.log, filesCert, c.Users, sendCertificate, c.config.Google().PdfPath)
+	users, err = google.Drive(c.googleClient, c.log, filesCert, c.Certificates, sendCertificate, c.config.Google().PdfPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to send date to drive")
 	}
@@ -92,7 +92,7 @@ func (c *Container) Generate() error {
 func (c *Container) Update() error {
 	var files []google.FilesBytes
 	var filesCert []google.FilesBytes
-	for _, user := range c.Users {
+	for _, user := range c.Certificates {
 		qrData := qr.NewQR(user, c.log, c.config.TemplatesConfig())
 		hash := user.Hashing(fmt.Sprintf("%s %s %s", user.Date, user.Participant, user.CourseTitle))
 
@@ -125,12 +125,12 @@ func (c *Container) Update() error {
 		filesCert = append(filesCert, google.FilesBytes{File: fileBytes, Name: name, ID: user.ID, Type: "application/pdf"})
 	}
 
-	users, err := google.Drive(c.googleClient, c.log, files, c.Users, SendQR, c.config.Google().QRPath)
+	users, err := google.Drive(c.googleClient, c.log, files, c.Certificates, SendQR, c.config.Google().QRPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to send date to drive")
 	}
 
-	users, err = google.Drive(c.googleClient, c.log, filesCert, c.Users, sendCertificate, c.config.Google().PdfPath)
+	users, err = google.Drive(c.googleClient, c.log, filesCert, c.Certificates, sendCertificate, c.config.Google().PdfPath)
 	if err != nil {
 		return errors.Wrap(err, "failed to send date to drive")
 	}

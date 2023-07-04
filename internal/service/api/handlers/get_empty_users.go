@@ -48,7 +48,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
-	emptyUsers := make([]*helpers.User, 0)
+	emptyUsers := make([]*helpers.Certificate, 0)
 	for id, user := range users {
 		user.ID = id
 		user.ShortCourseName = Config(r).TemplatesConfig()[user.CourseTitle]
@@ -63,7 +63,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, newUserResponse(emptyUsers))
 }
 
-func newUserResponse(users []*helpers.User) resources.UserListResponse {
+func newUserResponse(users []*helpers.Certificate) resources.UserListResponse {
 	usersData := make([]resources.User, 0)
 	for _, user := range users {
 		resp := resources.User{

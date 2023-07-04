@@ -26,11 +26,11 @@ func CheckContainerState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	Log(r).Debug("container on  handler: ", container)
-	ape.Render(w, newUserWithImgResponse(container.Users, container.ID, container.Status))
-	return
+
+	ape.Render(w, newUserWithImgResponse(container.Certificates, container.ID, container.Status))
 }
 
-func newUserWithImgResponse(users []*helpers.User, id int, status bool) resources.ContainerResponse {
+func newUserWithImgResponse(users []*helpers.Certificate, id int, status bool) resources.ContainerResponse {
 	usersData := make([]resources.User, 0)
 	for _, user := range users {
 		resp := resources.User{

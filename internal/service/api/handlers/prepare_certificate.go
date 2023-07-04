@@ -18,7 +18,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
-	users := req.PrepareUsers()
+	certificates := req.PrepareCertificates()
 
 	googleClient := google.NewGoogleClient(Config(r))
 	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
@@ -53,7 +53,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := PdfCreator(r).NewContainer(users, googleClient, req.Data.Attributes.Address, req.Data.Attributes.Url, client, MasterQ(r), pdf.Generate)
+	id := PdfCreator(r).NewContainer(certificates, googleClient, req.Data.Attributes.Address, req.Data.Attributes.Url, client, MasterQ(r), pdf.Generate)
 
 	ape.Render(w, NewContainerResponse(id))
 }

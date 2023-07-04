@@ -13,7 +13,7 @@ const Update = "Update"
 const Generate = "generates"
 
 type CreatorPDF interface {
-	NewContainer(users []*helpers.User, google *google.Google, address, sheetUrl string, owner *data.Client, masterQ data.MasterQ, process string) int
+	NewContainer(users []*helpers.Certificate, google *google.Google, address, sheetUrl string, owner *data.Client, masterQ data.MasterQ, process string) int
 	CheckContainerState(containerID int) *Container
 	Run(ctx context.Context)
 	removeIndex(index int)
@@ -36,10 +36,10 @@ func NewPdfCreator(log *logan.Entry, config config.Config) *CreatorPDFType {
 	}
 }
 
-func (p *CreatorPDFType) NewContainer(users []*helpers.User, google *google.Google, address, sheetUrl string, owner *data.Client, masterQ data.MasterQ, process string) int {
+func (p *CreatorPDFType) NewContainer(certificates []*helpers.Certificate, google *google.Google, address, sheetUrl string, owner *data.Client, masterQ data.MasterQ, process string) int {
 	p.lastContainerID++
 	p.handlerChan <- &Container{
-		Users:        users,
+		Certificates: certificates,
 		ID:           p.lastContainerID,
 		Status:       false,
 		log:          p.log,

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type User struct {
+type Certificate struct {
 	Date               string
 	Participant        string
 	CourseTitle        string
@@ -23,11 +23,11 @@ type User struct {
 	ShortCourseName    string
 }
 
-func (u *User) SetSignature(signature string) {
+func (u *Certificate) SetSignature(signature string) {
 	u.Signature = signature
 }
 
-func (u *User) SetDataHash(hash string) {
+func (u *Certificate) SetDataHash(hash string) {
 	u.DataHash = hash
 	if len(u.TxHash) > 0 && len(u.TxHash) < 5 {
 		u.SerialNumber = hash[:20]
@@ -38,7 +38,7 @@ func (u *User) SetDataHash(hash string) {
 	}
 }
 
-func (u *User) Hashing(msg string) string {
+func (u *Certificate) Hashing(msg string) string {
 	sum := sha256.Sum256([]byte(msg))
 	return fmt.Sprintf("%x", sum[:])
 }

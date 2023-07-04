@@ -20,7 +20,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	users := req.PrepareUsers()
+	certificates := req.PrepareCertificates()
 
 	googleClient := google.NewGoogleClient(Config(r))
 	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
@@ -55,7 +55,26 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := PdfCreator(r).NewContainer(users, googleClient, req.Data.Attributes.Address, req.Data.Attributes.Url, client, MasterQ(r), pdf.Update)
+	for _, certificate := range certificates {
+		if certificate.Certificate != "" {
+			file, err := googleClient.Download(certificate.Certificate)
+			if err != nil {
+				Log(r).Error("failed to ", err)
+				ape.Render(w, problems.BadRequest(err))
+				return
+			}
+			img, err := pdf.NewImageConverter().Convert(file)
+			if err != nil {
+				Log(r).Error("failed to convert", err)
+				ape.Render(w, problems.BadRequest(err))
+				return
+			}
+
+			certificate.ImageCertificate = img
+		}
+	}
+
+	id := PdfCreator(r).NewContainer(certificates, googleClient, req.Data.Attributes.Address, req.Data.Attributes.Url, client, MasterQ(r), pdf.Update)
 
 	ape.Render(w, NewContainerResponse(id))
 }

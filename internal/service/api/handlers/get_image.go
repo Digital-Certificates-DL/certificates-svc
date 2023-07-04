@@ -19,11 +19,11 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	certificates := request.PrepareUsers()
+	certificates := request.PrepareCertificates()
 
-	client := google.NewGoogleClient(Config(r))
+	googleClient := google.NewGoogleClient(Config(r))
 
-	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), request.Data.Attributes.Name)
+	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), request.Data.Attributes.Name)
 	if len(link) != 0 {
 		Log(r).WithError(err).Error("failed to authorize")
 
@@ -45,7 +45,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 
 	for _, certificate := range certificates {
 		if certificate.Certificate != "" {
-			file, err := client.Download(certificate.Certificate)
+			file, err := googleClient.Download(certificate.Certificate)
 			if err != nil {
 				Log(r).Error("failed to ", err)
 				ape.Render(w, problems.BadRequest(err))

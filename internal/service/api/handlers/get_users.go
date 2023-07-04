@@ -65,7 +65,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	readyUsers := make([]*helpers.User, 0)
+	readyUsers := make([]*helpers.Certificate, 0)
 	for id, user := range users {
 		user.ID = id
 		user.ShortCourseName = Config(r).TemplatesConfig()[user.CourseTitle]

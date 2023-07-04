@@ -24,18 +24,14 @@ func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 	return request, err
 }
 
-func (p *PrepareCertificates) PrepareUsers() []*helpers.User {
-	result := make([]*helpers.User, 0)
+func (p *PrepareCertificates) PrepareCertificates() []*helpers.Certificate {
+	result := make([]*helpers.Certificate, 0)
 	for _, user := range p.Data.Attributes.CertificatesData {
-		//id, err := strconv.ParseInt(user.ID, 16, 64)
-		//if err != nil {
-		//	return nil
-		//}
 		img, err := base64toJpg(bytes.NewBuffer(user.CertificateImg).String())
 		if err != nil {
 			img = nil
 		}
-		resUser := helpers.User{
+		resUser := helpers.Certificate{
 			ID:                 int(user.Id),
 			Date:               user.Date,
 			CourseTitle:        user.CourseTitle,

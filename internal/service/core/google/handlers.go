@@ -85,7 +85,7 @@ func (h *Handler) decrement() {
 	}
 }
 
-func (h *Handler) Read(users []*helpers.User, flag string) []*helpers.User {
+func (h *Handler) Read(users []*helpers.Certificate, flag string) []*helpers.Certificate {
 	for {
 		select {
 		case path := <-h.chOutput:
@@ -104,7 +104,7 @@ func (h *Handler) Read(users []*helpers.User, flag string) []*helpers.User {
 	}
 }
 
-func (h *Handler) setLink(user *helpers.User, path FilesBytes, flag string) *helpers.User {
+func (h *Handler) setLink(user *helpers.Certificate, path FilesBytes, flag string) *helpers.Certificate {
 	switch strings.ToLower(flag) {
 	case "qr":
 		user.DigitalCertificate = strings.ReplaceAll(path.Link, "https://", "")
@@ -123,7 +123,7 @@ func (h *Handler) insertData(files []FilesBytes) {
 	close(h.chInput)
 }
 
-func Drive(googleClient *Google, log *logan.Entry, files []FilesBytes, users []*helpers.User, flag string, folderName string) ([]*helpers.User, error) {
+func Drive(googleClient *Google, log *logan.Entry, files []FilesBytes, users []*helpers.Certificate, flag string, folderName string) ([]*helpers.Certificate, error) {
 	var err error
 	input := make(chan FilesBytes)
 	output := make(chan FilesBytes)

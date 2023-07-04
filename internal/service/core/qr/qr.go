@@ -36,12 +36,12 @@ type QRCreator interface {
 }
 
 type QR struct {
-	user      *helpers.User
+	user      *helpers.Certificate
 	templates map[string]string
 	log       *logan.Entry
 }
 
-func NewQR(user *helpers.User, log *logan.Entry, templates map[string]string) QRCreator {
+func NewQR(user *helpers.Certificate, log *logan.Entry, templates map[string]string) QRCreator {
 	return QR{
 		user:      user,
 		log:       log,
