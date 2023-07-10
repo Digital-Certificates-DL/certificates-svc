@@ -28,9 +28,7 @@ func NewSetSettings(r *http.Request) (SetSettings, error) {
 
 func validateSettingsData(request resources.Settings) error {
 	return MergeErrors(validation.Errors{
-		"/attributes/code": validation.Validate(request.Attributes.Code,
-			validation.Required),
 		"/attributes/name": validation.Validate(request.Attributes.Name,
-			validation.Required, validation.Match(regexp.MustCompile("^(?=.*[A-Za-z])[A-Za-z\\s]+$"))),
+			validation.Required, validation.Match(regexp.MustCompile("^([A-Za-z])[A-Za-z\\s]+$"))),
 	}).Filter()
 }

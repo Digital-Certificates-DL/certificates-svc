@@ -42,7 +42,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K", Config(r).Log())
+	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K")
 	if errs != nil {
 		Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))

@@ -41,6 +41,6 @@ func validateParseData(request resources.ParseUsers) error {
 		"/attributes/url": validation.Validate(request.Attributes.Url,
 			validation.Required),
 		"/attributes/name": validation.Validate(request.Attributes.Name,
-			validation.Required, validation.Match(regexp.MustCompile("^(?=.*[A-Za-z])[A-Za-z\\s]+$"))),
+			validation.Required, validation.Match(regexp.MustCompile("^([A-Za-z])[A-Za-z\\s]+$"))),
 	}).Filter()
 }

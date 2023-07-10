@@ -33,6 +33,6 @@ func validateIpfsData(request resources.IpfsFileUpload) error {
 		"/attributes/img": validation.Validate(request.Attributes.Img,
 			validation.Required),
 		"/attributes/name": validation.Validate(request.Attributes.Name,
-			validation.Required, validation.Match(regexp.MustCompile("^(?=.*[A-Za-z])[A-Za-z\\s]+$"))),
+			validation.Required, validation.Match(regexp.MustCompile("^([A-Za-z])[A-Za-z\\s]+$"))),
 	}).Filter()
 }
