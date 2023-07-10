@@ -11,4 +11,4 @@ allOf:
         properties:
           link:
             type: string
-            example: "httpL//localhost/*"
+            example: "http://localhost/*"

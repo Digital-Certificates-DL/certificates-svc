@@ -38,6 +38,6 @@ import:
     after: setup
 
   - image: builder
-    add: /go/src/github.com/Digital-Certificates-DL/certificates-svc/staff
-    to: /staff
+    add: /go/src/github.com/Digital-Certificates-DL/certificates-svc/static
+    to: /static
     after: setup

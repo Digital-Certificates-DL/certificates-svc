@@ -14,7 +14,7 @@ import (
 
 type ConnectorHandler interface {
 	Upload(data []byte) (string, error)
-	PrepareJSON(tokenName, tokenDescription, imagePath string) ([]byte, error)
+	PrepareJSON(tokenName, tokenDescription, link, imagePath string) ([]byte, error)
 	PrepareImagePath(imagePath string) ([]byte, error)
 }
 
@@ -27,22 +27,22 @@ func NewConnector(cfg *config.NetworksConfig) *Connector {
 }
 
 func (i Connector) Upload(data []byte) (string, error) {
-	ipfs := shell.NewShellWithClient(i.cfg.IPFSEndpoint, NewClient(i.cfg.IpfsPrId, i.cfg.IpfsPrKey))
+	ipfs := shell.NewShellWithClient(i.cfg.IpfsEndpoint, NewClient(i.cfg.IpfsPrId, i.cfg.IpfsPrKey))
 
 	fileHash, err := ipfs.Add(bytes.NewReader(data))
 	if err != nil {
-		return "", errors.Wrap(err, "failed to upload")
+		return "", errors.Wrap(err, "failed to upload file to ipfs")
 	}
 	return fileHash, nil
 
 }
 
-func (i Connector) PrepareJSON(tokenName, tokenDescription, imagePath string) ([]byte, error) {
+func (i Connector) PrepareJSON(tokenName, tokenDescription, link, imagePath string) ([]byte, error) {
 	erc721 := ERC721json{
 		Name:        tokenName,
 		Description: tokenDescription,
-		Image:       "https://ipfs.io/ipfs/" + imagePath,
-		ExternalUrl: "https://dlt-academy.com/certificates",
+		Image:       i.cfg.IpfsDisplayFileDomen + imagePath,
+		ExternalUrl: link,
 	}
 
 	erc721JSON, err := json.Marshal(erc721)

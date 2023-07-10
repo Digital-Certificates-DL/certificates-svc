@@ -2,20 +2,37 @@ package requests
 
 import (
 	"encoding/json"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
+	"regexp"
 )
 
-type UploadFileToIPFS struct {
-	Data resources.IpfsFileUploadRequest //todo replace string to []byte
+type IpfsFileUpload struct {
+	Data resources.IpfsFileUpload //todo replace string to []byte
 }
 
-func NewUploadFileToIPFS(r *http.Request) (UploadFileToIPFS, error) {
-	request := UploadFileToIPFS{}
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
-		return UploadFileToIPFS{}, errors.Wrap(err, "failed to decode data")
+func NewUploadFileToIPFS(r *http.Request) (IpfsFileUpload, error) {
+	request := IpfsFileUpload{}
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return IpfsFileUpload{}, errors.Wrap(err, "failed to decode data")
 	}
-	return request, err
+
+	if err := validateIpfsData(request.Data); err != nil {
+		return IpfsFileUpload{}, errors.Wrap(err, "failed to validate data")
+	}
+
+	return request, nil
+}
+
+func validateIpfsData(request resources.IpfsFileUpload) error {
+	return MergeErrors(validation.Errors{
+		"/attributes/description": validation.Validate(request.Attributes.Description,
+			validation.Required),
+		"/attributes/img": validation.Validate(request.Attributes.Img,
+			validation.Required),
+		"/attributes/name": validation.Validate(request.Attributes.Name,
+			validation.Required, validation.Match(regexp.MustCompile("^(?=.*[A-Za-z])[A-Za-z\\s]+$"))),
+	}).Filter()
 }

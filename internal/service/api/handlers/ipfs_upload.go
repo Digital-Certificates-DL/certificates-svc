@@ -17,8 +17,13 @@ func UploadFileToIpfs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	connector := ipfs.NewConnector(Config(r).NetworksConfig())
-	imgHash, err := connector.Upload(req.Data.Img)
-	jsonHash, err := connector.PrepareJSON(req.Data.Name, req.Data.Description, imgHash)
+	imgHash, err := connector.Upload(req.Data.Attributes.Img)
+	if err != nil {
+		Log(r).WithError(err).Error("failed to upload ")
+		ape.Render(w, problems.InternalError())
+		return
+	}
+	jsonHash, err := connector.PrepareJSON(req.Data.Attributes.Name, req.Data.Attributes.Description, Config(r).SbtConfig().ExternalURL, imgHash)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to prepare json")
 		ape.Render(w, problems.InternalError())
@@ -33,14 +38,13 @@ func UploadFileToIpfs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ape.Render(w, newIpfsUploadResponse(preparedURI))
-	Log(r).Debug(newIpfsUploadResponse(preparedURI))
 }
 
 func newIpfsUploadResponse(uri string) resources.IpfsFileResponse {
 	return resources.IpfsFileResponse{
 		Data: resources.IpfsFile{
 			Key: resources.Key{
-				Type: resources.IPFS,
+				Type: resources.IPFS_FILE_UPLOAD,
 			},
 			Attributes: resources.IpfsFileAttributes{
 				Url: uri,

@@ -13,18 +13,18 @@ post:
           properties:
             data:
               type: object
-              $ref: '#/components/schemas/UsersGetRequest'
+              $ref: '#/components/schemas/ParseUsers'
   responses:
     '201':
       description: Success
-#      content:
-#        application/json:
-#          schema:
-#            type: object
-#            properties:
-#              data:
-#                type: object
-#                $ref: '#/components/schemas/User'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                $ref: '#/components/schemas/User'
     '400':
       description: Bad Request
       content:

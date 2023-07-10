@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
@@ -12,7 +13,6 @@ import (
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
-	"log"
 	"net/http"
 	"os"
 )
@@ -23,8 +23,8 @@ type Google struct {
 	cfg          config.Config
 	prefixPath   string
 
-	sheetID string
-
+	sheetID  string
+	log      *logan.Entry
 	driveSrv *drive.Service
 	sheetSrv *sheets.Service
 }
@@ -32,6 +32,7 @@ type Google struct {
 func NewGoogleClient(cfg config.Config) *Google {
 	g := Google{
 		cfg: cfg,
+		log: cfg.Log(),
 	}
 	return &g
 }
@@ -50,6 +51,7 @@ func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name str
 	if client == nil {
 		return nil, "", errors.New("user not found")
 	}
+
 	tok := &oauth2.Token{}
 	if len(client.Token) == 0 {
 		tok, link, err := g.getTokenFromWeb(config, client.Code)
@@ -59,20 +61,19 @@ func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name str
 		if tok == nil {
 			return nil, link, nil
 		}
+
 		bf := new(bytes.Buffer)
-		err = json.NewEncoder(bf).Encode(tok)
-		if err != nil {
+		if err = json.NewEncoder(bf).Encode(tok); err != nil {
 			return nil, "", errors.Wrap(err, "failed to decode token")
 		}
+
 		client.Token = bf.Bytes()
-		err = clientQ.Update(client)
-		if err != nil {
+		if err = clientQ.Update(client); err != nil {
 			return nil, "", errors.Wrap(err, "failed to update")
 		}
 	} else {
-		log.Println("token already exist")
-		err = json.Unmarshal(client.Token, tok)
-		if err != nil {
+		g.log.Debug("token already exist")
+		if err = json.Unmarshal(client.Token, tok); err != nil {
 			return nil, "", errors.Wrap(err, "failed to encode token")
 		}
 	}
@@ -86,7 +87,8 @@ func (g *Google) getTokenFromWeb(config *oauth2.Config, code string) (*oauth2.To
 	if code == "" {
 		return nil, authURL, nil
 	}
-	log.Println(code)
+
+	g.log.Debug(code)
 	tok, err := config.Exchange(context.TODO(), code)
 	if err != nil {
 		return nil, "", errors.New("failed to generate token")
@@ -101,9 +103,9 @@ func (g *Google) tokenFromFile(file string) (*oauth2.Token, error) {
 		return nil, errors.Wrap(err, "Failed to open token's file")
 	}
 	defer f.Close()
+
 	tok := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(tok)
-	if err != nil {
+	if err = json.NewDecoder(f).Decode(tok); err != nil {
 		return nil, errors.Wrap(err, "Failed to parse file")
 	}
 	return tok, nil
@@ -115,8 +117,11 @@ func (g *Google) saveToken(path string, token *oauth2.Token) error {
 	if err != nil {
 		return errors.Wrap(err, "Unable to cache oauth token")
 	}
+
 	defer f.Close()
-	json.NewEncoder(f).Encode(token)
+	if err = json.NewEncoder(f).Encode(token); err != nil {
+		return errors.Wrap(err, "failed to  encode token")
+	}
 	return nil
 }
 
@@ -126,11 +131,12 @@ func (g *Google) Connect(path string, clientQ data.ClientQ, name string) (string
 		return "", errors.Wrap(err, "unable to read client secret file")
 	}
 	link := ""
-	config, err := google.ConfigFromJSON(b, drive.DriveScope, sheets.SpreadsheetsScope)
+	googleConfig, err := google.ConfigFromJSON(b, drive.DriveScope, sheets.SpreadsheetsScope)
 	if err != nil {
 		return "", errors.Wrap(err, "unable to parse client secret file to config")
 	}
-	g.client, link, err = g.getClient(config, clientQ, name)
+
+	g.client, link, err = g.getClient(googleConfig, clientQ, name)
 	if err != nil {
 		return link, errors.Wrap(err, "unable to get client")
 	}
@@ -140,14 +146,17 @@ func (g *Google) Connect(path string, clientQ data.ClientQ, name string) (string
 	if len(link) != 0 {
 		return link, nil
 	}
+
 	g.driveSrv, err = drive.NewService(context.Background(), option.WithHTTPClient(g.client))
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create new drive service")
 	}
+
 	g.sheetSrv, err = sheets.NewService(context.Background(), option.WithHTTPClient(g.client))
 	if err != nil {
 		return "", errors.Wrap(err, "failed to create new sheet service")
 	}
+
 	return "", nil
 }
 
@@ -156,5 +165,6 @@ func (g *Google) ConnectSheetByKey(apiKey string) (*sheets.Service, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect")
 	}
+
 	return sheetsService, nil
 }

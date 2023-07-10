@@ -17,7 +17,7 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	settings, err := MasterQ(r).ClientQ().GetByName(req.Data.Name)
+	settings, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get settings")
 		ape.Render(w, problems.BadRequest(err))
@@ -25,8 +25,8 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 	}
 	if settings == nil {
 		user := data.Client{
-			Name: req.Data.Name,
-			Code: req.Data.Code,
+			Name: req.Data.Attributes.Name,
+			Code: req.Data.Attributes.Code,
 		}
 		_, err := MasterQ(r).ClientQ().Insert(&user)
 		if err != nil {
@@ -37,16 +37,16 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(204)
 		return
 	}
-	settings.Code = req.Data.Code
+	settings.Code = req.Data.Attributes.Code
 	err = MasterQ(r).ClientQ().Update(settings)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to update settings")
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	if req.Data.Code != "" {
+	if req.Data.Attributes.Code != "" {
 		client := google.NewGoogleClient(Config(r))
-		_, err = client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Name)
+		_, err = client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 		if err != nil {
 			Log(r).WithError(err).Error("failed to connect")
 			ape.Render(w, problems.InternalError())

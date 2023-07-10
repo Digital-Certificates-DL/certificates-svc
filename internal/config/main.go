@@ -21,6 +21,7 @@ type Config interface {
 	NetworksConfiger
 	ExamsConfiger
 	pgdb.Databaser
+	SbtConfiger
 }
 
 type config struct {
@@ -37,6 +38,7 @@ type config struct {
 	NetworksConfiger
 	getter kv.Getter
 	comfig.Listenerer
+	SbtConfiger
 }
 
 func New(getter kv.Getter) Config {
@@ -54,5 +56,6 @@ func New(getter kv.Getter) Config {
 		NetworksConfiger:  NewEthRPCConfiger(getter),
 		Databaser:         pgdb.NewDatabaser(getter),
 		Logger:            comfig.NewLogger(getter, comfig.LoggerOpts{}),
+		SbtConfiger:       NewSbtConfiger(getter),
 	}
 }

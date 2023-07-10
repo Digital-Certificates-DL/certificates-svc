@@ -7,9 +7,7 @@ import (
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/distributed_lab/running"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/helpers"
-	"log"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -22,7 +20,6 @@ type FilesBytes struct {
 }
 
 type Handler struct {
-	mu           sync.Mutex
 	running      int
 	chInput      chan FilesBytes
 	chOutput     chan FilesBytes
@@ -75,9 +72,7 @@ func (h *Handler) StartDriveRunner() {
 }
 
 func (h *Handler) decrement() {
-	h.mu.Lock()
 	h.running--
-	h.mu.Unlock()
 	if h.running == 0 {
 		close(h.chOutput)
 		h.cancel()
@@ -93,7 +88,7 @@ func (h *Handler) Read(users []*helpers.Certificate, flag string) []*helpers.Cer
 			for id, u := range users {
 				if u.ID == path.ID {
 					users[id] = h.setLink(users[id], path, flag)
-					log.Println("set external link: ", flag)
+					h.log.Debug("set external link: ", flag)
 					break
 				}
 			}

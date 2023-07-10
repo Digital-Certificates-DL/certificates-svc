@@ -90,10 +90,6 @@ func (p *CreatorPDFType) CheckContainerState(containerID int) *Container {
 
 	for _, container := range p.readyContainers {
 		if container.ID == containerID {
-			//if container.Status {
-			//
-			//	//defer p.removeIndex(i)
-			//}
 			p.log.Debug("container: ", container)
 			return container
 		}

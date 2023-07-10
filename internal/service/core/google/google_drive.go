@@ -66,27 +66,17 @@ func (g *Google) GetFile(url string) (*drive.File, error) {
 }
 
 func (g *Google) Download(url string) ([]byte, error) {
-	//f, err := g.driveSrv.Files.Export(g.googleParseURl(url), "application/pdf").Download()
-
-	// Get the file metadata to retrieve the file name and download URL
 	file, err := g.driveSrv.Files.Get(g.googleParseURl(url)).Download()
 	if err != nil {
-		fmt.Println("Unable to retrieve file metadata: ", err)
-		return nil, err
+		return nil, errors.Wrap(err, "failed to  get file data")
 	}
 
 	defer file.Body.Close()
 
 	out := new(bytes.Buffer)
-	if err != nil {
-		fmt.Println("Unable to create file: ", err)
-		return nil, err
-	}
-
 	_, err = io.Copy(out, file.Body)
 	if err != nil {
-		fmt.Println("Unable to save file: ", err)
-		return nil, err
+		return nil, errors.Wrap(err, "Unable to save file")
 	}
 
 	return out.Bytes(), nil

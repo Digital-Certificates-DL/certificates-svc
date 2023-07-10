@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"image"
 	"image/jpeg"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -61,14 +60,11 @@ func (i ImageConvert) Convert(blob []byte) ([]byte, error) {
 		return nil, errors.Wrap(err, "failed to get abs output file")
 	}
 
-	log.Println(fileInputPath + " " + fileOutputPath)
 	cmd := exec.Command("sh", "-c", "gs -sDEVICE=png16m -dNOPAUSE -dBATCH -dSAFER -sOutputFile="+fileOutputPath+" "+fileInputPath)
-	out, err := cmd.Output()
+	_, err = cmd.Output()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to exec convert script")
 	}
-
-	log.Println(out)
 
 	fileBlob, err := os.ReadFile(fileOutputPath)
 	if err != nil {

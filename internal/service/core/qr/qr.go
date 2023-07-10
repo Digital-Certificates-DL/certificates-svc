@@ -17,8 +17,6 @@ import (
 	"strings"
 )
 
-const sample = "message:\n%s\n\naddress:\n%s\n\nsignature:\n%s\n\ncertificate page:\nhttps://dlt-academy.com/certificates"
-
 var shortTitles = map[string]string{
 	"Beginner at theoretical aspects blockchain technology": "blockchain",
 	"Theory of database organization and basic SQL":         "database",
@@ -36,16 +34,18 @@ type QRCreator interface {
 }
 
 type QR struct {
-	user      *helpers.Certificate
-	templates map[string]string
-	log       *logan.Entry
+	user              *helpers.Certificate
+	templates         map[string]string
+	log               *logan.Entry
+	qrMessageTemplate string
 }
 
-func NewQR(user *helpers.Certificate, log *logan.Entry, templates map[string]string) QRCreator {
+func NewQR(user *helpers.Certificate, log *logan.Entry, templates map[string]string, qrMessageTemplate string) QRCreator {
 	return QR{
-		user:      user,
-		log:       log,
-		templates: templates,
+		user:              user,
+		log:               log,
+		templates:         templates,
+		qrMessageTemplate: qrMessageTemplate,
 	}
 }
 
@@ -81,7 +81,7 @@ func (q QR) GenerateQR(address []byte) ([]byte, []byte, string, error) {
 }
 
 func (q QR) PrepareMsgForQR(name string, address, signature []byte) string {
-	return fmt.Sprintf(sample, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
+	return fmt.Sprintf(q.qrMessageTemplate, name, fmt.Sprintf("%s", address), fmt.Sprintf("%s", signature))
 
 }
 

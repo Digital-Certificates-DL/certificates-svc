@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"fmt"
 	"github.com/alecthomas/kingpin"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3"
@@ -37,8 +36,6 @@ func Run(args []string) bool {
 		log.WithError(err).Error("failed to parse arguments")
 		return false
 	}
-
-	fmt.Println(serviceCmd.FullCommand())
 
 	switch cmd {
 	case serviceCmd.FullCommand():

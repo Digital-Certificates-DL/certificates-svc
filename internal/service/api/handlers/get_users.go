@@ -21,7 +21,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := google.NewGoogleClient(Config(r))
-	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Name)
+	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 
 	if len(link) != 0 {
 		Log(r).WithError(err).Error("failed to authorize")
@@ -50,10 +50,8 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", Config(r).Log())
+	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K", Config(r).Log())
 	if errs != nil {
-		fmt.Println(errs[0].Error())
-
 		if strings.Contains(errs[0].Error(), "400") {
 			Log(r).Error("token expired")
 			ape.RenderErr(w, problems.Unauthorized())

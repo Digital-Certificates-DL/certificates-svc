@@ -13,7 +13,7 @@ post:
           properties:
             data:
               type: object
-              $ref: '#/components/schemas/PdfsCreateRequest'
+              $ref: '#/components/schemas/PrepareCertificates'
   responses:
     '201':
       description: Success

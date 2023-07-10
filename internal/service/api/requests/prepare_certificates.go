@@ -16,12 +16,12 @@ type PrepareCertificates struct {
 
 func NewPrepareCertificates(r *http.Request) (PrepareCertificates, error) {
 	request := PrepareCertificates{}
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return PrepareCertificates{}, errors.Wrap(err, "failed to decode data")
 	}
+
 	request.Data.Attributes.Url = request.parse()
-	return request, err
+	return request, nil
 }
 
 func (p *PrepareCertificates) PrepareCertificates() []*helpers.Certificate {

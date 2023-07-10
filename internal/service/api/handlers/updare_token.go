@@ -16,7 +16,7 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userInfo, err := MasterQ(r).ClientQ().GetByName(req.Data.Name)
+	userInfo, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get user")
 		ape.RenderErr(w, problems.InternalError())
@@ -30,7 +30,7 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userInfo.Token = nil
-	userInfo.Code = req.Data.Code
+	userInfo.Code = req.Data.Attributes.Code
 
 	err = MasterQ(r).ClientQ().Update(userInfo)
 	if err != nil {
@@ -40,11 +40,11 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := google.NewGoogleClient(Config(r))
-	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Name)
+	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 
 	if len(link) != 0 {
 		ape.Render(w, newLinkResponse(link))
-		w.WriteHeader(201)
+		w.WriteHeader(204)
 		return
 	}
 

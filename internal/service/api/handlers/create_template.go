@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
@@ -12,8 +10,6 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/api/requests"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
-	"image"
-	"image/png"
 	"net/http"
 )
 
@@ -24,9 +20,8 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
-	d := pdf.DefaultData
+	defaultData := pdf.DefaultData
 	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Relationships.User)
-	Log(r).Debug("client ", client)
 	if err != nil {
 		Log(r).Error(errors.Wrap(err, "failed to get client"))
 		ape.Render(w, problems.InternalError())
@@ -38,16 +33,14 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("********")
 	if template.Width == 0 || template.High == 0 {
 		tp := pdf.DefaultTemplateTall
-		_, _, imgBytes, err := tp.Prepare(d, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
+		_, _, imgBytes, err := tp.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
 		if err != nil {
 			Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 			ape.Render(w, problems.InternalError())
 			return
 		}
-		fmt.Println(template.Width)
 		ape.Render(w, newTemplateImageResp(imgBytes))
 		return
 	}
@@ -63,13 +56,12 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
 	file.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
 	file.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
-	_, _, imgBytes, err := template.Prepare(d, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
+	_, _, imgBytes, err := template.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
 	if err != nil {
 		Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
 		ape.Render(w, problems.InternalError())
 		return
 	}
-	fmt.Println("IsCompleted: ", req.Data.Attributes.IsCompleted)
 	if req.Data.Attributes.IsCompleted {
 		templateBytes, err := json.Marshal(template)
 		if err != nil {
@@ -77,10 +69,6 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 			ape.Render(w, problems.InternalError())
 			return
 		}
-		Log(r).Debug("template: ", templateBytes)
-		fmt.Println("template ", templateBytes)
-
-		Log(r).Debug("client ", client)
 
 		_, err = MasterQ(r).TemplateQ().Insert(&data.Template{
 			Template: templateBytes,
@@ -106,21 +94,4 @@ func newTemplateImageResp(img []byte) resources.TemplateResponse {
 			},
 		},
 	}
-}
-
-func base64BytestoPng(data []byte) (string, error) {
-	reader := base64.NewDecoder(base64.StdEncoding, bytes.NewReader(data))
-	m, _, err := image.Decode(reader)
-	if err != nil {
-		return "", err
-	}
-
-	//Encode from image format to writer
-	buf := new(bytes.Buffer)
-
-	err = png.Encode(buf, m)
-	if err != nil {
-		return "", err
-	}
-	return buf.String(), nil
 }

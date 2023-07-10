@@ -18,8 +18,7 @@ type CheckContainerState struct {
 
 func NewCheckContainerState(r *http.Request) (int, error) {
 	request := CheckContainerState{}
-	err := urlval.Decode(r.URL.Query(), &request)
-	if err != nil {
+	if err := urlval.Decode(r.URL.Query(), &request); err != nil {
 		return -1, err
 	}
 

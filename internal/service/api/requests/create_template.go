@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
@@ -19,42 +20,52 @@ type GenerateTemplate struct {
 
 func NewGenerateTemplate(r *http.Request) (pdf.PDF, []byte, GenerateTemplate, error) {
 	request := GenerateTemplate{}
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
-		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode raw request ")
 	}
+
 	pdfTemplate := pdf.PDF{}
-	err = json.Unmarshal(request.Data.Attributes.Template, &pdfTemplate)
-	if err != nil {
-		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
+	if err := json.Unmarshal(request.Data.Attributes.Template, &pdfTemplate); err != nil {
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode template data")
 	}
 
-	str := strings.ReplaceAll(request.Data.Attributes.BackgroundImg, "data:image/jpeg;base64,", "")
-	str = strings.ReplaceAll(str, "data:image/png;base64,", "")
+	rawImg := strings.ReplaceAll(request.Data.Attributes.BackgroundImg, "data:image/jpeg;base64,", "")
+	rawImg = strings.ReplaceAll(rawImg, "data:image/png;base64,", "")
 
-	data, err := base64toJpg(str)
+	imgBytes, err := base64toJpg(rawImg)
 	if err != nil {
-		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to decode data")
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to convert image")
+	}
+
+	if err = validateTemplateData(request.Data); err != nil {
+		return pdf.PDF{}, nil, GenerateTemplate{}, errors.Wrap(err, "failed to validate data")
 
 	}
-	return pdfTemplate, data, request, err
+	return pdfTemplate, imgBytes, request, err
 }
 
-// Given a base64 string of a JPEG, encodes it into an JPEG image test.jpg
 func base64toJpg(data string) ([]byte, error) {
-
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
 	m, _, err := image.Decode(reader)
 	if err != nil {
 		return nil, err
 	}
 
-	//Encode from image format to writer
 	buf := new(bytes.Buffer)
-
-	err = jpeg.Encode(buf, m, &jpeg.Options{Quality: 75})
-	if err != nil {
+	if err = jpeg.Encode(buf, m, &jpeg.Options{Quality: 75}); err != nil {
 		return nil, err
 	}
+
 	return buf.Bytes(), nil
+}
+
+func validateTemplateData(template resources.Template) error {
+	return MergeErrors(validation.Errors{
+		"/attributes/is_completed": validation.Validate(template.Attributes.IsCompleted,
+			validation.Required),
+		"/attributes/template_name": validation.Validate(template.Attributes.TemplateName,
+			validation.Required),
+		"/attributes/background_img": validation.Validate(template.Attributes.BackgroundImg,
+			validation.Required),
+	}).Filter()
 }

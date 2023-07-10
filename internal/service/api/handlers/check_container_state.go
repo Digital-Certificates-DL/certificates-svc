@@ -36,7 +36,7 @@ func newUserWithImgResponse(users []*helpers.Certificate, id int, status bool) r
 		resp := resources.User{
 			Key: resources.Key{
 				ID:   fmt.Sprintf("%x", user.ID),
-				Type: resources.USER,
+				Type: resources.PARSE_USERS,
 			},
 			Attributes: resources.UserBlob{ //todo make better
 				Participant:        user.Participant,

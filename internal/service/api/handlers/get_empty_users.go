@@ -22,7 +22,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 
 	client := google.NewGoogleClient(Config(r))
 
-	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Name)
+	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 	if len(link) != 0 {
 		Log(r).WithError(err).Error("failed to authorize")
 
@@ -42,7 +42,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, errs := client.ParseFromWeb(req.Data.Url, "A1:K", Config(r).Log())
+	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K", Config(r).Log())
 	if errs != nil {
 		Log(r).Error("failed to parse table: Errors:", errs)
 		ape.Render(w, problems.BadRequest(err))
@@ -69,7 +69,7 @@ func newUserResponse(users []*helpers.Certificate) resources.UserListResponse {
 		resp := resources.User{
 			Key: resources.Key{
 				ID:   fmt.Sprintf("%x", user.ID),
-				Type: resources.USER,
+				Type: resources.PARSE_USERS,
 			},
 			Attributes: resources.UserBlob{
 				Certificate:    user.Certificate,

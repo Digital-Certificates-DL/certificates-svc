@@ -13,9 +13,13 @@ type UpdateTokenRequest struct {
 
 func NewUpdateTokenRequest(r *http.Request) (UpdateTokenRequest, error) {
 	request := UpdateTokenRequest{}
-	err := json.NewDecoder(r.Body).Decode(&request)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return UpdateTokenRequest{}, errors.Wrap(err, "failed to decode data")
 	}
+
+	if err := validateSettingsData(request.Data); err != nil {
+		return UpdateTokenRequest{}, errors.Wrap(err, "failed to decode data")
+	}
+
 	return request, nil
 }

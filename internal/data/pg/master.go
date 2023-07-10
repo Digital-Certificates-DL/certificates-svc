@@ -12,20 +12,20 @@ type masterQ struct {
 
 func NewMasterQ(db *pgdb.DB) data.MasterQ {
 	return &masterQ{
-		db: db.Clone(),
+		db: db,
 	}
 }
 
 func (q *masterQ) New() data.MasterQ {
-	return NewMasterQ(q.db)
+	return NewMasterQ(q.db.Clone())
 }
 
 func (q *masterQ) ClientQ() data.ClientQ {
-	return NewClientQ(q.db)
+	return NewClientQ(q.db.Clone())
 }
 
 func (q *masterQ) TemplateQ() data.TemplateQ {
-	return NewTemplateQ(q.db)
+	return NewTemplateQ(q.db.Clone())
 }
 
 func (q *masterQ) Transaction(fn func(data interface{}) error, data interface{}) error {

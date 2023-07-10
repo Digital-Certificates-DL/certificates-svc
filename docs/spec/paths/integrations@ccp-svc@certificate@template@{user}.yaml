@@ -1,4 +1,4 @@
-post:
+get:
   tags:
     - Get template by user
   summary: template

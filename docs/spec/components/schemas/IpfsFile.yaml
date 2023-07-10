@@ -1,5 +1,5 @@
 allOf:
-  - $ref: '#/components/schemas/IpfsKey'
+  - $ref: '#/components/schemas/IpfsFileUploadKey'
   - type: object
     required:
       - attributes

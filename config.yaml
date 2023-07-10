@@ -17,6 +17,9 @@ networks:
   ipfs_pr_id: ""
   ipfs_pr_key: ""
 
+sbt:
+  external_url: "https://dlt-academy.com/certificates"
+
 google:
   secret_path: "./client.json"
   qr_path: "qr"
@@ -66,6 +69,8 @@ exams:
     "Basic level": "Basic level"
     "graduated with honors": "Exam passed with honors"
     "Listener only": "Listener only. Exam not passed"
+
+
 
 cop:
   disabled: true

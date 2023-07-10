@@ -1,5 +1,5 @@
 allOf:
-  - $ref: '#/components/schemas/PrepareCertificateKey'
+  - $ref: '#/components/schemas/PrepareCertificatesKey'
   - type: object
     required:
       - attributes

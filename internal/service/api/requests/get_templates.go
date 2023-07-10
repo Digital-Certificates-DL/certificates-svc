@@ -2,6 +2,7 @@ package requests
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/urlval"
 	"net/http"
 )
@@ -16,10 +17,10 @@ type GetTemplateRequest struct {
 
 func NewGetTemplateRequest(r *http.Request) (GetTemplateRequest, error) {
 	request := GetTemplateRequest{}
-	err := urlval.Decode(r.URL.Query(), &request)
-	if err != nil {
-		return request, err
+	if err := urlval.Decode(r.URL.Query(), &request); err != nil {
+		return request, errors.Wrap(err, "failed to decode query")
 	}
 	request.User = chi.URLParam(r, UserPathParam)
-	return request, err
+
+	return request, nil
 }

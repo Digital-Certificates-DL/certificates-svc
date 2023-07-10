@@ -6,4 +6,4 @@ properties:
   type:
     type: string
     enum:
-      - ipfs
+      - ipfs_file_upload
