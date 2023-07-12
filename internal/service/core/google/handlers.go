@@ -131,7 +131,7 @@ func Drive(googleClient *Google, log *logan.Entry, files []FilesBytes, users []*
 	handler.StartDriveRunner()
 	go handler.insertData(files)
 	users = handler.Read(users, flag)
-	log.Info("sSent to drive: ", handler.count)
+	log.Info("Sent to drive: ", handler.count)
 
 	return users, err
 }

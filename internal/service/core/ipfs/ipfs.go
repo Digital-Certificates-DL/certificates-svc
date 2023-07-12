@@ -54,7 +54,7 @@ func (i Connector) PrepareJSON(tokenName, tokenDescription, link, imagePath stri
 }
 
 func (i Connector) PrepareImagePath(imagePath string) ([]byte, error) {
-	path, err := filepath.Abs("main.go") //todo  make better
+	path, err := filepath.Abs("main.go")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get absolute path")
 	}

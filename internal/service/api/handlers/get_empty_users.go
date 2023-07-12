@@ -15,8 +15,8 @@ import (
 func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewGetUsers(r)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to parse request")
-		ape.Render(w, problems.BadRequest(err))
+		Log(r).WithError(err).Debug("failed to parse request")
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
@@ -24,7 +24,7 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 
 	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 	if len(link) != 0 {
-		Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Debug("failed to authorize")
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -37,15 +37,15 @@ func GetUsersEmpty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		Log(r).WithError(err).Error("failed to connect")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to connect")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K")
 	if errs != nil {
-		Log(r).Error("failed to parse table: Errors:", errs)
-		ape.Render(w, problems.BadRequest(err))
+		Log(r).WithError(err).Debug("failed to parse table: Errors:", errs)
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	emptyUsers := make([]*helpers.Certificate, 0)

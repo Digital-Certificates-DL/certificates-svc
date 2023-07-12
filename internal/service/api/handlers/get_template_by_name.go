@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/base64"
-	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
@@ -14,33 +13,33 @@ import (
 func GetTemplateByName(w http.ResponseWriter, r *http.Request) {
 	request, err := requests.NewGetTemplateByNameRequest(r)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to parse request "))
+		Log(r).WithError(err).Debug("failed to parse request ")
 		ape.Render(w, problems.BadRequest(err))
 		return
 	}
 
 	client, err := MasterQ(r).ClientQ().GetByName(request.User)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to get client"))
+		Log(r).WithError(err).Debug("failed to get client")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
 	if client == nil {
-		Log(r).Error(errors.Wrap(err, "client is not found"))
+		Log(r).WithError(err).Debug("client is not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
 	tmp, err := MasterQ(r).TemplateQ().GetByName(request.TemplateName, client.ID)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to select templates "))
+		Log(r).WithError(err).Debug("failed to select templates ")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 
 	if tmp != nil {
-		Log(r).Error(errors.Wrap(err, "template is not found"))
+		Log(r).WithError(err).Debug("template is not found")
 		ape.Render(w, problems.NotFound())
 		return
 	}

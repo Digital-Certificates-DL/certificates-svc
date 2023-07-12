@@ -22,6 +22,7 @@ type Config interface {
 	ExamsConfiger
 	pgdb.Databaser
 	SbtConfiger
+	StaticConfiger
 }
 
 type config struct {
@@ -39,11 +40,13 @@ type config struct {
 	getter kv.Getter
 	comfig.Listenerer
 	SbtConfiger
+	StaticConfiger
 }
 
 func New(getter kv.Getter) Config {
 	return &config{
 		getter:            getter,
+		StaticConfiger:    NewStaticConfiger(getter),
 		ExamsConfiger:     NewExamsConfiger(getter),
 		TitlesConfiger:    NewTitlesConfiger(getter),
 		Listenerer:        comfig.NewListenerer(getter),

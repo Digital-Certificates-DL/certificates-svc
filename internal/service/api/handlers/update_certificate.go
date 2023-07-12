@@ -16,8 +16,8 @@ import (
 func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to connect")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to connect")
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	certificates := req.PrepareCertificates()
@@ -25,13 +25,13 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 	googleClient := google.NewGoogleClient(Config(r))
 	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to connect")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to connect")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	if len(link) != 0 {
-		Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Debug("failed to authorize")
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
 			Detail: "Invalid token",
@@ -50,7 +50,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if client == nil {
-		Log(r).Error(errors.Wrap(err, "user is not found"))
+		Log(r).WithError(err).Debug("user is not found")
 		ape.Render(w, problems.NotFound())
 		return
 	}
@@ -59,13 +59,13 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		if certificate.Certificate != "" {
 			file, err := googleClient.Download(certificate.Certificate)
 			if err != nil {
-				Log(r).Error("failed to ", err)
+				Log(r).WithError(err).Debug("failed to download file ")
 				ape.Render(w, problems.BadRequest(err))
 				return
 			}
 			img, err := pdf.NewImageConverter().Convert(file)
 			if err != nil {
-				Log(r).Error("failed to convert", err)
+				Log(r).WithError(err).Debug("failed to convert")
 				ape.Render(w, problems.BadRequest(err))
 				return
 			}

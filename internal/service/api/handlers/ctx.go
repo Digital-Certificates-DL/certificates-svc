@@ -16,6 +16,7 @@ const (
 	configCtxKey
 	masterqCtxKey
 	pdfCreatorCtxKey
+	staticConfigerCtxKey
 )
 
 func CtxLog(entry *logan.Entry) func(context.Context) context.Context {
@@ -56,4 +57,14 @@ func CtxPdfCreator(entry pdf.CreatorPDF) func(context.Context) context.Context {
 
 func PdfCreator(r *http.Request) pdf.CreatorPDF {
 	return r.Context().Value(pdfCreatorCtxKey).(pdf.CreatorPDF)
+}
+
+func CtxStaticConfiger(entry *config.StaticConfig) func(context.Context) context.Context {
+	return func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, staticConfigerCtxKey, entry)
+	}
+}
+
+func StaticConfiger(r *http.Request) *config.StaticConfig {
+	return r.Context().Value(staticConfigerCtxKey).(*config.StaticConfig)
 }

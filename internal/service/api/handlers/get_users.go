@@ -15,7 +15,7 @@ import (
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewGetUsers(r)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to parse request")
+		Log(r).WithError(err).Debug("failed to parse request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -24,7 +24,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	link, err := client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 
 	if len(link) != 0 {
-		Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Debug("failed to authorize")
 
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
@@ -38,14 +38,16 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Log(r).WithError(err).Error("failed to authorize")
 		if strings.Contains(err.Error(), "unable to get client") {
+			Log(r).WithError(err).Debug("failed to get client")
 			ape.RenderErr(w, problems.NotFound())
 			return
 		}
 		if strings.Contains(err.Error(), "Token has been expired or revoked") {
+			Log(r).WithError(err).Debug("failed to get client ")
 			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}
-		Log(r).WithError(err).Error("failed to authorize")
+		Log(r).WithError(err).Debug("failed to authorize")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -53,7 +55,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K")
 	if errs != nil {
 		if strings.Contains(errs[0].Error(), "400") {
-			Log(r).Error("token expired")
+			Log(r).WithError(err).Debug("token expired")
 			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}

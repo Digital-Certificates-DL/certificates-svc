@@ -12,18 +12,18 @@ import (
 	"strings"
 )
 
-func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64) ([]byte, string, []byte, error) {
+func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64, abs string) ([]byte, string, []byte, error) {
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
-	if err := pdf.AddTTFFont("italic", "./static/font/Inter-Italic.ttf"); err != nil {
+	if err := pdf.AddTTFFont("italic", abs+"/static/font/Inter-Italic.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add font")
 	}
-	if err := pdf.AddTTFFont("regular", "./static/font/Inter-Regular.ttf"); err != nil {
+	if err := pdf.AddTTFFont("regular", abs+"/static/font/Inter-Regular.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-Regular")
 	}
-	if err := pdf.AddTTFFont("semibold", "./static/font/Inter-SemiBold.ttf"); err != nil {
+	if err := pdf.AddTTFFont("semibold", abs+"/static/font/Inter-SemiBold.ttf"); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to add Inter-SemiBold.ttf")
 	}
 
@@ -51,7 +51,7 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 			}
 		} else {
 
-			file, err := os.Open(fmt.Sprintf("./static/templates/%s.png", templateImg))
+			file, err := os.Open(fmt.Sprintf("%s/static/templates/%s.png", abs, templateImg))
 			defer file.Close()
 			if err != nil {
 				return nil, "", nil, errors.Wrap(err, "default template isn't found")

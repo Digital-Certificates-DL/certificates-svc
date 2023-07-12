@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
@@ -16,29 +15,29 @@ import (
 func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	template, backgroundImg, req, err := requests.NewGenerateTemplate(r)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to generate template"))
-		ape.Render(w, problems.BadRequest(err))
+		Log(r).WithError(err).Debug("failed to generate template")
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	defaultData := pdf.DefaultData
 	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Relationships.User)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to get client"))
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to get client")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if client == nil {
-		Log(r).Error(errors.Wrap(err, "client is not found"))
-		ape.Render(w, problems.NotFound())
+		Log(r).WithError(err).Debug("client is not found")
+		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
 	if template.Width == 0 || template.High == 0 {
 		tp := pdf.DefaultTemplateTall
-		_, _, imgBytes, err := tp.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
+		_, _, imgBytes, err := tp.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID, StaticConfiger(r).Location)
 		if err != nil {
-			Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
-			ape.Render(w, problems.InternalError())
+			Log(r).WithError(err).Debug("failed to prepare pdf")
+			ape.RenderErr(w, problems.InternalError())
 			return
 		}
 		ape.Render(w, newTemplateImageResp(imgBytes))
@@ -56,17 +55,17 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
 	file.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
 	file.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
-	_, _, imgBytes, err := template.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID)
+	_, _, imgBytes, err := template.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID, StaticConfiger(r).Location)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to prepare pdf"))
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to prepare pdf")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if req.Data.Attributes.IsCompleted {
 		templateBytes, err := json.Marshal(template)
 		if err != nil {
-			Log(r).Error(errors.Wrap(err, "failed to marshal"))
-			ape.Render(w, problems.InternalError())
+			Log(r).WithError(err).Debug("failed to marshal")
+			ape.RenderErr(w, problems.InternalError())
 			return
 		}
 
@@ -77,8 +76,8 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 			UserID: client.ID,
 		})
 		if err != nil {
-			Log(r).Error(errors.Wrap(err, "failed to insert template"))
-			ape.Render(w, problems.InternalError())
+			Log(r).WithError(err).Debug("failed to insert template")
+			ape.RenderErr(w, problems.InternalError())
 			return
 		}
 	}

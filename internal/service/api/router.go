@@ -21,6 +21,7 @@ func (s *service) router(cfg config.Config) chi.Router {
 			handlers.CtxLog(s.log),
 			handlers.CtxPdfCreator(s.pdfCreator),
 			handlers.CtxConfig(cfg),
+			handlers.CtxStaticConfiger(cfg.StaticConfig()),
 		),
 	)
 

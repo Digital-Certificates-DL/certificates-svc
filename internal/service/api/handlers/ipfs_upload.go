@@ -12,28 +12,28 @@ import (
 func UploadFileToIpfs(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewUploadFileToIPFS(r)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to parse data")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to parse data")
+		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	connector := ipfs.NewConnector(Config(r).NetworksConfig())
 	imgHash, err := connector.Upload(req.Data.Attributes.Img)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to upload ")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to upload ")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	jsonHash, err := connector.PrepareJSON(req.Data.Attributes.Name, req.Data.Attributes.Description, Config(r).SbtConfig().ExternalURL, imgHash)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to prepare json")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to prepare json")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	preparedURI, err := connector.Upload(jsonHash)
 	if err != nil {
-		Log(r).WithError(err).Error("failed to upload")
-		ape.Render(w, problems.InternalError())
+		Log(r).WithError(err).Debug("failed to upload")
+		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
