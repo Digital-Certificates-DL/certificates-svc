@@ -55,7 +55,7 @@ func (c *Container) Generate() error {
 		pdf := PDF{}
 		certificate := pdf.SetTemplateData(DefaultTemplateTall)
 
-		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
+		pdfData := NewData(user.Participant, user.CourseTitle, "30 hours / 1 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, NewPDFConfig(c.config), c.masterQ, nil, c.owner.ID, c.config.StaticConfig().Location)
 		if err != nil {
 			return errors.Wrap(err, "failed to create pdf")
