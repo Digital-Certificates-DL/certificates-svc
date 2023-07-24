@@ -3,7 +3,7 @@ package data
 type ClientQ interface {
 	New() ClientQ
 	Get() (*Client, error)
-	Insert(data *Client) (int64, error)
+	Insert(data *Client) error
 	GetByID(hash string) (*Client, error)
 	GetByName(name string) (*Client, error)
 	Update(data *Client) error

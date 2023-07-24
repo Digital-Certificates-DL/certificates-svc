@@ -69,7 +69,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		_, err = MasterQ(r).TemplateQ().Insert(&data.Template{
+		err = MasterQ(r).TemplateQ().Insert(&data.Template{
 			Template: templateBytes,
 			//ImgBytes: backgroundImg,
 			Name:   req.Data.Attributes.TemplateName,

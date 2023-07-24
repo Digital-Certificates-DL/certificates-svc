@@ -3,7 +3,7 @@ package data
 type TemplateQ interface {
 	New() TemplateQ
 	Get() (*Template, error)
-	Insert(data *Template) (int64, error)
+	Insert(data *Template) error
 	GetByUserID(hash string) (*Template, error)
 	GetByName(name string, userID int64) (*Template, error)
 	Update(data *Template) error

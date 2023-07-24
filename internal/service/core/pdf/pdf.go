@@ -123,7 +123,7 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 
 	pdf.SetX(p.SerialNumber.X)
 	pdf.SetY(p.SerialNumber.Y)
-	if err := pdf.Cell(nil, data.SerialNumber); err != nil {
+	if err := pdf.CellWithOption(&gopdf.Rect{W: 300, H: 300}, data.SerialNumber, gopdf.CellOption{Align: gopdf.Right}); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to cell SerialNumber ")
 	}
 
@@ -134,7 +134,7 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 
 	pdf.SetX(p.Date.X)
 	pdf.SetY(p.Date.Y)
-	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Issued on: %s", data.Date)); err != nil {
+	if err := pdf.CellWithOption(&gopdf.Rect{W: 300, H: 300}, fmt.Sprintf("Issued on: %s", data.Date), gopdf.CellOption{Align: gopdf.Right}); err != nil {
 		return nil, "", nil, errors.Wrap(err, "failed to cell Date")
 	}
 	///////////// Course

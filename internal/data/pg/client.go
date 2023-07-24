@@ -16,17 +16,25 @@ func NewClientQ(db *pgdb.DB) data.ClientQ {
 	return &ClientQ{
 		db:  db,
 		sql: sq.Select("b.*").From(fmt.Sprintf("%s as b", clientTableName)),
+		//upd: sq.Update(),
 	}
 }
 
 type ClientQ struct {
 	db  *pgdb.DB
 	sql sq.SelectBuilder
+	upd sq.UpdateBuilder
 }
 
 func (q *ClientQ) New() data.ClientQ {
-	return NewClientQ(q.db)
+	return NewClientQ(q.db.Clone())
 }
+
+//func (q *ClientQ) WhereId(id int64) *ClientQ {
+//	q.sql = q.sql.Where()
+//	//q.upd = q.upd.Where()
+//	return q
+//}
 
 func (q *ClientQ) Get() (*data.Client, error) {
 	var result data.Client
@@ -49,15 +57,15 @@ func (q *ClientQ) Update(client *data.Client) error {
 	return nil
 }
 
-func (q *ClientQ) Insert(value *data.Client) (int64, error) {
+func (q *ClientQ) Insert(value *data.Client) error {
 	clauses := structs.Map(value)
 	var id int64
 
 	if err := q.db.Get(&id, sq.Insert(clientTableName).SetMap(clauses).Suffix("returning id")); err != nil {
-		return -1, errors.Wrap(err, "failed to insert client")
+		return errors.Wrap(err, "failed to insert client")
 	}
 
-	return id, nil
+	return nil
 }
 
 func (q *ClientQ) GetByID(id string) (*data.Client, error) {

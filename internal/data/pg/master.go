@@ -17,15 +17,16 @@ func NewMasterQ(db *pgdb.DB) data.MasterQ {
 }
 
 func (q *masterQ) New() data.MasterQ {
-	return NewMasterQ(q.db.Clone())
+	return NewMasterQ(q.db)
+	//return NewMasterQ(q.db).New()
 }
 
 func (q *masterQ) ClientQ() data.ClientQ {
-	return NewClientQ(q.db.Clone())
+	return NewClientQ(q.db)
 }
 
 func (q *masterQ) TemplateQ() data.TemplateQ {
-	return NewTemplateQ(q.db.Clone())
+	return NewTemplateQ(q.db)
 }
 
 func (q *masterQ) Transaction(fn func(data interface{}) error, data interface{}) error {

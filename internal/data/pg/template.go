@@ -25,7 +25,7 @@ type TemplateQ struct {
 }
 
 func (q *TemplateQ) New() data.TemplateQ {
-	return NewTemplateQ(q.db)
+	return NewTemplateQ(q.db.Clone())
 }
 
 func (q *TemplateQ) Get() (*data.Template, error) {
@@ -62,15 +62,15 @@ func (q *TemplateQ) Select(id int64) ([]data.Template, error) {
 	return result, nil
 }
 
-func (q *TemplateQ) Insert(value *data.Template) (int64, error) {
+func (q *TemplateQ) Insert(value *data.Template) error {
 	clauses := structs.Map(value)
 	var id int64
 
 	if err := q.db.Get(&id, sq.Insert(templateTableName).SetMap(clauses).Suffix("returning id")); err != nil {
-		return -1, errors.Wrap(err, "failed to insert template ")
+		return errors.Wrap(err, "failed to insert template ")
 	}
 
-	return id, nil
+	return nil
 }
 
 func (q *TemplateQ) GetByUserID(id string) (*data.Template, error) {

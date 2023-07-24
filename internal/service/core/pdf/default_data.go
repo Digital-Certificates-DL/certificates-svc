@@ -85,13 +85,15 @@ var DefaultTemplateTall = PDF{
 		Font:     "regular",
 	},
 	SerialNumber: Field{
-		X:        1270,
+		X: 1244,
+		//X:        1270,
 		Y:        112,
 		FontSize: 24,
 		Font:     "regular",
 	},
 	Date: Field{
-		X:        1282,
+		X: 1244,
+		//X:        1282,
 		Y:        158,
 		FontSize: 24,
 		Font:     "regular",

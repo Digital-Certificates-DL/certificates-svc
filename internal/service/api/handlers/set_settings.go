@@ -28,8 +28,7 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 			Name: req.Data.Attributes.Name,
 			Code: req.Data.Attributes.Code,
 		}
-		_, err := MasterQ(r).ClientQ().Insert(&user)
-		if err != nil {
+		if err = MasterQ(r).ClientQ().Insert(&user); err != nil {
 			Log(r).WithError(err).Debug("failed to get settings")
 			ape.RenderErr(w, problems.InternalError())
 			return
