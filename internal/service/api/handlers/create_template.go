@@ -20,7 +20,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defaultData := pdf.DefaultData
-	client, err := MasterQ(r).ClientQ().WhereName(req.Data.Relationships.User).Get()
+	client, err := MasterQ(r).ClientQ().FilterByName(req.Data.Relationships.User).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get client")
 		ape.RenderErr(w, problems.InternalError())

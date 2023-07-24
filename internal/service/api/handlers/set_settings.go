@@ -17,7 +17,7 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	settings, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
+	settings, err := MasterQ(r).ClientQ().FilterByName(req.Data.Attributes.Name).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get settings")
 		ape.RenderErr(w, problems.InternalError())
@@ -37,7 +37,7 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	settings.Code = req.Data.Attributes.Code
-	err = MasterQ(r).ClientQ().WhereID(settings.ID).Update(settings)
+	err = MasterQ(r).ClientQ().FilterByID(settings.ID).Update(settings)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to update settings")
 		ape.RenderErr(w, problems.InternalError())

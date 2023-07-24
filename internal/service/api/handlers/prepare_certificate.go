@@ -39,7 +39,7 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
+	client, err := MasterQ(r).ClientQ().FilterByName(req.Data.Attributes.Name).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get client")
 		ape.RenderErr(w, problems.InternalError())

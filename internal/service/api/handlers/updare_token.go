@@ -16,7 +16,7 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userInfo, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
+	userInfo, err := MasterQ(r).ClientQ().FilterByName(req.Data.Attributes.Name).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get user")
 		ape.RenderErr(w, problems.InternalError())
@@ -32,7 +32,7 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 	userInfo.Token = nil
 	userInfo.Code = req.Data.Attributes.Code
 
-	err = MasterQ(r).ClientQ().WhereID(userInfo.ID).Update(userInfo)
+	err = MasterQ(r).ClientQ().FilterByID(userInfo.ID).Update(userInfo)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to update user")
 		ape.RenderErr(w, problems.InternalError())

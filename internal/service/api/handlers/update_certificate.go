@@ -41,7 +41,7 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
+	client, err := MasterQ(r).ClientQ().FilterByName(req.Data.Attributes.Name).Get()
 	Log(r).Debug("user ", client)
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get user")

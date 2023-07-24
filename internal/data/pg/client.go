@@ -68,13 +68,13 @@ func (q *ClientQ) Insert(value *data.Client) error {
 	return nil
 }
 
-func (q *ClientQ) WhereID(id int64) data.ClientQ {
+func (q *ClientQ) FilterByID(id int64) data.ClientQ {
 	q.sql = q.sql.Where(sq.Eq{idField: id})
 	q.upd = q.upd.Where(sq.Eq{idField: id})
 	return q
 }
 
-func (q *ClientQ) WhereName(name string) data.ClientQ {
+func (q *ClientQ) FilterByName(name string) data.ClientQ {
 	q.sql = q.sql.Where(sq.Eq{nameField: name})
 	q.upd = q.upd.Where(sq.Eq{nameField: name})
 	return q

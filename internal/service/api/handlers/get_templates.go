@@ -17,7 +17,7 @@ func GetTemplates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().WhereName(userName.User).Get()
+	client, err := MasterQ(r).ClientQ().FilterByName(userName.User).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get client")
 		ape.RenderErr(w, problems.InternalError())
@@ -30,7 +30,7 @@ func GetTemplates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmps, err := MasterQ(r).TemplateQ().Select(client.ID)
+	tmps, err := MasterQ(r).TemplateQ().FilterByUser(client.ID).Select()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to select templates ")
 		ape.RenderErr(w, problems.InternalError())

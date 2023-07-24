@@ -240,7 +240,7 @@ func (p *PDF) setName(pdf *gopdf.GoPdf, name string) error {
 }
 
 func (p *PDF) initBackground(pdf *gopdf.GoPdf, templateQ data.TemplateQ, templateImg, abs string, userID int64) error {
-	template, err := templateQ.GetByName(templateImg, userID)
+	template, err := templateQ.FilterByName(templateImg).FilterByUser(userID).Get()
 	if err != nil {
 		return errors.Wrap(err, "failed to get background img")
 	}

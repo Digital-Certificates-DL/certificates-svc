@@ -44,7 +44,7 @@ func NewGoogleClientTest(prefixPath string) *Google {
 }
 
 func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name string) (*http.Client, string, error) {
-	client, err := clientQ.WhereName(name).Get()
+	client, err := clientQ.FilterByName(name).Get()
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to get client")
 	}
@@ -68,7 +68,7 @@ func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name str
 		}
 
 		client.Token = bf.Bytes()
-		if err = clientQ.WhereID(client.ID).Update(client); err != nil {
+		if err = clientQ.FilterByID(client.ID).Update(client); err != nil {
 			return nil, "", errors.Wrap(err, "failed to update")
 		}
 	} else {

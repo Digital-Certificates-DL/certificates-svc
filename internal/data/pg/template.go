@@ -12,16 +12,22 @@ import (
 
 const templateTableName = "template"
 
+const (
+	userIDField = "user_id"
+)
+
 func NewTemplateQ(db *pgdb.DB) data.TemplateQ {
 	return &TemplateQ{
 		db:  db,
 		sql: sq.Select("b.*").From(fmt.Sprintf("%s as b", clientTableName)),
+		upd: sq.Update("b.*"),
 	}
 }
 
 type TemplateQ struct {
 	db  *pgdb.DB
 	sql sq.SelectBuilder
+	upd sq.UpdateBuilder
 }
 
 func (q *TemplateQ) New() data.TemplateQ {
@@ -44,17 +50,17 @@ func (q *TemplateQ) Get() (*data.Template, error) {
 
 func (q *TemplateQ) Update(client *data.Template) error {
 	clauses := structs.Map(client)
-	if err := q.db.Exec(sq.Update(templateTableName).SetMap(clauses).Where(sq.Eq{"id": client.ID})); err != nil {
+	if err := q.db.Exec(q.upd.SetMap(clauses)); err != nil {
 		return errors.Wrap(err, "failed to update template")
 	}
 
 	return nil
 }
 
-func (q *TemplateQ) Select(id int64) ([]data.Template, error) {
+func (q *TemplateQ) Select() ([]data.Template, error) {
 	var result []data.Template
 
-	err := q.db.Select(&result, sq.Select("*").From(templateTableName).Where(sq.Eq{"user_id": id}))
+	err := q.db.Select(&result, q.sql)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to select templates")
 	}
@@ -73,38 +79,24 @@ func (q *TemplateQ) Insert(value *data.Template) error {
 	return nil
 }
 
-func (q *TemplateQ) GetByUserID(id string) (*data.Template, error) {
-	var result data.Template
-	err := q.db.Get(&result, sq.Select("*").From(templateTableName).Where(sq.Eq{"user_id": id}))
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get template")
-	}
-
-	return &result, nil
-}
-
-func (q *TemplateQ) GetByName(name string, clientID int64) (*data.Template, error) {
-	var result data.Template
-	err := q.db.Get(&result, sq.Select("*").From(templateTableName).Where(sq.Eq{"name": name, "user_id": clientID}))
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get template")
-	}
-	return &result, nil
-}
-
 func (q *TemplateQ) Page(pageParams pgdb.OffsetPageParams) data.TemplateQ {
 	q.sql = pageParams.ApplyTo(q.sql, "id")
 	return q
 }
 
 func (q *TemplateQ) FilterByUser(id int64) data.TemplateQ {
-	q.sql = q.sql.Where(sq.Eq{"user_id": id})
+	q.sql = q.sql.Where(sq.Eq{userIDField: id})
+	return q
+}
+
+func (q *TemplateQ) FilterByID(id int64) data.TemplateQ {
+	q.sql = q.sql.Where(sq.Eq{idField: id})
+	q.upd = q.upd.Where(sq.Eq{idField: id})
+	return q
+}
+
+func (q *TemplateQ) FilterByName(name string) data.TemplateQ {
+	q.sql = q.sql.Where(sq.Eq{nameField: name})
+	q.upd = q.upd.Where(sq.Eq{nameField: name})
 	return q
 }
