@@ -12,11 +12,18 @@ import (
 
 const clientTableName = "users"
 
+const (
+	idField    = "id"
+	nameField  = "name"
+	tokenField = "token"
+	codeField  = "code"
+)
+
 func NewClientQ(db *pgdb.DB) data.ClientQ {
 	return &ClientQ{
 		db:  db,
 		sql: sq.Select("b.*").From(fmt.Sprintf("%s as b", clientTableName)),
-		//upd: sq.Update(),
+		upd: sq.Update("b.*"),
 	}
 }
 
@@ -29,12 +36,6 @@ type ClientQ struct {
 func (q *ClientQ) New() data.ClientQ {
 	return NewClientQ(q.db.Clone())
 }
-
-//func (q *ClientQ) WhereId(id int64) *ClientQ {
-//	q.sql = q.sql.Where()
-//	//q.upd = q.upd.Where()
-//	return q
-//}
 
 func (q *ClientQ) Get() (*data.Client, error) {
 	var result data.Client
@@ -50,8 +51,7 @@ func (q *ClientQ) Get() (*data.Client, error) {
 
 func (q *ClientQ) Update(client *data.Client) error {
 	clauses := structs.Map(client)
-	err := q.db.Exec(sq.Update(clientTableName).SetMap(clauses).Where(sq.Eq{"id": client.ID}))
-	if err != nil {
+	if err := q.db.Exec(q.upd.SetMap(clauses)); err != nil {
 		return errors.Wrap(err, "failed to update client")
 	}
 	return nil
@@ -68,32 +68,16 @@ func (q *ClientQ) Insert(value *data.Client) error {
 	return nil
 }
 
-func (q *ClientQ) GetByID(id string) (*data.Client, error) {
-	var result data.Client
-	err := q.db.Get(&result, sq.Select("*").From(clientTableName).Where(sq.Eq{"id": id}))
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get client")
-	}
-
-	return &result, nil
+func (q *ClientQ) WhereID(id int64) data.ClientQ {
+	q.sql = q.sql.Where(sq.Eq{idField: id})
+	q.upd = q.upd.Where(sq.Eq{idField: id})
+	return q
 }
 
-func (q *ClientQ) GetByName(name string) (*data.Client, error) {
-	var result data.Client
-	err := q.db.Get(&result, sq.Select("*").From(clientTableName).Where(sq.Eq{"name": name}))
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get client")
-	}
-
-	return &result, nil
+func (q *ClientQ) WhereName(name string) data.ClientQ {
+	q.sql = q.sql.Where(sq.Eq{nameField: name})
+	q.upd = q.upd.Where(sq.Eq{nameField: name})
+	return q
 }
 
 func (q *ClientQ) Page(pageParams pgdb.OffsetPageParams) data.ClientQ {

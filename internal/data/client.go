@@ -4,9 +4,9 @@ type ClientQ interface {
 	New() ClientQ
 	Get() (*Client, error)
 	Insert(data *Client) error
-	GetByID(hash string) (*Client, error)
-	GetByName(name string) (*Client, error)
 	Update(data *Client) error
+	WhereName(name string) ClientQ
+	WhereID(id int64) ClientQ
 }
 
 type Client struct {

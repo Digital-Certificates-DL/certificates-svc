@@ -13,7 +13,7 @@ import (
 func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to parse data")
+		Log(r).WithError(err).Error("failed to parse data")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -22,14 +22,13 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 	googleClient := google.NewGoogleClient(Config(r))
 	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to connect")
+		Log(r).WithError(err).Error("failed to connect")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	if len(link) != 0 {
-		Log(r).WithError(err).Debug("failed to authorize")
-
+		Log(r).WithError(err).Error("failed to authorize")
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
 			Detail: "Invalid token",
@@ -40,14 +39,14 @@ func PrepareCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
+	client, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to get client")
+		Log(r).WithError(err).Error("failed to get client")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if client == nil {
-		Log(r).WithError(err).Debug("client is not found")
+		Log(r).WithError(err).Error("client is not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}

@@ -41,7 +41,7 @@ func (p *CreatorPDFType) NewContainer(certificates []*helpers.Certificate, googl
 	p.handlerChan <- &Container{
 		Certificates: certificates,
 		ID:           p.lastContainerID,
-		Status:       false,
+		Status:       isProcessingStatus,
 		log:          p.log,
 		config:       p.config,
 		masterQ:      masterQ,
@@ -66,7 +66,7 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 				if err != nil {
 					p.log.Error(err, "failed to run container")
 				}
-				container.Status = true
+				container.Status = readyStatus
 				p.log.Debug("Success: ", container)
 
 				p.readyContainers = append(p.readyContainers, container)
@@ -77,7 +77,7 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 				if err != nil {
 					p.log.Error(err, "failed to run container")
 				}
-				container.Status = true
+				container.Status = readyStatus
 				p.readyContainers = append(p.readyContainers, container)
 			}
 			break

@@ -12,27 +12,27 @@ import (
 func GetTemplates(w http.ResponseWriter, r *http.Request) {
 	userName, err := requests.NewGetTemplateRequest(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to parse request ")
+		Log(r).WithError(err).Error("failed to parse request ")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().GetByName(userName.User)
+	client, err := MasterQ(r).ClientQ().WhereName(userName.User).Get()
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to get client")
+		Log(r).WithError(err).Error("failed to get client")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	if client == nil {
-		Log(r).WithError(err).Debug("client is not found")
+		Log(r).WithError(err).Error("client is not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
 
 	tmps, err := MasterQ(r).TemplateQ().Select(client.ID)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to select templates ")
+		Log(r).WithError(err).Error("failed to select templates ")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

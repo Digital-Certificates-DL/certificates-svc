@@ -19,7 +19,7 @@ type ContainerHandler interface {
 type Container struct {
 	Certificates []*helpers.Certificate
 	ID           int
-	Status       bool
+	Status       string
 	log          *logan.Entry
 	config       config.Config
 	masterQ      data.MasterQ
@@ -81,7 +81,7 @@ func (c *Container) Generate() error {
 		return errors.Wrap(err, "failed to set result on table")
 	}
 
-	c.Status = true
+	c.Status = readyStatus
 	return nil
 }
 
@@ -132,7 +132,7 @@ func (c *Container) Update() error {
 	if errs != nil {
 		return errors.Wrap(err, "failed to set result on table")
 	}
-	c.Status = true
+	c.Status = readyStatus
 
 	return nil
 }

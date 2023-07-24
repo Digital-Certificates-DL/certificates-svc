@@ -7,5 +7,5 @@ package resources
 type ContainerAttributes struct {
 	Certificates []User `json:"certificates"`
 	ContainerId  string `json:"container_id"`
-	Status       bool   `json:"status"`
+	Status       string `json:"status"`
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/google/jsonapi"
 	"gitlab.com/distributed_lab/ape"
 	"gitlab.com/distributed_lab/ape/problems"
-	"gitlab.com/distributed_lab/logan/v3/errors"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/api/requests"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/google"
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
@@ -16,7 +15,7 @@ import (
 func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewPrepareCertificates(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to connect")
+		Log(r).WithError(err).Error("failed to connect")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -25,13 +24,13 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 	googleClient := google.NewGoogleClient(Config(r))
 	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to connect")
+		Log(r).WithError(err).Error("failed to connect")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	if len(link) != 0 {
-		Log(r).WithError(err).Debug("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
 			Detail: "Invalid token",
@@ -42,15 +41,15 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
+	client, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
 	Log(r).Debug("user ", client)
 	if err != nil {
-		Log(r).Error(errors.Wrap(err, "failed to get user"))
+		Log(r).WithError(err).Error("failed to get user")
 		ape.Render(w, problems.InternalError())
 		return
 	}
 	if client == nil {
-		Log(r).WithError(err).Debug("user is not found")
+		Log(r).WithError(err).Error("user is not found")
 		ape.Render(w, problems.NotFound())
 		return
 	}
@@ -59,13 +58,13 @@ func UpdateCertificate(w http.ResponseWriter, r *http.Request) {
 		if certificate.Certificate != "" {
 			file, err := googleClient.Download(certificate.Certificate)
 			if err != nil {
-				Log(r).WithError(err).Debug("failed to download file ")
+				Log(r).WithError(err).Error("failed to download file ")
 				ape.Render(w, problems.BadRequest(err))
 				return
 			}
 			img, err := pdf.NewImageConverter().Convert(file)
 			if err != nil {
-				Log(r).WithError(err).Debug("failed to convert")
+				Log(r).WithError(err).Error("failed to convert")
 				ape.Render(w, problems.BadRequest(err))
 				return
 			}

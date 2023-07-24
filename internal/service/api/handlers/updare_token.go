@@ -11,20 +11,20 @@ import (
 func UpdateToken(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewUpdateTokenRequest(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to parse request")
+		Log(r).WithError(err).Error("failed to parse request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	userInfo, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
+	userInfo, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to get user")
+		Log(r).WithError(err).Error("failed to get user")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 
 	if userInfo == nil {
-		Log(r).WithError(err).Debug("user is not found")
+		Log(r).WithError(err).Error("user is not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -32,9 +32,9 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 	userInfo.Token = nil
 	userInfo.Code = req.Data.Attributes.Code
 
-	err = MasterQ(r).ClientQ().Update(userInfo)
+	err = MasterQ(r).ClientQ().WhereID(userInfo.ID).Update(userInfo)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to update user")
+		Log(r).WithError(err).Error("failed to update user")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -49,7 +49,7 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to connect to google")
+		Log(r).WithError(err).Error("failed to connect to google")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}

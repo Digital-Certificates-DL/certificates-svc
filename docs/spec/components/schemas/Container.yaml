@@ -18,8 +18,13 @@ allOf:
           certificates:
             type: array
             items:
+              type: object
               $ref: '#/components/schemas/User'
           status:
-            type: boolean
-            example: false
+            type: string
+            enum:
+              - "is_processing"
+              - "ready"
+              - "not_found"
+
 

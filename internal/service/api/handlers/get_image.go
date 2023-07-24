@@ -13,7 +13,7 @@ import (
 func GetImages(w http.ResponseWriter, r *http.Request) {
 	request, err := requests.NewPrepareCertificates(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to parse request ")
+		Log(r).WithError(err).Error("failed to parse request ")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
@@ -23,7 +23,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 
 	link, err := googleClient.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), request.Data.Attributes.Name)
 	if len(link) != 0 {
-		Log(r).WithError(err).Debug("failed to authorize")
+		Log(r).WithError(err).Error("failed to authorize")
 		ape.RenderErr(w, []*jsonapi.ErrorObject{{
 			Title:  "Forbidden",
 			Detail: "Invalid token",
@@ -35,7 +35,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to connect")
+		Log(r).WithError(err).Error("failed to connect")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -44,13 +44,13 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		if certificate.Certificate != "" {
 			file, err := googleClient.Download(certificate.Certificate)
 			if err != nil {
-				Log(r).WithError(err).Debug("failed to download  file")
+				Log(r).WithError(err).Error("failed to download  file")
 				ape.RenderErr(w, problems.InternalError())
 				return
 			}
 			img, err := pdf.NewImageConverter().Convert(file)
 			if err != nil {
-				Log(r).WithError(err).Debug("failed to convert")
+				Log(r).WithError(err).Error("failed to convert")
 				ape.RenderErr(w, problems.InternalError())
 				return
 			}

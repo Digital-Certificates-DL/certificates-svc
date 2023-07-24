@@ -1,5 +1,10 @@
 package pdf
 
+const (
+	readyStatus        = ""
+	isProcessingStatus = ""
+)
+
 type PDF struct {
 	High         float64 `json:"high"`
 	Width        float64 `json:"width"`

@@ -12,14 +12,14 @@ import (
 func SetSettings(w http.ResponseWriter, r *http.Request) {
 	req, err := requests.NewSetSettings(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to parse request")
+		Log(r).WithError(err).Error("failed to parse request")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
-	settings, err := MasterQ(r).ClientQ().GetByName(req.Data.Attributes.Name)
+	settings, err := MasterQ(r).ClientQ().WhereName(req.Data.Attributes.Name).Get()
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to get settings")
+		Log(r).WithError(err).Error("failed to get settings")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -29,7 +29,7 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 			Code: req.Data.Attributes.Code,
 		}
 		if err = MasterQ(r).ClientQ().Insert(&user); err != nil {
-			Log(r).WithError(err).Debug("failed to get settings")
+			Log(r).WithError(err).Error("failed to get settings")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -37,9 +37,9 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	settings.Code = req.Data.Attributes.Code
-	err = MasterQ(r).ClientQ().Update(settings)
+	err = MasterQ(r).ClientQ().WhereID(settings.ID).Update(settings)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to update settings")
+		Log(r).WithError(err).Error("failed to update settings")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
@@ -47,7 +47,7 @@ func SetSettings(w http.ResponseWriter, r *http.Request) {
 		client := google.NewGoogleClient(Config(r))
 		_, err = client.Connect(Config(r).Google().SecretPath, MasterQ(r).ClientQ(), req.Data.Attributes.Name)
 		if err != nil {
-			Log(r).WithError(err).Debug("failed to connect")
+			Log(r).WithError(err).Error("failed to connect")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}

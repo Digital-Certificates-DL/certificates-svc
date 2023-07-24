@@ -44,7 +44,7 @@ func NewGoogleClientTest(prefixPath string) *Google {
 }
 
 func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name string) (*http.Client, string, error) {
-	client, err := clientQ.GetByName(name)
+	client, err := clientQ.WhereName(name).Get()
 	if err != nil {
 		return nil, "", errors.Wrap(err, "failed to get client")
 	}
@@ -68,7 +68,7 @@ func (g *Google) getClient(config *oauth2.Config, clientQ data.ClientQ, name str
 		}
 
 		client.Token = bf.Bytes()
-		if err = clientQ.Update(client); err != nil {
+		if err = clientQ.WhereID(client.ID).Update(client); err != nil {
 			return nil, "", errors.Wrap(err, "failed to update")
 		}
 	} else {
@@ -94,35 +94,6 @@ func (g *Google) getTokenFromWeb(config *oauth2.Config, code string) (*oauth2.To
 		return nil, "", errors.New("failed to generate token")
 	}
 	return tok, "", nil
-}
-
-// Retrieves a token from a local file.
-func (g *Google) tokenFromFile(file string) (*oauth2.Token, error) {
-	f, err := os.Open("token.json")
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to open token's file")
-	}
-	defer f.Close()
-
-	tok := &oauth2.Token{}
-	if err = json.NewDecoder(f).Decode(tok); err != nil {
-		return nil, errors.Wrap(err, "Failed to parse file")
-	}
-	return tok, nil
-
-}
-
-func (g *Google) saveToken(path string, token *oauth2.Token) error {
-	f, err := os.OpenFile("token.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		return errors.Wrap(err, "Unable to cache oauth token")
-	}
-
-	defer f.Close()
-	if err = json.NewEncoder(f).Encode(token); err != nil {
-		return errors.Wrap(err, "failed to  encode token")
-	}
-	return nil
 }
 
 func (g *Google) Connect(path string, clientQ data.ClientQ, name string) (string, error) {
@@ -158,13 +129,4 @@ func (g *Google) Connect(path string, clientQ data.ClientQ, name string) (string
 	}
 
 	return "", nil
-}
-
-func (g *Google) ConnectSheetByKey(apiKey string) (*sheets.Service, error) {
-	sheetsService, err := sheets.NewService(context.Background(), option.WithAPIKey(apiKey))
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect")
-	}
-
-	return sheetsService, nil
 }

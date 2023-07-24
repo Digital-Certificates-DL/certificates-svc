@@ -15,19 +15,19 @@ import (
 func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	template, backgroundImg, req, err := requests.NewGenerateTemplate(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to generate template")
+		Log(r).WithError(err).Error("failed to generate template")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 	defaultData := pdf.DefaultData
-	client, err := MasterQ(r).ClientQ().GetByName(req.Data.Relationships.User)
+	client, err := MasterQ(r).ClientQ().WhereName(req.Data.Relationships.User).Get()
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to get client")
+		Log(r).WithError(err).Error("failed to get client")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if client == nil {
-		Log(r).WithError(err).Debug("client is not found")
+		Log(r).WithError(err).Error("client is not found")
 		ape.RenderErr(w, problems.NotFound())
 		return
 	}
@@ -36,7 +36,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		tp := pdf.DefaultTemplateTall
 		_, _, imgBytes, err := tp.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID, StaticConfiger(r).Location)
 		if err != nil {
-			Log(r).WithError(err).Debug("failed to prepare pdf")
+			Log(r).WithError(err).Error("failed to prepare pdf")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -57,14 +57,14 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 	file.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
 	_, _, imgBytes, err := template.Prepare(defaultData, pdf.NewPDFConfig(Config(r)), MasterQ(r), backgroundImg, client.ID, StaticConfiger(r).Location)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to prepare pdf")
+		Log(r).WithError(err).Error("failed to prepare pdf")
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
 	if req.Data.Attributes.IsCompleted {
 		templateBytes, err := json.Marshal(template)
 		if err != nil {
-			Log(r).WithError(err).Debug("failed to marshal")
+			Log(r).WithError(err).Error("failed to marshal")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}
@@ -76,7 +76,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 			UserID: client.ID,
 		})
 		if err != nil {
-			Log(r).WithError(err).Debug("failed to insert template")
+			Log(r).WithError(err).Error("failed to insert template")
 			ape.RenderErr(w, problems.InternalError())
 			return
 		}

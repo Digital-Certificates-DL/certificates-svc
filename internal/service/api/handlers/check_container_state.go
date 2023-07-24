@@ -13,14 +13,14 @@ import (
 func CheckContainerState(w http.ResponseWriter, r *http.Request) {
 	containerID, err := requests.NewCheckContainerState(r)
 	if err != nil {
-		Log(r).WithError(err).Debug("failed to generate template")
+		Log(r).WithError(err).Error("failed to generate template")
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
 
 	container := PdfCreator(r).CheckContainerState(containerID)
 	if container == nil {
-		Log(r).WithError(err).Debug("user not found")
+		Log(r).WithError(err).Error("user not found")
 		w.WriteHeader(http.StatusProcessing)
 		return
 	}
@@ -29,7 +29,7 @@ func CheckContainerState(w http.ResponseWriter, r *http.Request) {
 	ape.Render(w, newUserWithImgResponse(container.Certificates, container.ID, container.Status))
 }
 
-func newUserWithImgResponse(users []*helpers.Certificate, id int, status bool) resources.ContainerResponse {
+func newUserWithImgResponse(users []*helpers.Certificate, id int, status string) resources.ContainerResponse {
 	usersData := make([]resources.User, 0)
 	for _, user := range users {
 		resp := resources.User{
