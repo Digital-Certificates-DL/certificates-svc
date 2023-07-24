@@ -23,7 +23,7 @@ func NewClientQ(db *pgdb.DB) data.ClientQ {
 	return &ClientQ{
 		db:  db,
 		sql: sq.Select("b.*").From(fmt.Sprintf("%s as b", clientTableName)),
-		upd: sq.Update("b.*"),
+		upd: sq.Update(clientTableName),
 	}
 }
 
@@ -46,6 +46,7 @@ func (q *ClientQ) Get() (*data.Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get client")
 	}
+
 	return &result, nil
 }
 
@@ -54,6 +55,7 @@ func (q *ClientQ) Update(client *data.Client) error {
 	if err := q.db.Exec(q.upd.SetMap(clauses)); err != nil {
 		return errors.Wrap(err, "failed to update client")
 	}
+
 	return nil
 }
 
@@ -71,16 +73,19 @@ func (q *ClientQ) Insert(value *data.Client) error {
 func (q *ClientQ) FilterByID(id int64) data.ClientQ {
 	q.sql = q.sql.Where(sq.Eq{idField: id})
 	q.upd = q.upd.Where(sq.Eq{idField: id})
+
 	return q
 }
 
 func (q *ClientQ) FilterByName(name string) data.ClientQ {
 	q.sql = q.sql.Where(sq.Eq{nameField: name})
 	q.upd = q.upd.Where(sq.Eq{nameField: name})
+
 	return q
 }
 
 func (q *ClientQ) Page(pageParams pgdb.OffsetPageParams) data.ClientQ {
-	q.sql = pageParams.ApplyTo(q.sql, "id")
+	q.sql = pageParams.ApplyTo(q.sql, idField)
+
 	return q
 }

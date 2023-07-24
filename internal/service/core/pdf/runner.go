@@ -59,7 +59,13 @@ func (p *CreatorPDFType) Run(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case container := <-p.handlerChan:
+
+		case container, ok := <-p.handlerChan:
+			if !ok {
+				ctx.Done()
+				return
+			}
+
 			switch container.process {
 			case Generate:
 				err := container.Generate()

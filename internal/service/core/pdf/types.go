@@ -1,8 +1,8 @@
 package pdf
 
 const (
-	readyStatus        = ""
-	isProcessingStatus = ""
+	readyStatus        = "ready_status"
+	isProcessingStatus = "processing"
 )
 
 type PDF struct {

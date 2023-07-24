@@ -248,10 +248,11 @@ func (p *PDF) initBackground(pdf *gopdf.GoPdf, templateQ data.TemplateQ, templat
 		if err = p.setBackgroundFromFile(pdf, abs, templateImg); err != nil {
 			return errors.Wrap(err, "failed to set back  from file")
 		}
-	}
-	if err = p.setBackgroundFromTemplate(pdf, template.ImgBytes); err != nil {
-		return errors.Wrap(err, "failed to set back from template")
+	} else {
+		if err = p.setBackgroundFromTemplate(pdf, template.ImgBytes); err != nil {
+			return errors.Wrap(err, "failed to set back from template")
 
+		}
 	}
 
 	return nil
