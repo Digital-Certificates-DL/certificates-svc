@@ -54,6 +54,11 @@ func (p *PrepareCertificates) PrepareCertificates() []*helpers.Certificate {
 
 func (p *PrepareCertificates) parse() string {
 	id := strings.Replace(p.Data.Attributes.Url, "https://docs.google.com/spreadsheets/d/", "", 1)
-	id = strings.Replace(id, "/", "", 1)
+
+	index := strings.Index(id, "/")
+	if index != -1 {
+		id = id[:index]
+	}
+
 	return id
 }

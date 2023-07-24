@@ -31,7 +31,11 @@ func NewGetUsers(r *http.Request) (ParseUsers, error) {
 
 func (g *ParseUsers) parse() string {
 	id := strings.Replace(g.Data.Attributes.Url, "https://docs.google.com/spreadsheets/d/", "", 1)
-	id = strings.Replace(id, "/", "", 1)
+
+	index := strings.Index(id, "/")
+	if index != -1 {
+		id = id[:index]
+	}
 
 	return id
 }
