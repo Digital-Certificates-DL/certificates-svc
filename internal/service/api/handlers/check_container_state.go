@@ -47,6 +47,7 @@ func newUserWithImgResponse(users []*helpers.Certificate, id int, status string)
 				Points:             user.Points,
 				Note:               user.Note,
 				Signature:          user.Signature,
+				Msg:                user.Msg,
 			},
 		}
 		usersData = append(usersData, resp)
