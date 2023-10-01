@@ -1,12 +1,11 @@
 package cli
 
 import (
-	"fmt"
 	"github.com/alecthomas/kingpin"
 	"gitlab.com/distributed_lab/kit/kv"
 	"gitlab.com/distributed_lab/logan/v3"
 	"gitlab.com/tokend/course-certificates/ccp/internal/config"
-	"gitlab.com/tokend/course-certificates/ccp/internal/service"
+	"gitlab.com/tokend/course-certificates/ccp/internal/service/api"
 )
 
 func Run(args []string) bool {
@@ -38,11 +37,9 @@ func Run(args []string) bool {
 		return false
 	}
 
-	fmt.Println(serviceCmd.FullCommand())
-
 	switch cmd {
 	case serviceCmd.FullCommand():
-		service.Run(cfg)
+		api.Run(cfg)
 	case migrateUpCmd.FullCommand():
 		err = MigrateUp(cfg)
 	case migrateDownCmd.FullCommand():

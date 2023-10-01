@@ -21,6 +21,8 @@ type Config interface {
 	NetworksConfiger
 	ExamsConfiger
 	pgdb.Databaser
+	SbtConfiger
+	StaticConfiger
 }
 
 type config struct {
@@ -37,11 +39,14 @@ type config struct {
 	NetworksConfiger
 	getter kv.Getter
 	comfig.Listenerer
+	SbtConfiger
+	StaticConfiger
 }
 
 func New(getter kv.Getter) Config {
 	return &config{
 		getter:            getter,
+		StaticConfiger:    NewStaticConfiger(getter),
 		ExamsConfiger:     NewExamsConfiger(getter),
 		TitlesConfiger:    NewTitlesConfiger(getter),
 		Listenerer:        comfig.NewListenerer(getter),
@@ -54,5 +59,6 @@ func New(getter kv.Getter) Config {
 		NetworksConfiger:  NewEthRPCConfiger(getter),
 		Databaser:         pgdb.NewDatabaser(getter),
 		Logger:            comfig.NewLogger(getter, comfig.LoggerOpts{}),
+		SbtConfiger:       NewSbtConfiger(getter),
 	}
 }

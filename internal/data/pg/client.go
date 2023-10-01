@@ -5,83 +5,87 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/fatih/structs"
+	"github.com/pkg/errors"
 	"gitlab.com/distributed_lab/kit/pgdb"
 	"gitlab.com/tokend/course-certificates/ccp/internal/data"
-	"sync"
 )
 
 const clientTableName = "users"
 
+const (
+	idField    = "id"
+	nameField  = "name"
+	tokenField = "token"
+	codeField  = "code"
+)
+
 func NewClientQ(db *pgdb.DB) data.ClientQ {
 	return &ClientQ{
-		db:  db.Clone(),
+		db:  db,
 		sql: sq.Select("b.*").From(fmt.Sprintf("%s as b", clientTableName)),
+		upd: sq.Update(clientTableName),
 	}
 }
 
 type ClientQ struct {
-	mx  sync.Mutex
 	db  *pgdb.DB
 	sql sq.SelectBuilder
+	upd sq.UpdateBuilder
 }
 
 func (q *ClientQ) New() data.ClientQ {
-	q.mx.Lock()
-	defer q.mx.Unlock()
-	return NewClientQ(q.db)
+	return NewClientQ(q.db.Clone())
 }
 
 func (q *ClientQ) Get() (*data.Client, error) {
-	q.mx.Lock()
-	defer q.mx.Unlock()
 	var result data.Client
 	err := q.db.Get(&result, q.sql)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return &result, err
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get client")
+	}
+
+	return &result, nil
 }
 
 func (q *ClientQ) Update(client *data.Client) error {
 	clauses := structs.Map(client)
-	stmt := sq.Update(clientTableName).SetMap(clauses).Where(sq.Eq{"id": client.ID})
-	err := q.db.Exec(stmt)
+	if err := q.db.Exec(q.upd.SetMap(clauses)); err != nil {
+		return errors.Wrap(err, "failed to update client")
+	}
 
-	return err
+	return nil
 }
 
-func (q *ClientQ) Insert(value *data.Client) (int64, error) {
+func (q *ClientQ) Insert(value *data.Client) error {
 	clauses := structs.Map(value)
 	var id int64
 
-	stmt := sq.Insert(clientTableName).SetMap(clauses).Suffix("returning id")
-	err := q.db.Get(&id, stmt)
+	if err := q.db.Get(&id, sq.Insert(clientTableName).SetMap(clauses).Suffix("returning id")); err != nil {
+		return errors.Wrap(err, "failed to insert client")
+	}
 
-	return id, err
+	return nil
 }
 
-func (q *ClientQ) GetByID(id string) (*data.Client, error) {
+func (q *ClientQ) FilterByID(id int64) data.ClientQ {
+	q.sql = q.sql.Where(sq.Eq{idField: id})
+	q.upd = q.upd.Where(sq.Eq{idField: id})
 
-	var result data.Client
-	err := q.db.Get(&result, sq.Select("*").From(clientTableName).Where(sq.Eq{"id": id}))
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-	return &result, err
+	return q
 }
 
-func (q *ClientQ) GetByName(name string) (*data.Client, error) {
-	var result data.Client
-	err := q.db.Get(&result, sq.Select("*").From(clientTableName).Where(sq.Eq{"name": name}))
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-	return &result, err
+func (q *ClientQ) FilterByName(name string) data.ClientQ {
+	q.sql = q.sql.Where(sq.Eq{nameField: name})
+	q.upd = q.upd.Where(sq.Eq{nameField: name})
+
+	return q
 }
 
 func (q *ClientQ) Page(pageParams pgdb.OffsetPageParams) data.ClientQ {
-	q.mx.Lock()
-	defer q.mx.Unlock()
-	q.sql = pageParams.ApplyTo(q.sql, "id")
+	q.sql = pageParams.ApplyTo(q.sql, idField)
+
 	return q
 }

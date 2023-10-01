@@ -3,12 +3,12 @@ package data
 type TemplateQ interface {
 	New() TemplateQ
 	Get() (*Template, error)
-	Insert(data *Template) (int64, error)
-	GetByUserID(hash string) (*Template, error)
-	GetByName(name string, userID int64) (*Template, error)
+	Insert(data *Template) error
 	Update(data *Template) error
-	Select(id int64) ([]Template, error)
+	Select() ([]Template, error)
 	FilterByUser(ids int64) TemplateQ
+	FilterByName(name string) TemplateQ
+	FilterByID(ids int64) TemplateQ
 }
 
 type Template struct {
