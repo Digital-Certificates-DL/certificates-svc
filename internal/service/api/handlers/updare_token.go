@@ -44,7 +44,7 @@ func UpdateToken(w http.ResponseWriter, r *http.Request) {
 
 	if len(link) != 0 {
 		ape.Render(w, newLinkResponse(link))
-		w.WriteHeader(204)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 

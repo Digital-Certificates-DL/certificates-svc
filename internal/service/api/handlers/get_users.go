@@ -55,7 +55,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, errs := client.ParseFromWeb(req.Data.Attributes.Url, "A1:K")
 	if errs != nil {
 		if strings.Contains(errs[0].Error(), "400") {
-			Log(r).WithError(err).Error("token expired")
+			Log(r).WithError(err).Error("token expired or revoked")
 			ape.RenderErr(w, problems.Unauthorized())
 			return
 		}
