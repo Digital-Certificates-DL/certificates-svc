@@ -3,37 +3,31 @@ log:
   level: info
 
 db:
-  url: postgres://postgres:password@localhost:5432/ccp?sslmode=disable
+  url:
 
 listener:
   addr: :8000
 
 signature:
-  key: "5HtbQzoofDVmEvzAMd89iq5nRpFUm8xudgkSNZ4rPN9z5AWcGEJ"
+  key: ""
 
 networks:
-  rpc_eth: "https://goerli.infura.io/v3/45efc27205e746adb3a1d6c3da69a7ba"
+  rpc_eth: ""
   ipfs: "https://ipfs.infura.io:5001"
-  ipfs_pr_id: "2LgGs3QZ5Ndz065ZVu4xoSTWzcU"
-  ipfs_pr_key: "4afcd5182cb6e849fa72726d44f77186"
+  ipfs_pr_id: ""
+  ipfs_pr_key: ""
+
+sbt:
+  external_url: "https://dlt-academy.com/certificates"
 
 google:
   secret_path: "./client.json"
   qr_path: "qr"
   pdf_path: "pdf"
   api_key: ""
-#  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
   code: ""
   enable: true
-#
-#google:
-#  secret_path: "./client.json"
-#  qr_path: "qr"
-#  pdf_path: "pdf"
-#  api_key: ""
-##  api_key: "AIzaSyB5JPdmDD-BCyOs7WpQaXqz_wiZJ-VMQ"
-#  code: "4/0AVHEtk6nkskIwm0pcZEhcrOpoXZG14GYeuoeQ4akl5HOHJLcuwpDRryMZydgBekmjzgElg"
-#  enable: true
+
 
 tables:
   result: "test.xlsx"
@@ -76,10 +70,11 @@ exams:
     "graduated with honors": "Exam passed with honors"
     "Listener only": "Listener only. Exam not passed"
 
+
+
 cop:
   disabled: true
   endpoint: "http://..."
   upstream: "http://..."
-  service_name: css
+  service_name: ccp
   service_port: 80
-

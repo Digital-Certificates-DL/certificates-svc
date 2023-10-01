@@ -15,10 +15,11 @@ type NetworksConfiger interface {
 }
 
 type NetworksConfig struct {
-	RPCEthEndpoint *ethclient.Client `fig:"rpc_eth"`
-	IPFSEndpoint   string            `fig:"ipfs"`
-	IpfsPrId       string            `fig:"ipfs_pr_id"`
-	IpfsPrKey      string            `fig:"ipfs_pr_key"`
+	RPCEthEndpoint       *ethclient.Client `fig:"rpc_eth"`
+	IpfsEndpoint         string            `fig:"ipfs"`
+	IpfsPrId             string            `fig:"ipfs_pr_id"`
+	IpfsPrKey            string            `fig:"ipfs_pr_key"`
+	IpfsDisplayFileDomen string            `fig:"ipfs_file_display_domen"`
 }
 
 func NewEthRPCConfiger(getter kv.Getter) NetworksConfiger {

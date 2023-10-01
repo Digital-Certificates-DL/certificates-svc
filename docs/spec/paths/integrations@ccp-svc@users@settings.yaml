@@ -1,0 +1,35 @@
+post:
+  tags:
+    - Set user's setting
+  summary: users_setting
+  operationId: setting
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              $ref: '#/components/schemas/Settings'
+  responses:
+    '204':
+      description: Success
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  $ref: "#/components/responses/BadRequest"
+    '500':
+      $ref: "#/components/responses/InternalError"
+

@@ -1,0 +1,78 @@
+type: object
+required:
+   - date
+   - courseTitle
+   - points
+   - participant
+   - serialNumber
+   - note
+   - certificate
+   - dataHash
+   - txHash
+   - signature
+   - digitalCertificate
+   - id
+   - msg
+   - certificateImg
+   - shortCourse
+properties:
+  date:
+    type: string
+    format: string
+    example: "02.12.2022"
+  courseTitle:
+    type: string
+    format: string
+    example: "Title of course"
+  points:
+    type: string
+    format: string
+    example: "99"
+  participant:
+    type: string
+    format: string
+    example: "99"
+  serialNumber:
+    type: string
+    format: string
+    example: "17e1da2fa97f8196b4d8"
+  note:
+    type: string
+    format: string
+    example: "12sffacd4....."
+  certificate:
+    type: string
+    format: string
+    example: "drive.google.com/file/d/1QXRYX9OeT_TTFm0ya1RaXTVTxaMC7YnL/view"
+  dataHash:
+    type: string
+    format: string
+    example: "f4f3a35acd60078b21382bd0899ce076587247eb26ba29da8c30902f292189ba"
+  txHash:
+    type: string
+    format: string
+    example: "17e1da2fa97f8196b4d8fb39a26ff4d61537688ac03a53e3807a9652b5e6535e"
+  signature:
+    type: string
+    format: string
+    example: "HK9olLqTss5lGvQX2CoqjTIs+zqLJciCvxH3rqrAPh9FSY0uNz/z1h4LInqtQ+EDYmhvBx4+IjhbvY7BMf2ODNI="
+  digitalCertificate:
+    type: string
+    format: string
+    example: "drive.google.com/file/d/1QXRYX9OeT_TTFm0ya1RaXTVTxaMC7YnL/view"
+  id:
+    type: number
+    format: int64
+    example: 1
+  msg:
+    type: string
+    format: string
+    example: "11.04.2023 Ruslan Ovsiienko Basic theory about decentralized finance"
+  shortCourse:
+    type: string
+    format: string
+    example: "blockchain"
+  certificateImg:
+    type: array
+    items:
+      type: byte

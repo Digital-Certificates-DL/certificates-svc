@@ -1,0 +1,42 @@
+FROM golang:1.19-alpine as buildbase
+# Ignore APT warnings about not having a TTY
+# Copy source code
+# install build essentials
+# Update and install required packages
+RUN apk update && apk add --no-cache \
+    wget \
+    build-base \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    tiff-dev \
+    giflib-dev \
+    libx11-dev \
+    linux-headers \
+    ghostscript
+
+#ENV IMAGEMAGICK_VERSION=7.1.1-11
+#
+## Install ImageMagick
+#RUN cd && \
+#    wget https://github.com/ImageMagick/ImageMagick/archive/${IMAGEMAGICK_VERSION}.tar.gz && \
+#    tar xvzf ${IMAGEMAGICK_VERSION}.tar.gz && \
+#    cd ImageMagick* && \
+#    ./configure \
+#        --without-magick-plus-plus \
+#        --without-perl \
+#        --disable-openmp \
+#        --with-gvc=no \
+#        --disable-docs && \
+#    make -j$(nproc) && make install \
+#
+
+# Build the Go application
+WORKDIR /go/src/github.com/Digital-Certificates-DL/certificates-svc
+COPY . .
+
+RUN go install
+RUN go build -o /usr/local/bin /go/src/github.com/Digital-Certificates-DL/certificates-svc
+
+
+
+ENTRYPOINT ["/usr/local/bin/ccp"]

@@ -1,0 +1,32 @@
+allOf:
+  - $ref: '#/components/schemas/PrepareCertificatesKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - url
+          - name
+          - address
+          - certificates_data
+        properties:
+          name:
+            type: string
+            example: "DL"
+          url:
+            type: string
+            example: "ipfs://..."
+          address:
+            type: string
+            example: "0xa0f254..."
+          certificates_data:
+            type: array
+            items:
+              anyOf:
+                - $ref: '#/components/schemas/UserBlob'
+                  description: "user"
+
+
+

@@ -1,12 +1,20 @@
-type: object
-required:
-  - name
-  - code
-properties:
-  name:
-    type: string
-    example: ""
-  code:
-    type: string
-    example: ""
+allOf:
+  - $ref: '#/components/schemas/SettingsKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - name
+          - code
+        properties:
+          name:
+            type: string
+            example: ""
+          code:
+            type: string
+            example: ""
 

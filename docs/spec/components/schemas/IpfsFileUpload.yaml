@@ -1,0 +1,27 @@
+allOf:
+  - $ref: '#/components/schemas/IpfsFileUploadKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - img
+          - description
+          - name
+        properties:
+          name:
+            type: string
+            format: string
+            example: "Name"
+          img:
+            type: array
+            items:
+              type: byte
+          description:
+            type: string
+            format: string
+            example: "Some description"
+
