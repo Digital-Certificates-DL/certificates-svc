@@ -53,9 +53,14 @@ func (c *Container) Generate() error {
 		files = append(files, google.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
 		pdf := PDF{}
-		certificate := pdf.SetTemplateData(DefaultTemplateTall)
+		certificateTemplate, err := pdf.InitTemplate(c.masterQ, user.CourseTitle, c.owner.ID)
+		if err != nil {
+			return errors.Wrap(err, "failed to get template")
+		}
 
-		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
+		certificate := pdf.SetTemplateData(*certificateTemplate)
+
+		pdfData := NewData(user.Participant, user.CourseTitle, certificateTemplate.Credits.Text, user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, NewPDFConfig(c.config), c.masterQ, nil, c.owner.ID, c.config.StaticConfig().Location)
 		if err != nil {
 			return errors.Wrap(err, "failed to create pdf")
@@ -105,9 +110,14 @@ func (c *Container) Update() error {
 		files = append(files, google.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
 		pdf := PDF{}
-		certificate := pdf.SetTemplateData(DefaultTemplateTall)
+		certificateTemplate, err := pdf.InitTemplate(c.masterQ, user.CourseTitle, c.owner.ID)
+		if err != nil {
+			return errors.Wrap(err, "failed to get template")
+		}
 
-		pdfData := NewData(user.Participant, user.CourseTitle, "45 hours / 1.5 ECTS Credit", user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
+		certificate := pdf.SetTemplateData(*certificateTemplate)
+
+		pdfData := NewData(user.Participant, user.CourseTitle, certificateTemplate.Credits.Text, user.Points, user.SerialNumber, user.Date, img, user.Note, "", "")
 		fileBytes, name, certificateImg, err := certificate.Prepare(pdfData, NewPDFConfig(c.config), c.masterQ, nil, c.owner.ID, c.config.StaticConfig().Location)
 		if err != nil {
 			return errors.Wrap(err, "failed to create pdf")

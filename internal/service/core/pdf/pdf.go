@@ -2,6 +2,7 @@ package pdf
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/signintech/gopdf"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -14,7 +15,7 @@ import (
 
 func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64, abs string) ([]byte, string, []byte, error) {
 	pdf := new(gopdf.GoPdf)
-	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
+	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.Height}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
 
@@ -24,6 +25,9 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 
 	templateImg := config.templates[data.Course]
 
+	if templateImg == "" {
+		templateImg = data.Course
+	}
 	if backgroundImg == nil {
 		if err := p.initBackground(pdf, masterQ.TemplateQ(), templateImg, abs, userID); err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to init background")
@@ -94,7 +98,7 @@ func (p *PDF) setBackground(pdf *gopdf.GoPdf, image []byte) error {
 		return errors.Wrap(err, "failed to prepare background")
 	}
 
-	err = pdf.ImageByHolder(backgroundImgHolder, 0, 0, &gopdf.Rect{W: p.Width, H: p.High})
+	err = pdf.ImageByHolder(backgroundImgHolder, 0, 0, &gopdf.Rect{W: p.Width, H: p.Height})
 	if err != nil {
 		return errors.Wrap(err, "failed to set background")
 	}
@@ -121,7 +125,7 @@ func (p *PDF) setLevel(pdf *gopdf.GoPdf, level string) error {
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Level.Y)
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, level, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, level, gopdf.CellOption{Align: gopdf.Center}); err != nil {
 		return errors.Wrap(err, "failed to cell Level")
 	}
 
@@ -135,7 +139,7 @@ func (p *PDF) setExam(pdf *gopdf.GoPdf, exam string) error {
 	pdf.SetX(0)
 	pdf.SetY(p.Exam.Y)
 
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, exam, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, exam, gopdf.CellOption{Align: gopdf.Center}); err != nil {
 		return errors.Wrap(err, "failed to cell Exam")
 	}
 
@@ -148,7 +152,7 @@ func (p *PDF) setQR(pdf *gopdf.GoPdf, qr []byte) error {
 		return errors.Wrap(err, "failed to convert bytes to image QR")
 	}
 
-	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.High, H: p.QR.High})
+	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.Width, H: p.QR.Height})
 	if err != nil {
 		return errors.Wrap(err, "failed to set image QR")
 	}
@@ -156,14 +160,17 @@ func (p *PDF) setQR(pdf *gopdf.GoPdf, qr []byte) error {
 	return nil
 }
 
-func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string) error {
+func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string, templateImg string) error {
 	if err := pdf.SetFont("italic", "", p.Course.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Course")
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Course.Y)
+	if courseTitle == "" {
+		courseTitle = templateImg
+	}
 
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, courseTitle, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, courseTitle, gopdf.CellOption{Align: gopdf.Center}); err != nil {
 		return errors.Wrap(err, "failed to cell Course")
 	}
 
@@ -192,7 +199,7 @@ func (p *PDF) setPoints(pdf *gopdf.GoPdf, points string) error {
 	}
 	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
-	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", points)); err != nil {
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, fmt.Sprintf("Count of points: %s", points)); err != nil {
 		return errors.Wrap(err, "failed to cell points")
 	}
 
@@ -219,7 +226,7 @@ func (p *PDF) setCredits(pdf *gopdf.GoPdf, credits string) error {
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
 
-	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(credits)); err != nil {
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, fmt.Sprintf(credits)); err != nil {
 		return errors.Wrap(err, "failed to cell credits")
 	}
 
@@ -232,7 +239,7 @@ func (p *PDF) setName(pdf *gopdf.GoPdf, name string) error {
 	}
 	pdf.SetY(p.Name.Y)
 	pdf.SetX(0)
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, name, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, name, gopdf.CellOption{Align: gopdf.Center}); err != nil {
 		return errors.Wrap(err, "failed to cell name")
 	}
 
@@ -268,7 +275,7 @@ func (p *PDF) prepareName(name, course string) string {
 }
 
 func (p *PDF) SetTemplateData(template PDF) *PDF {
-	certificate := NewPDF(template.High, template.Width)
+	certificate := NewPDF(template.Height, template.Width)
 	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font)
 	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font)
 	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font)
@@ -277,9 +284,37 @@ func (p *PDF) SetTemplateData(template PDF) *PDF {
 	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font)
 	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
 	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
-	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
+	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.Height, template.QR.Width)
 
 	return certificate
+}
+
+func (p *PDF) InitTemplate(masterQ data.MasterQ, templateName string, userID int64) (*PDF, error) {
+	template, err := masterQ.TemplateQ().FilterByName(templateName).FilterByUser(userID).Get()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get template data")
+	}
+	if template.Template == nil {
+		return &DefaultTemplateTall, nil
+	}
+
+	pdf, err := p.templateDecoder(template.Template)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode template")
+	}
+
+	return pdf, nil
+
+}
+
+func (p *PDF) templateDecoder(templateBytes []byte) (*PDF, error) {
+	pdf := new(PDF)
+	err := json.Unmarshal(templateBytes, pdf)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode template")
+	}
+
+	return pdf, nil
 }
 
 func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig, templateImg string) error {
@@ -304,7 +339,7 @@ func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig
 	}
 
 	isLevel, title, level := p.checkLevel(config.titles[templateImg])
-	if err := p.setCourse(pdf, title); err != nil {
+	if err := p.setCourse(pdf, title, templateImg); err != nil {
 		return errors.Wrap(err, "failed to set course")
 	}
 

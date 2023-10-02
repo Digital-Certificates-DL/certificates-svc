@@ -2,8 +2,8 @@ package pdf
 
 func NewPDF(high, width float64) *PDF {
 	return &PDF{
-		High:  high,
-		Width: width,
+		Height: high,
+		Width:  width,
 	}
 }
 
@@ -102,7 +102,7 @@ func (p *PDF) SetQR(x, y float64, size int, high, width float64) {
 		X:        x,
 		Y:        y,
 		FontSize: size,
-		High:     high,
+		Height:   high,
 		Width:    width,
 	}
 

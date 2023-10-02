@@ -6,7 +6,7 @@ const (
 )
 
 type PDF struct {
-	High         float64 `json:"high"`
+	Height       float64 `json:"height"`
 	Width        float64 `json:"width"`
 	Name         Field   `json:"name"`
 	Course       Field   `json:"course"`
@@ -28,8 +28,9 @@ type Field struct {
 	FontSize int     `json:"font_size"`
 	Color    string  `json:"color"`
 	Font     string  `json:"font"`
-	High     float64 `json:"high"`
+	Height   float64 `json:"height"`
 	Width    float64 `json:"width"`
+	Text     string  `json:"text"`
 }
 
 type PDFData struct {

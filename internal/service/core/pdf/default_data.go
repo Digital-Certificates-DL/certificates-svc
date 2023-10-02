@@ -1,8 +1,8 @@
 package pdf
 
 var DefaultTemplateNormal = PDF{
-	High:  595,
-	Width: 842,
+	Height: 595,
+	Width:  842,
 	Name: Field{
 		X:        200,
 		Y:        217,
@@ -40,10 +40,10 @@ var DefaultTemplateNormal = PDF{
 		Font:     "regular",
 	},
 	QR: Field{
-		X:     658,
-		Y:     106,
-		High:  114,
-		Width: 114,
+		X:      658,
+		Y:      106,
+		Height: 114,
+		Width:  114,
 	},
 	Exam: Field{
 		X:        300,
@@ -60,8 +60,8 @@ var DefaultTemplateNormal = PDF{
 }
 
 var DefaultTemplateTall = PDF{
-	High:  1190,
-	Width: 1684,
+	Height: 1190,
+	Width:  1684,
 	Name: Field{
 		Y:        434,
 		FontSize: 56,
@@ -77,6 +77,7 @@ var DefaultTemplateTall = PDF{
 		Y:        112,
 		FontSize: 24,
 		Font:     "regular",
+		Text:     "45 hours / 1.5 ECTS Credit",
 	},
 	Points: Field{
 		X:        140,
@@ -99,10 +100,10 @@ var DefaultTemplateTall = PDF{
 		Font:     "regular",
 	},
 	QR: Field{
-		X:     1316,
-		Y:     212,
-		High:  228,
-		Width: 228,
+		X:      1316,
+		Y:      212,
+		Height: 228,
+		Width:  228,
 	},
 	Exam: Field{
 		Y:        600,

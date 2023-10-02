@@ -61,7 +61,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		Log(r).Error("failed to parse table: Errors:", errs)
-		ape.RenderErr(w, problems.BadRequest(err)...)
+		ape.RenderErr(w, problems.Unauthorized())
 		return
 	}
 

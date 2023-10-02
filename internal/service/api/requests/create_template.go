@@ -9,7 +9,7 @@ import (
 	"gitlab.com/tokend/course-certificates/ccp/internal/service/core/pdf"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"image"
-	"image/jpeg"
+	"image/png"
 	"net/http"
 	"strings"
 )
@@ -52,7 +52,7 @@ func base64toJpg(data string) ([]byte, error) {
 	}
 
 	buf := new(bytes.Buffer)
-	if err = jpeg.Encode(buf, m, &jpeg.Options{Quality: 75}); err != nil {
+	if err = png.Encode(buf, m); err != nil {
 		return nil, err
 	}
 
