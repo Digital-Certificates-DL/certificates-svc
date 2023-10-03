@@ -19,6 +19,7 @@ allOf:
           - background_img
           - is_completed
           - template_name
+          - template_short_name
         properties:
           template:
             type: object
@@ -28,5 +29,7 @@ allOf:
           is_completed:
             type: boolean
           template_name:
+            type: string
+          template_short_name:
             type: string
 

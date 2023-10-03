@@ -69,10 +69,11 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = MasterQ(r).TemplateQ().Insert(&data.Template{
-			Template: templateBytes,
-			ImgBytes: []byte(strings.Replace(req.Data.Attributes.BackgroundImg, "data:image/png;base64,", "", 1)),
-			Name:     req.Data.Attributes.TemplateName,
-			UserID:   client.ID,
+			Template:  templateBytes,
+			ImgBytes:  []byte(strings.Replace(req.Data.Attributes.BackgroundImg, "data:image/png;base64,", "", 1)),
+			Name:      req.Data.Attributes.TemplateName,
+			ShortName: req.Data.Attributes.TemplateShortName,
+			UserID:    client.ID,
 		})
 		if err != nil {
 			Log(r).WithError(err).Error("failed to insert template")

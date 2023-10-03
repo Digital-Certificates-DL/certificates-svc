@@ -104,3 +104,10 @@ func (q *TemplateQ) FilterByName(name string) data.TemplateQ {
 
 	return q
 }
+
+func (q *TemplateQ) FilterByShortName(name string) data.TemplateQ {
+	q.sql = q.sql.Where(sq.Eq{nameField: name})
+	q.upd = q.upd.Where(sq.Eq{nameField: name})
+
+	return q
+}

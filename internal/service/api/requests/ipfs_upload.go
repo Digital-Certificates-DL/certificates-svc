@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.com/tokend/course-certificates/ccp/resources"
 	"net/http"
-	"regexp"
 )
 
 type IpfsFileUpload struct {
@@ -32,7 +31,5 @@ func validateIpfsData(request resources.IpfsFileUpload) error {
 			validation.Required),
 		"/attributes/img": validation.Validate(request.Attributes.Img,
 			validation.Required),
-		"/attributes/name": validation.Validate(request.Attributes.Name,
-			validation.Required, validation.Match(regexp.MustCompile("^([A-Za-z])[A-Za-z\\s]+$"))),
 	}).Filter()
 }

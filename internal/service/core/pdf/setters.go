@@ -22,61 +22,66 @@ func NewData(name, course, credits, points, serialNumber, date string, qr []byte
 	}
 }
 
-func (p *PDF) SetName(x, y float64, size int, font string) {
+func (p *PDF) SetName(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Name = fl
 }
 
-func (p *PDF) SetCourse(x, y float64, size int, font string) {
+func (p *PDF) SetCourse(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Course = fl
 }
-func (p *PDF) SetCredits(x, y float64, size int, font string) {
+func (p *PDF) SetCredits(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Credits = fl
 }
 
-func (p *PDF) SetLevel(x, y float64, size int, font string) {
+func (p *PDF) SetLevel(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Level = fl
 }
 
-func (p *PDF) SetPoints(x, y float64, size int, font string) {
+func (p *PDF) SetPoints(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Points = fl
 }
 
-func (p *PDF) SetSerialNumber(x, y float64, size int, font string) {
+func (p *PDF) SetSerialNumber(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
@@ -87,12 +92,13 @@ func (p *PDF) SetSerialNumber(x, y float64, size int, font string) {
 	p.SerialNumber = fl
 }
 
-func (p *PDF) SetDate(x, y float64, size int, font string) {
+func (p *PDF) SetDate(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Date = fl
@@ -109,12 +115,13 @@ func (p *PDF) SetQR(x, y float64, size int, high, width float64) {
 	p.QR = fl
 }
 
-func (p *PDF) SetExam(x, y float64, size int, font string) {
+func (p *PDF) SetExam(x, y float64, size int, font string, color string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
+		Color:    color,
 	}
 
 	p.Exam = fl
