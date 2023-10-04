@@ -126,6 +126,7 @@ func (p *PDF) setLevel(pdf *gopdf.GoPdf, level string) error {
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Level.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Level.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Level.Color, "#", "", 1))
@@ -147,6 +148,7 @@ func (p *PDF) setExam(pdf *gopdf.GoPdf, exam string) error {
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Exam.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Exam.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Exam.Color, "#", "", 1))
@@ -182,6 +184,7 @@ func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string, templateImg string
 	}
 	pdf.SetX(0)
 	pdf.SetY(p.Course.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Course.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Course.Color, "#", "", 1))
@@ -208,6 +211,7 @@ func (p *PDF) setSerialNumber(pdf *gopdf.GoPdf, serialNumber string) error {
 
 	pdf.SetX(p.SerialNumber.X)
 	pdf.SetY(p.SerialNumber.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.SerialNumber.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.SerialNumber.Color, "#", "", 1))
@@ -231,6 +235,7 @@ func (p *PDF) setPoints(pdf *gopdf.GoPdf, points string) error {
 	}
 	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Points.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Points.Color, "#", "", 1))
@@ -253,6 +258,7 @@ func (p *PDF) setDate(pdf *gopdf.GoPdf, date string) error {
 
 	pdf.SetX(p.Date.X)
 	pdf.SetY(p.Date.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Date.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Date.Color, "#", "", 1))
@@ -273,6 +279,7 @@ func (p *PDF) setCredits(pdf *gopdf.GoPdf, credits string) error {
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Credits.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Credits.Color, "#", "", 1))
@@ -294,6 +301,7 @@ func (p *PDF) setName(pdf *gopdf.GoPdf, name string) error {
 	}
 	pdf.SetY(p.Name.Y)
 	pdf.SetX(0)
+	pdf.SetTextColor(255, 255, 255)
 
 	if p.Name.Color != "" {
 		rgb, err := p.hex2RGB(strings.Replace(p.Name.Color, "#", "", 1))
@@ -341,10 +349,10 @@ func (p *PDF) SetTemplateData(template PDF) *PDF {
 	certificate := NewPDF(template.Height, template.Width)
 	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font, template.Name.Color)
 	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font, template.Date.Color)
-	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color)
+	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color, template.Course.Text)
 	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font, template.Credits.Color)
 	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font, template.Exam.Color)
-	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font, template.Level.Color)
+	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font, template.Level.Color, template.Level.Text)
 	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font, template.SerialNumber.Color)
 	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font, template.Points.Color)
 	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.Height, template.QR.Width)
@@ -402,6 +410,12 @@ func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig
 	}
 
 	isLevel, title, level := p.checkLevel(config.titles[templateImg])
+	if title == "" {
+		level = p.Level.Text
+		title = p.Course.Text
+		isLevel = len(level) > 0
+	}
+
 	if err := p.setCourse(pdf, title, templateImg); err != nil {
 		return errors.Wrap(err, "failed to set course")
 	}

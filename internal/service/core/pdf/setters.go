@@ -34,13 +34,14 @@ func (p *PDF) SetName(x, y float64, size int, font string, color string) {
 	p.Name = fl
 }
 
-func (p *PDF) SetCourse(x, y float64, size int, font string, color string) {
+func (p *PDF) SetCourse(x, y float64, size int, font string, color string, text string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
 		Color:    color,
+		Text:     text,
 	}
 
 	p.Course = fl
@@ -57,13 +58,14 @@ func (p *PDF) SetCredits(x, y float64, size int, font string, color string) {
 	p.Credits = fl
 }
 
-func (p *PDF) SetLevel(x, y float64, size int, font string, color string) {
+func (p *PDF) SetLevel(x, y float64, size int, font string, color string, text string) {
 	fl := Field{
 		X:        x,
 		Y:        y,
 		FontSize: size,
 		Font:     font,
 		Color:    color,
+		Text:     text,
 	}
 
 	p.Level = fl

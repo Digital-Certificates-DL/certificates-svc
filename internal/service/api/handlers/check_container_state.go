@@ -21,7 +21,7 @@ func CheckContainerState(w http.ResponseWriter, r *http.Request) {
 	container := PdfCreator(r).CheckContainerState(containerID)
 	if container == nil {
 		Log(r).WithError(err).Error("user not found")
-		w.WriteHeader(http.StatusProcessing)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	Log(r).Debug("container on  handler: ", container)
