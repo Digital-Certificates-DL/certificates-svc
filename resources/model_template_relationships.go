@@ -5,5 +5,5 @@
 package resources
 
 type TemplateRelationships struct {
-	User string `json:"user"`
+	User Relation `json:"user"`
 }
