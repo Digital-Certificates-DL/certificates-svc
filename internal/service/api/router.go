@@ -36,7 +36,6 @@ func (s *service) router(cfg config.Config) chi.Router {
 		r.Route("/certificate", func(r chi.Router) {
 			r.Post("/", handlers.PrepareCertificate)
 			r.Post("/bitcoin", handlers.UpdateCertificate)
-			r.Post("/template", handlers.CreateTemplate)
 			r.Put("/", handlers.UpdateCertificate)
 			r.Post("/ipfs", handlers.UploadFileToIpfs)
 			r.Get("/{container}", handlers.CheckContainerState)
