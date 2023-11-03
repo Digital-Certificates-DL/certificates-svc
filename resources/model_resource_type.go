@@ -9,6 +9,7 @@ type ResourceType string
 // List of ResourceType
 const (
 	CONTAINER           ResourceType = "container"
+	EXPIRED_TOKEN       ResourceType = "expired_token"
 	IPFS_FILE           ResourceType = "ipfs_file"
 	IPFS_FILE_UPLOAD    ResourceType = "ipfs_file_upload"
 	LINK                ResourceType = "link"

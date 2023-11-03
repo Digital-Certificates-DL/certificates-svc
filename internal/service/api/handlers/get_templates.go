@@ -41,9 +41,9 @@ func GetTemplates(w http.ResponseWriter, r *http.Request) {
 }
 
 func newTemlateListResp(tmps []data.Template) resources.TemplateListResponse {
-	var reponseTmpList []resources.Template
+	responseTmpList := make([]resources.Template, 0)
 	for _, tmp := range tmps {
-		reponseTmpList = append(reponseTmpList, resources.Template{
+		responseTmpList = append(responseTmpList, resources.Template{
 			Attributes: resources.TemplateAttributes{
 				BackgroundImg: string(tmp.ImgBytes),
 				TemplateName:  tmp.Name,
@@ -51,6 +51,6 @@ func newTemlateListResp(tmps []data.Template) resources.TemplateListResponse {
 		})
 	}
 	return resources.TemplateListResponse{
-		Data: reponseTmpList,
+		Data: responseTmpList,
 	}
 }

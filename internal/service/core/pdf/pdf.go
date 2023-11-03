@@ -2,6 +2,7 @@ package pdf
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/signintech/gopdf"
 	"gitlab.com/distributed_lab/logan/v3/errors"
@@ -9,12 +10,13 @@ import (
 	"image"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
 func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, backgroundImg []byte, userID int64, abs string) ([]byte, string, []byte, error) {
 	pdf := new(gopdf.GoPdf)
-	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.High}})
+	pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: p.Width, H: p.Height}})
 	pdf.AddPage()
 	pdf.SetTextColor(255, 255, 255)
 
@@ -24,6 +26,9 @@ func (p *PDF) Prepare(data PDFData, config *PDFConfig, masterQ data.MasterQ, bac
 
 	templateImg := config.templates[data.Course]
 
+	if templateImg == "" {
+		templateImg = data.Course
+	}
 	if backgroundImg == nil {
 		if err := p.initBackground(pdf, masterQ.TemplateQ(), templateImg, abs, userID); err != nil {
 			return nil, "", nil, errors.Wrap(err, "failed to init background")
@@ -94,7 +99,7 @@ func (p *PDF) setBackground(pdf *gopdf.GoPdf, image []byte) error {
 		return errors.Wrap(err, "failed to prepare background")
 	}
 
-	err = pdf.ImageByHolder(backgroundImgHolder, 0, 0, &gopdf.Rect{W: p.Width, H: p.High})
+	err = pdf.ImageByHolder(backgroundImgHolder, 0, 0, &gopdf.Rect{W: p.Width, H: p.Height})
 	if err != nil {
 		return errors.Wrap(err, "failed to set background")
 	}
@@ -119,9 +124,28 @@ func (p *PDF) setLevel(pdf *gopdf.GoPdf, level string) error {
 	if err := pdf.SetFont("italic", "", p.Level.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Level")
 	}
-	pdf.SetX(0)
 	pdf.SetY(p.Level.Y)
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, level, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	pdf.SetTextColor(255, 255, 255)
+
+	if p.Level.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Level.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if p.Level.XCenter {
+		pdf.SetX(0)
+
+		if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, level, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell Level")
+		}
+
+		return nil
+	}
+
+	pdf.SetX(p.Level.X)
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, level); err != nil {
 		return errors.Wrap(err, "failed to cell Level")
 	}
 
@@ -132,10 +156,27 @@ func (p *PDF) setExam(pdf *gopdf.GoPdf, exam string) error {
 	if err := pdf.SetFont("italic", "", p.Exam.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Exam")
 	}
-	pdf.SetX(0)
 	pdf.SetY(p.Exam.Y)
+	pdf.SetTextColor(255, 255, 255)
 
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, exam, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	if p.Exam.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Exam.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if p.Exam.XCenter {
+		pdf.SetX(0)
+		if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, exam, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell Exam")
+		}
+
+		return nil
+	}
+
+	pdf.SetX(p.Exam.X)
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, exam); err != nil {
 		return errors.Wrap(err, "failed to cell Exam")
 	}
 
@@ -148,7 +189,7 @@ func (p *PDF) setQR(pdf *gopdf.GoPdf, qr []byte) error {
 		return errors.Wrap(err, "failed to convert bytes to image QR")
 	}
 
-	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.High, H: p.QR.High})
+	err = pdf.ImageFrom(img, p.QR.X, p.QR.Y, &gopdf.Rect{W: p.QR.Width, H: p.QR.Height})
 	if err != nil {
 		return errors.Wrap(err, "failed to set image QR")
 	}
@@ -156,14 +197,35 @@ func (p *PDF) setQR(pdf *gopdf.GoPdf, qr []byte) error {
 	return nil
 }
 
-func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string) error {
+func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string, templateImg string) error {
 	if err := pdf.SetFont("italic", "", p.Course.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Course")
 	}
-	pdf.SetX(0)
-	pdf.SetY(p.Course.Y)
 
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, courseTitle, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	pdf.SetY(p.Course.Y)
+	pdf.SetTextColor(255, 255, 255)
+
+	if p.Course.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Course.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if courseTitle == "" {
+		courseTitle = templateImg
+	}
+
+	if p.Course.XCenter {
+		pdf.SetX(0)
+		if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, courseTitle, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell Course")
+		}
+		return nil
+	}
+
+	pdf.SetX(p.Course.X)
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, courseTitle); err != nil {
 		return errors.Wrap(err, "failed to cell Course")
 	}
 
@@ -175,8 +237,27 @@ func (p *PDF) setSerialNumber(pdf *gopdf.GoPdf, serialNumber string) error {
 		return errors.Wrap(err, "failed to set font SerialNumber")
 	}
 
-	pdf.SetX(p.SerialNumber.X)
 	pdf.SetY(p.SerialNumber.Y)
+	pdf.SetTextColor(255, 255, 255)
+
+	if p.SerialNumber.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.SerialNumber.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if p.SerialNumber.XCenter {
+		pdf.SetX(0)
+
+		if err := pdf.CellWithOption(&gopdf.Rect{W: 300, H: 300}, serialNumber, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell SerialNumber ")
+		}
+		return nil
+	}
+
+	pdf.SetX(p.SerialNumber.X)
+
 	if err := pdf.CellWithOption(&gopdf.Rect{W: 300, H: 300}, serialNumber, gopdf.CellOption{Align: gopdf.Right}); err != nil {
 		return errors.Wrap(err, "failed to cell SerialNumber ")
 	}
@@ -190,9 +271,28 @@ func (p *PDF) setPoints(pdf *gopdf.GoPdf, points string) error {
 		return errors.Wrap(err, "failed to set font points")
 
 	}
-	pdf.SetX(p.Points.X)
 	pdf.SetY(p.Points.Y)
-	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf("Count of points: %s", points)); err != nil {
+	pdf.SetTextColor(255, 255, 255)
+
+	if p.Points.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Points.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if p.Points.XCenter {
+		pdf.SetX(0)
+
+		if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, fmt.Sprintf("Count of points: %s", points), gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell points")
+		}
+
+		return nil
+	}
+
+	pdf.SetX(p.Points.X)
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, fmt.Sprintf("Count of points: %s", points)); err != nil {
 		return errors.Wrap(err, "failed to cell points")
 	}
 
@@ -204,8 +304,26 @@ func (p *PDF) setDate(pdf *gopdf.GoPdf, date string) error {
 		return errors.Wrap(err, "failed to set font Date")
 	}
 
-	pdf.SetX(p.Date.X)
 	pdf.SetY(p.Date.Y)
+	pdf.SetTextColor(255, 255, 255)
+
+	if p.Date.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Date.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if p.Date.XCenter {
+		pdf.SetX(0)
+
+		if err := pdf.CellWithOption(&gopdf.Rect{W: 300, H: 300}, fmt.Sprintf("Issued on: %s", date), gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell Date")
+		}
+		return nil
+	}
+	pdf.SetX(p.Date.X)
+
 	if err := pdf.CellWithOption(&gopdf.Rect{W: 300, H: 300}, fmt.Sprintf("Issued on: %s", date), gopdf.CellOption{Align: gopdf.Right}); err != nil {
 		return errors.Wrap(err, "failed to cell Date")
 	}
@@ -218,8 +336,16 @@ func (p *PDF) setCredits(pdf *gopdf.GoPdf, credits string) error {
 	}
 	pdf.SetX(p.Credits.X)
 	pdf.SetY(p.Credits.Y)
+	pdf.SetTextColor(255, 255, 255)
 
-	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.High}, fmt.Sprintf(credits)); err != nil {
+	if p.Credits.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Credits.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, fmt.Sprintf(credits)); err != nil {
 		return errors.Wrap(err, "failed to cell credits")
 	}
 
@@ -231,12 +357,31 @@ func (p *PDF) setName(pdf *gopdf.GoPdf, name string) error {
 		return errors.Wrap(err, "failed to set font name")
 	}
 	pdf.SetY(p.Name.Y)
-	pdf.SetX(0)
-	if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.High}, name, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+	pdf.SetTextColor(255, 255, 255)
+
+	if p.Name.Color != "" {
+		rgb, err := p.hex2RGB(strings.Replace(p.Name.Color, "#", "", 1))
+		if err == nil {
+			pdf.SetTextColor(rgb.Red, rgb.Green, rgb.Blue)
+		}
+	}
+
+	if p.Name.XCenter {
+		pdf.SetX(0)
+
+		if err := pdf.CellWithOption(&gopdf.Rect{W: p.Width, H: p.Height}, name, gopdf.CellOption{Align: gopdf.Center}); err != nil {
+			return errors.Wrap(err, "failed to cell name")
+		}
+		return nil
+	}
+
+	pdf.SetX(p.Name.X)
+	if err := pdf.Cell(&gopdf.Rect{W: p.Width, H: p.Height}, name); err != nil {
 		return errors.Wrap(err, "failed to cell name")
 	}
 
 	return nil
+
 }
 
 func (p *PDF) initBackground(pdf *gopdf.GoPdf, templateQ data.TemplateQ, templateImg, abs string, userID int64) error {
@@ -268,18 +413,46 @@ func (p *PDF) prepareName(name, course string) string {
 }
 
 func (p *PDF) SetTemplateData(template PDF) *PDF {
-	certificate := NewPDF(template.High, template.Width)
-	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font)
-	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font)
-	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font)
-	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font)
-	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font)
-	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font)
-	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font)
-	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font)
-	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.High, template.Width)
+	certificate := NewPDF(template.Height, template.Width)
+	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font, template.Name.Color, template.Name.XCenter)
+	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font, template.Date.Color, template.Date.XCenter)
+	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color, template.Course.Text, template.Course.XCenter)
+	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font, template.Credits.Color, template.Credits.XCenter)
+	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font, template.Exam.Color, template.Exam.XCenter)
+	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font, template.Level.Color, template.Level.Text, template.Level.XCenter)
+	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font, template.SerialNumber.Color, template.SerialNumber.XCenter)
+	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font, template.Points.Color, template.Points.XCenter)
+	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.Height, template.QR.Width)
 
 	return certificate
+}
+
+func (p *PDF) InitTemplate(masterQ data.MasterQ, templateName string, userID int64) (*PDF, error) {
+	template, err := masterQ.TemplateQ().FilterByName(templateName).FilterByUser(userID).Get()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get template data")
+	}
+	if template == nil || template.Template == nil {
+		return &DefaultTemplateTall, nil
+	}
+
+	pdf, err := p.templateDecoder(template.Template)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode template")
+	}
+
+	return pdf, nil
+
+}
+
+func (p *PDF) templateDecoder(templateBytes []byte) (*PDF, error) {
+	pdf := new(PDF)
+	err := json.Unmarshal(templateBytes, pdf)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to decode template")
+	}
+
+	return pdf, nil
 }
 
 func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig, templateImg string) error {
@@ -304,7 +477,13 @@ func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig
 	}
 
 	isLevel, title, level := p.checkLevel(config.titles[templateImg])
-	if err := p.setCourse(pdf, title); err != nil {
+	if title == "" {
+		level = p.Level.Text
+		title = p.Course.Text
+		isLevel = len(level) > 0
+	}
+
+	if err := p.setCourse(pdf, title, templateImg); err != nil {
 		return errors.Wrap(err, "failed to set course")
 	}
 
@@ -325,4 +504,27 @@ func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig
 	}
 
 	return nil
+}
+
+type RGB struct {
+	Red   uint8
+	Green uint8
+	Blue  uint8
+}
+
+func (p *PDF) hex2RGB(hex string) (RGB, error) {
+	var rgb RGB
+	values, err := strconv.ParseUint(hex, 16, 32)
+
+	if err != nil {
+		return RGB{}, err
+	}
+
+	rgb = RGB{
+		Red:   uint8(values >> 16),
+		Green: uint8((values >> 8) & 0xFF),
+		Blue:  uint8(values & 0xFF),
+	}
+
+	return rgb, nil
 }

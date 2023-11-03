@@ -11,7 +11,8 @@ CREATE TABLE template (
        user_id INTEGER REFERENCES users(id),
        template TEXT,
        img_bytes text,
-       name TEXT
+       name TEXT,
+       short_name TEXT
 );
 
 -- +migrate Down

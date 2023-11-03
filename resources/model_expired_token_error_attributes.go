@@ -4,6 +4,6 @@
 
 package resources
 
-type TemplateRelationships struct {
-	User Relation `json:"user"`
+type ExpiredTokenErrorAttributes struct {
+	Error bool `json:"error"`
 }

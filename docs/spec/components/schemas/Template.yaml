@@ -11,7 +11,8 @@ allOf:
           - user
         properties:
           user:
-            type: string
+            type: object
+            $ref: '#/components/schemas/UserKey'
       attributes:
         type: object
         required:
@@ -19,6 +20,7 @@ allOf:
           - background_img
           - is_completed
           - template_name
+          - template_short_name
         properties:
           template:
             type: object
@@ -28,5 +30,7 @@ allOf:
           is_completed:
             type: boolean
           template_name:
+            type: string
+          template_short_name:
             type: string
 
