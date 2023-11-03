@@ -47,11 +47,11 @@ func (g *Google) GetFiles() ([]*drive.File, error) {
 	if len(r.Files) == 0 {
 
 		return nil, errors.New("No files found.")
-	} else {
-		for _, i := range r.Files {
-			g.cfg.Log().Info("%s (%s)\n", i.Name, i.Id)
-		}
 	}
+	for _, i := range r.Files {
+		g.cfg.Log().Info("%s (%s)\n", i.Name, i.Id)
+	}
+
 	return r.Files, nil
 }
 

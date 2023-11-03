@@ -414,14 +414,14 @@ func (p *PDF) prepareName(name, course string) string {
 
 func (p *PDF) SetTemplateData(template PDF) *PDF {
 	certificate := NewPDF(template.Height, template.Width)
-	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font, template.Name.Color)
-	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font, template.Date.Color)
-	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color, template.Course.Text)
-	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font, template.Credits.Color)
-	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font, template.Exam.Color)
-	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font, template.Level.Color, template.Level.Text)
-	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font, template.SerialNumber.Color)
-	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font, template.Points.Color)
+	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font, template.Name.Color, template.Name.XCenter)
+	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font, template.Date.Color, template.Date.XCenter)
+	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color, template.Course.Text, template.Course.XCenter)
+	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font, template.Credits.Color, template.Credits.XCenter)
+	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font, template.Exam.Color, template.Exam.XCenter)
+	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font, template.Level.Color, template.Level.Text, template.Level.XCenter)
+	certificate.SetSerialNumber(template.SerialNumber.X, template.SerialNumber.Y, template.SerialNumber.FontSize, template.SerialNumber.Font, template.SerialNumber.Color, template.SerialNumber.XCenter)
+	certificate.SetPoints(template.Points.X, template.Points.Y, template.Points.FontSize, template.Points.Font, template.Points.Color, template.Points.XCenter)
 	certificate.SetQR(template.QR.X, template.QR.Y, template.QR.FontSize, template.QR.Height, template.QR.Width)
 
 	return certificate
