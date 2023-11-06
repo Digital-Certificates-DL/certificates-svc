@@ -21,16 +21,18 @@ type PDF struct {
 }
 
 type Field struct {
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
-	XCenter  bool    `json:"x_center"`
-	YCenter  bool    `json:"y_center"`
-	FontSize int     `json:"font_size"`
-	Color    string  `json:"color"`
-	Font     string  `json:"font"`
-	Height   float64 `json:"height"`
-	Width    float64 `json:"width"`
-	Text     string  `json:"text"`
+	X            float64 `json:"x"`
+	Y            float64 `json:"y"`
+	XCenter      bool    `json:"x_center"`
+	YCenter      bool    `json:"y_center"`
+	FontSize     int     `json:"font_size"`
+	Color        string  `json:"color"`
+	Font         string  `json:"font"`
+	Height       float64 `json:"height"`
+	Width        float64 `json:"width"`
+	Text         string  `json:"text"`
+	IsBoldText   bool    `json:"is_bold_text"`
+	IsItalicText bool    `json:"is_italic_text"`
 }
 
 type PDFData struct {
