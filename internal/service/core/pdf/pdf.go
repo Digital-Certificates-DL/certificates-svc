@@ -120,8 +120,22 @@ func (p *PDF) setFonts(pdf *gopdf.GoPdf, abs string) error {
 	return nil
 }
 
+func (p *PDF) preparedFontStyle(isItalic bool, isBold bool) string {
+	result := ""
+
+	if isItalic {
+		result += "I"
+	}
+
+	if isBold {
+		result += "B"
+	}
+
+	return result
+}
+
 func (p *PDF) setLevel(pdf *gopdf.GoPdf, level string) error {
-	if err := pdf.SetFont("italic", "", p.Level.FontSize); err != nil {
+	if err := pdf.SetFont("italic", p.preparedFontStyle(p.Level.IsItalicText, p.Level.IsBoldText), p.Level.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Level")
 	}
 	pdf.SetY(p.Level.Y)
@@ -153,7 +167,7 @@ func (p *PDF) setLevel(pdf *gopdf.GoPdf, level string) error {
 }
 
 func (p *PDF) setExam(pdf *gopdf.GoPdf, exam string) error {
-	if err := pdf.SetFont("italic", "", p.Exam.FontSize); err != nil {
+	if err := pdf.SetFont("regular", p.preparedFontStyle(p.Exam.IsItalicText, p.Exam.IsBoldText), p.Exam.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Exam")
 	}
 	pdf.SetY(p.Exam.Y)
@@ -198,7 +212,7 @@ func (p *PDF) setQR(pdf *gopdf.GoPdf, qr []byte) error {
 }
 
 func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string, templateImg string) error {
-	if err := pdf.SetFont("italic", "", p.Course.FontSize); err != nil {
+	if err := pdf.SetFont("italic", p.preparedFontStyle(p.Course.IsItalicText, p.Course.IsBoldText), p.Course.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Course")
 	}
 
@@ -233,7 +247,7 @@ func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string, templateImg string
 }
 
 func (p *PDF) setSerialNumber(pdf *gopdf.GoPdf, serialNumber string) error {
-	if err := pdf.SetFont("italic", "", p.SerialNumber.FontSize); err != nil {
+	if err := pdf.SetFont("italic", p.preparedFontStyle(p.SerialNumber.IsItalicText, p.SerialNumber.IsBoldText), p.SerialNumber.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font SerialNumber")
 	}
 
@@ -267,7 +281,7 @@ func (p *PDF) setSerialNumber(pdf *gopdf.GoPdf, serialNumber string) error {
 }
 
 func (p *PDF) setPoints(pdf *gopdf.GoPdf, points string) error {
-	if err := pdf.SetFont("italic", "", p.Points.FontSize); err != nil {
+	if err := pdf.SetFont("italic", p.preparedFontStyle(p.Points.IsItalicText, p.Points.IsBoldText), p.Points.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font points")
 
 	}
@@ -300,7 +314,7 @@ func (p *PDF) setPoints(pdf *gopdf.GoPdf, points string) error {
 }
 
 func (p *PDF) setDate(pdf *gopdf.GoPdf, date string) error {
-	if err := pdf.SetFont("italic", "", p.Date.FontSize); err != nil {
+	if err := pdf.SetFont("italic", p.preparedFontStyle(p.Date.IsItalicText, p.Date.IsBoldText), p.Date.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font Date")
 	}
 
@@ -331,7 +345,7 @@ func (p *PDF) setDate(pdf *gopdf.GoPdf, date string) error {
 }
 
 func (p *PDF) setCredits(pdf *gopdf.GoPdf, credits string) error {
-	if err := pdf.SetFont("italic", "", p.Credits.FontSize); err != nil {
+	if err := pdf.SetFont("italic", p.preparedFontStyle(p.Credits.IsItalicText, p.Credits.IsBoldText), p.Credits.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font credits")
 	}
 	pdf.SetX(p.Credits.X)
@@ -353,7 +367,7 @@ func (p *PDF) setCredits(pdf *gopdf.GoPdf, credits string) error {
 }
 
 func (p *PDF) setName(pdf *gopdf.GoPdf, name string) error {
-	if err := pdf.SetFont("regular", "", p.Name.FontSize); err != nil {
+	if err := pdf.SetFont("regular", p.preparedFontStyle(p.Name.IsItalicText, p.Name.IsBoldText), p.Name.FontSize); err != nil {
 		return errors.Wrap(err, "failed to set font name")
 	}
 	pdf.SetY(p.Name.Y)
