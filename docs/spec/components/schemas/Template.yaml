@@ -21,7 +21,8 @@ allOf:
           - is_completed
           - template_name
           - template_short_name
-          - template-id
+          - template_id
+          - is_default_template
         properties:
           template:
             type: object
@@ -36,5 +37,7 @@ allOf:
             type: string
           template_id:
             type: int
-            format:  int64
+            format: int64
+          is_default_template:
+            type: boolean
 
