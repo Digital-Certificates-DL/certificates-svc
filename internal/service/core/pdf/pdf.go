@@ -446,7 +446,7 @@ func (p *PDF) InitTemplate(masterQ data.MasterQ, templateName string, userID int
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get template data")
 	}
-	if template == nil || template.Template == nil {
+	if template == nil || template.Template == nil || template.IsDefaultTemplate {
 		return &DefaultTemplateTall, nil
 	}
 

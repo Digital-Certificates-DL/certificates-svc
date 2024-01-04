@@ -53,6 +53,7 @@ func (c *Container) Generate() error {
 		files = append(files, google.FilesBytes{File: file, Name: name, ID: user.ID, Type: "image/svg+xml"})
 
 		pdf := PDF{}
+
 		certificateTemplate, err := pdf.InitTemplate(c.masterQ, user.CourseTitle, c.owner.ID)
 		if err != nil {
 			return errors.Wrap(err, "failed to get template")

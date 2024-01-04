@@ -7,12 +7,14 @@ var DefaultTemplateNormal = PDF{
 		X:        200,
 		Y:        217,
 		FontSize: 28,
+		XCenter:  true,
 		Font:     "semibold",
 	},
 	Course: Field{
 		X:        61,
 		Y:        259,
 		FontSize: 14,
+		XCenter:  true,
 		Font:     "semibold",
 	},
 	Credits: Field{
@@ -55,6 +57,7 @@ var DefaultTemplateNormal = PDF{
 		X:        300,
 		Y:        277,
 		FontSize: 14,
+		XCenter:  true,
 		Font:     "semibold",
 	},
 }
@@ -65,11 +68,13 @@ var DefaultTemplateTall = PDF{
 	Name: Field{
 		Y:        434,
 		FontSize: 56,
+		XCenter:  true,
 		Font:     "semibold",
 	},
 	Course: Field{
 		Y:        518,
 		FontSize: 28,
+		XCenter:  true,
 		Font:     "semibold",
 	},
 	Credits: Field{ //todo get from front and save to db
@@ -108,18 +113,21 @@ var DefaultTemplateTall = PDF{
 	Exam: Field{
 		Y:        600,
 		FontSize: 30,
+		XCenter:  true,
 		Font:     "italic",
 	},
 	Level: Field{
 		Y:        554,
 		FontSize: 28,
+		XCenter:  true,
 		Font:     "semibold",
 	},
 }
 
 var DefaultData = PDFData{
-	Name:         "Test Name",
-	Course:       "Blockchain and Distributed Systems",
+	Name:   "Test Name",
+	Course: "Blockchain and Distributed Systems",
+
 	Credits:      " 99",
 	Points:       "100",
 	SerialNumber: "694d0f5a7afe6fbc99cb",

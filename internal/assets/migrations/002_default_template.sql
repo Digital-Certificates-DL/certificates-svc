@@ -1,5 +1,9 @@
 -- +migrate Up
+ALTER TABLE template DROP COLUMN is_default_template;
 
-ALTER TABLE template ADD is_default_template INTEGER;
+ALTER TABLE template ADD is_default_template BOOLEAN  DEFAULT False;
 
-ALTER TABLE template ADD CONSTRAINT ck_testbool_ischk CHECK (is_default_template IN (1,0));
+
+-- +migrate Down
+
+ALTER TABLE template DROP COLUMN is_default_template;

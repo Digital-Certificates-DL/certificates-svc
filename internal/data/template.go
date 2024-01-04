@@ -18,7 +18,7 @@ type Template struct {
 	UserID            int64  `db:"user_id" structs:"user_id"`
 	Name              string `db:"name" structs:"name"`
 	ShortName         string `db:"short_name" structs:"short_name"`
-	IsDefaultTemplate bool   `db:"is_default_template" structs:"is_default_template"`
 	Template          []byte `db:"template" structs:"template"`
 	ImgBytes          []byte `db:"img_bytes" structs:"img_bytes"` //todo  make better
+	IsDefaultTemplate bool   `db:"is_default_template" structs:"is_default_template"`
 }
