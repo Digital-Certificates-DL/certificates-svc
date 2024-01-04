@@ -43,6 +43,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 			Name:      req.Data.Attributes.TemplateName,
 			ShortName: req.Data.Attributes.TemplateShortName,
 			UserID:    client.ID,
+			//IsDefaultTemplate:  TODO update
 		})
 		if err != nil {
 			Log(r).WithError(err).Error("failed to insert template")
