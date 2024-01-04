@@ -21,6 +21,7 @@ func NewTemplateQ(db *pgdb.DB) data.TemplateQ {
 		db:  db,
 		sql: sq.Select("b.*").From(fmt.Sprintf("%s as b", templateTableName)),
 		upd: sq.Update(templateTableName),
+		dlt: sq.Delete(templateTableName),
 	}
 }
 
@@ -28,6 +29,7 @@ type TemplateQ struct {
 	db  *pgdb.DB
 	sql sq.SelectBuilder
 	upd sq.UpdateBuilder
+	dlt sq.DeleteBuilder
 }
 
 func (q *TemplateQ) New() data.TemplateQ {
@@ -79,6 +81,15 @@ func (q *TemplateQ) Insert(value *data.Template) error {
 	return nil
 }
 
+func (q *TemplateQ) Delete() error {
+	err := q.db.Exec(q.dlt)
+	if err != nil {
+		return errors.Wrap(err, "failed to delete template")
+	}
+
+	return nil
+}
+
 func (q *TemplateQ) Page(pageParams pgdb.OffsetPageParams) data.TemplateQ {
 	q.sql = pageParams.ApplyTo(q.sql, idField)
 
@@ -87,6 +98,8 @@ func (q *TemplateQ) Page(pageParams pgdb.OffsetPageParams) data.TemplateQ {
 
 func (q *TemplateQ) FilterByUser(id int64) data.TemplateQ {
 	q.sql = q.sql.Where(sq.Eq{userIDField: id})
+	q.upd = q.upd.Where(sq.Eq{userIDField: id})
+	q.dlt = q.dlt.Where(sq.Eq{userIDField: id})
 
 	return q
 }
@@ -94,6 +107,7 @@ func (q *TemplateQ) FilterByUser(id int64) data.TemplateQ {
 func (q *TemplateQ) FilterByID(id int64) data.TemplateQ {
 	q.sql = q.sql.Where(sq.Eq{idField: id})
 	q.upd = q.upd.Where(sq.Eq{idField: id})
+	q.dlt = q.dlt.Where(sq.Eq{idField: id})
 
 	return q
 }
@@ -101,6 +115,7 @@ func (q *TemplateQ) FilterByID(id int64) data.TemplateQ {
 func (q *TemplateQ) FilterByName(name string) data.TemplateQ {
 	q.sql = q.sql.Where(sq.Eq{nameField: name})
 	q.upd = q.upd.Where(sq.Eq{nameField: name})
+	q.dlt = q.dlt.Where(sq.Eq{nameField: name})
 
 	return q
 }
@@ -108,6 +123,7 @@ func (q *TemplateQ) FilterByName(name string) data.TemplateQ {
 func (q *TemplateQ) FilterByShortName(name string) data.TemplateQ {
 	q.sql = q.sql.Where(sq.Eq{nameField: name})
 	q.upd = q.upd.Where(sq.Eq{nameField: name})
+	q.dlt = q.dlt.Where(sq.Eq{nameField: name})
 
 	return q
 }

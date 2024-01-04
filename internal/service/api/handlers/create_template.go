@@ -17,6 +17,7 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.BadRequest(err)...)
 		return
 	}
+
 	client, err := MasterQ(r).ClientQ().FilterByName(req.Data.Relationships.User.Data.ID).Get()
 	if err != nil {
 		Log(r).WithError(err).Error("failed to get client")
@@ -38,11 +39,12 @@ func CreateTemplate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = MasterQ(r).TemplateQ().Insert(&data.Template{
-			Template:  templateBytes,
-			ImgBytes:  []byte(strings.Replace(req.Data.Attributes.BackgroundImg, "data:image/png;base64,", "", 1)),
-			Name:      req.Data.Attributes.TemplateName,
-			ShortName: req.Data.Attributes.TemplateShortName,
-			UserID:    client.ID,
+			Template:          templateBytes,
+			ImgBytes:          []byte(strings.Replace(req.Data.Attributes.BackgroundImg, "data:image/png;base64,", "", 1)),
+			Name:              req.Data.Attributes.TemplateName,
+			ShortName:         req.Data.Attributes.TemplateShortName,
+			UserID:            client.ID,
+			IsDefaultTemplate: req.Data.Attributes.IsDefaultTemplate,
 		})
 		if err != nil {
 			Log(r).WithError(err).Error("failed to insert template")

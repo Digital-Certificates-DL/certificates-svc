@@ -36,6 +36,7 @@ func GetTemplates(w http.ResponseWriter, r *http.Request) {
 		ape.RenderErr(w, problems.InternalError())
 		return
 	}
+
 	ape.Render(w, newTemlateListResp(tmps))
 
 }
@@ -47,6 +48,7 @@ func newTemlateListResp(tmps []data.Template) resources.TemplateListResponse {
 			Attributes: resources.TemplateAttributes{
 				BackgroundImg: string(tmp.ImgBytes),
 				TemplateName:  tmp.Name,
+				TemplateId:    tmp.ID,
 			},
 		})
 	}
