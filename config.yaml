@@ -66,10 +66,10 @@ titles:
 exams:
   list:
     "": "Exam passed"
-    "Basic level": "Basic level"
+    "basic level": "Basic level"
     "graduated with honors": "Exam passed with honors"
-    "Listener only": "Listener only. Exam not passed"
-
+    "listener only": "Listener only. Exam not passed"
+    "without exam": ""
 
 
 cop:
