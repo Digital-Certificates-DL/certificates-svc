@@ -227,7 +227,7 @@ func (p *PDF) setCourse(pdf *gopdf.GoPdf, courseTitle string, templateImg string
 	}
 
 	if courseTitle == "" {
-		courseTitle = templateImg
+		courseTitle = fmt.Sprintf("has successfully completed course \"%s\"", templateImg)
 	}
 
 	if p.Course.XCenter {
@@ -430,7 +430,7 @@ func (p *PDF) SetTemplateData(template PDF) *PDF {
 	certificate := NewPDF(template.Height, template.Width)
 	certificate.SetName(template.Name.X, template.Name.Y, template.Name.FontSize, template.Name.Font, template.Name.Color, template.Name.XCenter)
 	certificate.SetDate(template.Date.X, template.Date.Y, template.Date.FontSize, template.Date.Font, template.Date.Color, template.Date.XCenter)
-	//certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color, template.Course.Text, template.Course.XCenter)
+	certificate.SetCourse(template.Course.X, template.Course.Y, template.Course.FontSize, template.Course.Font, template.Course.Color, template.Course.Text, template.Course.XCenter)
 	certificate.SetCredits(template.Credits.X, template.Credits.Y, template.Credits.FontSize, template.Credits.Font, template.Credits.Color, template.Credits.XCenter)
 	certificate.SetExam(template.Exam.X, template.Exam.Y, template.Exam.FontSize, template.Exam.Font, template.Exam.Color, template.Exam.XCenter)
 	certificate.SetLevel(template.Level.X, template.Level.Y, template.Level.FontSize, template.Level.Font, template.Level.Color, template.Level.Text, template.Level.XCenter)
@@ -497,9 +497,9 @@ func (p *PDF) CellAllPdfFields(pdf *gopdf.GoPdf, data PDFData, config *PDFConfig
 		isLevel = len(level) > 0
 	}
 
-	//if err := p.setCourse(pdf, title, templateImg); err != nil {
-	//	return errors.Wrap(err, "failed to set course")
-	//}
+	if err := p.setCourse(pdf, title, templateImg); err != nil {
+		return errors.Wrap(err, "failed to set course")
+	}
 
 	if data.QR != nil {
 		if err := p.setQR(pdf, data.QR); err != nil {
